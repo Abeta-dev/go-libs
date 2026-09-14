@@ -1,0 +1,31 @@
+name: Feature Request
+description: Propose a new feature, middleware, or resilience primitive for go-libs
+title: "feat: <brief description>"
+labels: ["enhancement", "proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an enhancement to go-libs. Please provide architectural context and use cases.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement / Use Case
+      description: What challenge or architectural pattern are you addressing?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution / API Design
+      description: Describe the proposed API signature, interface, or behavior.
+      render: go
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other approaches or workarounds did you consider?
+    validations:
+      required: false

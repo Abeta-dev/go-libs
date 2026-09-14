@@ -1,0 +1,58 @@
+services:
+  microservice:
+    build:
+      context: ..
+      dockerfile: examples/microservice/Dockerfile
+    container_name: microservice-app
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=:8080
+      - WORKER_POOL_SIZE=10
+      - WORKER_QUEUE_CAP=100
+      - SHUTDOWN_TIMEOUT=5s
+    restart: unless-stopped
+    networks:
+      - observability-net
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: microservice-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    restart: unless-stopped
+    depends_on:
+      - microservice
+    networks:
+      - observability-net
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: microservice-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    networks:
+      - observability-net
+
+networks:
+  observability-net:
+    driver: bridge

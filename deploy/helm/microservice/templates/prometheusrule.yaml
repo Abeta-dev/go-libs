@@ -1,0 +1,47 @@
+{{- if .Values.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "microservice.fullname" . }}
+  {{- if .Values.prometheusRule.namespace }}
+  namespace: {{ .Values.prometheusRule.namespace }}
+  {{- end }}
+  labels:
+    {{- include "microservice.labels" . | nindent 4 }}
+    {{- with .Values.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: {{ include "microservice.fullname" . }}-alerts
+      rules:
+        - alert: MicroserviceCircuitBreakerOpen
+          expr: app_circuit_breaker_state == 2
+          for: 1m
+          labels:
+            severity: critical
+            app: {{ include "microservice.name" . }}
+          annotations:
+            summary: "Microservice circuit breaker is TRIPPED"
+            description: "The outbound circuit breaker on pod {{ $labels.pod }} has tripped to Open state. Downstream dependency is failing."
+
+        - alert: MicroserviceWorkerPoolBacklog
+          expr: app_workerpool_queue_size > {{ .Values.prometheusRule.workerPoolBacklogThreshold | default 80 }}
+          for: 2m
+          labels:
+            severity: warning
+            app: {{ include "microservice.name" . }}
+          annotations:
+            summary: "Microservice worker pool queue backlog detected"
+            description: "Worker pool queue size on pod {{ $labels.pod }} is above threshold. Tasks are queuing."
+
+        - alert: MicroserviceWorkerPoolTasksDropped
+          expr: increase(app_workerpool_tasks_dropped_total[5m]) > 0
+          for: 1m
+          labels:
+            severity: critical
+            app: {{ include "microservice.name" . }}
+          annotations:
+            summary: "Microservice worker pool is dropping tasks"
+            description: "Worker pool capacity has been exceeded and asynchronous tasks are being dropped on pod {{ $labels.pod }}."
+{{- end }}

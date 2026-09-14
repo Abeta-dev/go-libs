@@ -1,0 +1,110 @@
+PASS
+ok  	github.com/umesh0492/go-libs/apperror	0.911s
+PASS
+ok  	github.com/umesh0492/go-libs/bodylimit	0.835s
+goos: darwin
+goarch: amd64
+pkg: github.com/umesh0492/go-libs/cache
+cpu: VirtualApple @ 2.50GHz
+BenchmarkTTL_GetSet-10     	13709852	        93.13 ns/op	       2 B/op	       0 allocs/op
+BenchmarkLRU_GetSet-10     	19476895	        71.46 ns/op	       2 B/op	       0 allocs/op
+BenchmarkLFU_GetSet-10     	10717351	       113.3 ns/op	       2 B/op	       0 allocs/op
+BenchmarkFIFO_GetSet-10    	20432313	        69.88 ns/op	       2 B/op	       0 allocs/op
+PASS
+ok  	github.com/umesh0492/go-libs/cache	6.484s
+goos: darwin
+goarch: amd64
+pkg: github.com/umesh0492/go-libs/circuitbreaker
+cpu: VirtualApple @ 2.50GHz
+BenchmarkCircuitBreaker_Execute_Closed-10      	 4634439	       260.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCircuitBreaker_Execute_Parallel-10    	 2095950	       568.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRatioBreaker_Execute_Closed-10        	 2490505	       442.6 ns/op	     197 B/op	       0 allocs/op
+BenchmarkRatioBreaker_Execute_Parallel-10      	 1883182	       655.5 ns/op	     166 B/op	       0 allocs/op
+PASS
+ok  	github.com/umesh0492/go-libs/circuitbreaker	8.618s
+PASS
+ok  	github.com/umesh0492/go-libs/cryptoutil	0.932s
+PASS
+ok  	github.com/umesh0492/go-libs/db	1.090s
+PASS
+ok  	github.com/umesh0492/go-libs/env	0.878s
+PASS
+ok  	github.com/umesh0492/go-libs/examples/microservice	1.078s
+?   	github.com/umesh0492/go-libs/examples/microservice/loadgen	[no test files]
+PASS
+ok  	github.com/umesh0492/go-libs/ginmw	1.242s
+PASS
+ok  	github.com/umesh0492/go-libs/health	0.859s
+PASS
+ok  	github.com/umesh0492/go-libs/httputil	0.910s
+PASS
+ok  	github.com/umesh0492/go-libs/idempotency	0.843s
+PASS
+ok  	github.com/umesh0492/go-libs/logger	0.867s
+PASS
+ok  	github.com/umesh0492/go-libs/maputil	0.874s
+PASS
+ok  	github.com/umesh0492/go-libs/metrics	0.752s
+PASS
+ok  	github.com/umesh0492/go-libs/pagination	0.879s
+goos: darwin
+goarch: amd64
+pkg: github.com/umesh0492/go-libs/ratelimit
+cpu: VirtualApple @ 2.50GHz
+BenchmarkTokenBucket_Allow-10         	10640880	       114.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkLeakyBucket_Allow-10         	11587788	       103.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFixedWindow_Allow-10         	 9657746	       116.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSlidingWindow_Allow-10       	 9160150	       131.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSlidingWindowLog_Allow-10    	 9531105	       113.0 ns/op	       2 B/op	       0 allocs/op
+PASS
+ok  	github.com/umesh0492/go-libs/ratelimit	7.346s
+goos: darwin
+goarch: amd64
+pkg: github.com/umesh0492/go-libs/rbac
+cpu: VirtualApple @ 2.50GHz
+BenchmarkRBAC_ExactMatch-10           	35164834	        37.09 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRBAC_WildcardMatch-10        	 5353470	       222.8 ns/op	      96 B/op	       2 allocs/op
+BenchmarkRBAC_HasPermission-10        	 1000000	      1079 ns/op	     416 B/op	      10 allocs/op
+BenchmarkRBAC_HasAllPermissions-10    	 1000000	      1110 ns/op	     432 B/op	      12 allocs/op
+PASS
+ok  	github.com/umesh0492/go-libs/rbac	5.859s
+PASS
+ok  	github.com/umesh0492/go-libs/rbaccontext	0.856s
+PASS
+ok  	github.com/umesh0492/go-libs/recovery	0.964s
+PASS
+ok  	github.com/umesh0492/go-libs/requestid	0.874s
+PASS
+ok  	github.com/umesh0492/go-libs/retry	0.862s
+PASS
+ok  	github.com/umesh0492/go-libs/securityheaders	0.832s
+PASS
+ok  	github.com/umesh0492/go-libs/shutdown	0.814s
+goos: darwin
+goarch: amd64
+pkg: github.com/umesh0492/go-libs/sliceutil
+cpu: VirtualApple @ 2.50GHz
+BenchmarkFirst-10     	413985106	         2.938 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReduce-10    	35346313	        35.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMap-10       	 2096355	       786.9 ns/op	    1792 B/op	       1 allocs/op
+BenchmarkFilter-10    	 2846864	       375.4 ns/op	    1016 B/op	       7 allocs/op
+BenchmarkChunk-10     	16310625	        79.27 ns/op	     240 B/op	       1 allocs/op
+BenchmarkUnique-10    	 2431918	       489.8 ns/op	     744 B/op	       4 allocs/op
+PASS
+ok  	github.com/umesh0492/go-libs/sliceutil	10.414s
+PASS
+ok  	github.com/umesh0492/go-libs/stringutil	0.876s
+PASS
+ok  	github.com/umesh0492/go-libs/telemetry	0.846s
+PASS
+ok  	github.com/umesh0492/go-libs/timeutil	0.826s
+PASS
+ok  	github.com/umesh0492/go-libs/validation	0.896s
+goos: darwin
+goarch: amd64
+pkg: github.com/umesh0492/go-libs/workerpool
+cpu: VirtualApple @ 2.50GHz
+BenchmarkWorkerPool_Submit-10            	 3739948	       313.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkWorkerPool_SubmitParallel-10    	 8726904	       158.6 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/umesh0492/go-libs/workerpool	3.896s

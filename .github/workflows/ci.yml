@@ -1,0 +1,188 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions: read-all
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  lint:
+    name: GolangCI-Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Enforce gofmt formatting
+        run: |
+          UNFORMATTED=$(gofmt -l $(git ls-files '*.go'))
+          if [ -n "$UNFORMATTED" ]; then
+            echo "❌ Error: Unformatted files detected by gofmt:"
+            echo "$UNFORMATTED"
+            exit 1
+          fi
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.13.2
+          args: --timeout=5m
+
+  test:
+    name: Test & Race (${{ matrix.go-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.25.x']
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+
+      - name: Verify Go Module Integrity
+        run: go mod verify
+
+      - name: Run Unit Tests with Race Detector
+        run: go test -race -v ./...
+
+      - name: Enforce Statement Coverage Gates
+        if: matrix.go-version == '1.25.x'
+        run: ./scripts/check_coverage.sh
+
+      - name: Upload Coverage Badge
+        if: matrix.go-version == '1.25.x'
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: coverage-badge
+          path: .github/badges/coverage.json
+          if-no-files-found: ignore
+
+      - name: Verify Blueprint Microservice Build
+        run: |
+          cd examples/microservice
+          go build -v .
+
+  scale-test:
+    name: Scale & Load Tests (-tags=scale)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Run 1000 Concurrent Connection Scale Test
+        run: |
+          cd examples/microservice
+          go test -v -tags=scale -timeout=15m ./...
+
+  fuzz:
+    name: Fuzz Testing (PR Corpus Verification)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Run Fuzz Targets (5s each)
+        run: |
+          go test -fuzz=^FuzzRealIP$ -fuzztime=5s ./ratelimit
+          go test -fuzz=^FuzzJWTExtract$ -fuzztime=5s ./ginmw
+          go test -fuzz=^FuzzErrorChain$ -fuzztime=5s ./apperror
+          go test -fuzz=^FuzzDuration$ -fuzztime=5s ./env
+          go test -fuzz=^FuzzMaskEmail$ -fuzztime=5s ./stringutil
+          go test -fuzz=^FuzzParseTime$ -fuzztime=5s ./timeutil
+          go test -fuzz=^FuzzAddBusinessDays$ -fuzztime=5s ./timeutil
+          go test -fuzz=^FuzzBusinessDays$ -fuzztime=5s ./timeutil
+
+  security:
+    name: Supply Chain & Vulnerability Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: 'stable'
+          check-latest: true
+
+      - name: Run govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          $(go env GOPATH)/bin/govulncheck ./...
+
+      - name: Generate CycloneDX SBOM
+        run: |
+          CYCLONEDX_VERSION="1.12.0"
+          curl -fsSL "https://github.com/CycloneDX/cyclonedx-gomod/releases/download/v${CYCLONEDX_VERSION}/cyclonedx-gomod_${CYCLONEDX_VERSION}_linux_amd64.tar.gz" | tar -xz cyclonedx-gomod
+          ./cyclonedx-gomod mod -json -output-version 1.5 -output bom.json .
+          rm ./cyclonedx-gomod
+
+      - name: Upload CycloneDX SBOM Artifact
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: cyclonedx-sbom
+          path: bom.json
+
+  benchmarks:
+    name: Benchmark Regression Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Run Benchmarks and Compare
+        run: ./scripts/check_benchmarks.sh
+
+  docs-match-tree:
+    name: Documentation & Version Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Verify Documentation & Version Match Tree
+        run: |
+          ./scripts/check_version.sh
+          ./scripts/check_leaf_imports.sh
+

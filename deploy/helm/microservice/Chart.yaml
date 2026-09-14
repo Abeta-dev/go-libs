@@ -1,0 +1,14 @@
+apiVersion: v2
+name: microservice
+description: Enterprise Production Helm Chart for go-libs Cloud-Native Microservice
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - golang
+  - microservice
+  - go-libs
+  - cloud-native
+maintainers:
+  - name: umesh0492
+    url: https://github.com/umesh0492/go-libs

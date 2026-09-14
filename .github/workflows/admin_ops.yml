@@ -1,0 +1,126 @@
+name: Admin Ops & Cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      purge_runs:
+        description: 'Purge historical workflow runs (completed/failed/cancelled)'
+        required: true
+        type: boolean
+        default: true
+      purge_drafts:
+        description: 'Purge draft releases'
+        required: true
+        type: boolean
+        default: true
+      dry_run:
+        description: 'Dry run (log actions without deleting)'
+        required: false
+        type: boolean
+        default: false
+
+permissions: read-all
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  cleanup:
+    name: Repository Maintenance & Cleanup
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Purge Historical Workflow Runs
+        if: ${{ inputs.purge_runs == true || github.event_name != 'workflow_dispatch' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          echo "🧹 Starting Historical Workflow Runs Cleanup for ${REPO}..."
+          CURRENT_RUN_ID="${{ github.run_id }}"
+
+          PAGE=1
+          PER_PAGE=100
+          DELETED_COUNT=0
+
+          while true; do
+            echo "Fetching page $PAGE of workflow runs..."
+            RESPONSE=$(curl -sSL -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${REPO}/actions/runs?per_page=${PER_PAGE}&page=${PAGE}")
+
+            # Extract run IDs where status is completed/cancelled/failure and id != CURRENT_RUN_ID
+            RUN_IDS=$(echo "$RESPONSE" | jq -r --arg cur "$CURRENT_RUN_ID" \
+              '.workflow_runs[]? | select((.id | tostring) != $cur and (.status == "completed" or .status == "cancelled" or .status == "failure" or .conclusion != null)) | .id')
+
+            if [ -z "$RUN_IDS" ]; then
+              echo "No more older completed workflow runs found on page $PAGE."
+              break
+            fi
+
+            for RUN_ID in $RUN_IDS; do
+              if [ "$DRY_RUN" = "true" ]; then
+                echo "[DRY RUN] Would delete workflow run ID: $RUN_ID"
+              else
+                echo "Deleting workflow run ID: $RUN_ID"
+                curl -sSL -X DELETE \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer ${GH_TOKEN}" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "https://api.github.com/repos/${REPO}/actions/runs/${RUN_ID}"
+                DELETED_COUNT=$((DELETED_COUNT + 1))
+              fi
+            done
+
+            TOTAL_COUNT=$(echo "$RESPONSE" | jq -r '.total_count // 0')
+            if [ "$TOTAL_COUNT" -le "$((PAGE * PER_PAGE))" ]; then
+              break
+            fi
+            PAGE=$((PAGE + 1))
+          done
+
+          echo "✅ Completed workflow run purge. Total runs deleted: $DELETED_COUNT"
+
+      - name: Purge Draft Releases
+        if: ${{ inputs.purge_drafts == true || github.event_name != 'workflow_dispatch' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          echo "🧹 Starting Draft Releases Cleanup for ${REPO}..."
+          DELETED_DRAFTS=0
+
+          RELEASES=$(curl -sSL -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${REPO}/releases?per_page=100")
+
+          DRAFT_IDS=$(echo "$RELEASES" | jq -r '.[]? | select(.draft == true) | .id')
+
+          if [ -z "$DRAFT_IDS" ]; then
+            echo "No draft releases found."
+          else
+            for RELEASE_ID in $DRAFT_IDS; do
+              if [ "$DRY_RUN" = "true" ]; then
+                echo "[DRY RUN] Would delete draft release ID: $RELEASE_ID"
+              else
+                echo "Deleting draft release ID: $RELEASE_ID"
+                curl -sSL -X DELETE \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer ${GH_TOKEN}" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "https://api.github.com/repos/${REPO}/releases/${RELEASE_ID}"
+                DELETED_DRAFTS=$((DELETED_DRAFTS + 1))
+              fi
+            done
+          fi
+
+          echo "✅ Completed draft release purge. Total drafts deleted: $DELETED_DRAFTS"

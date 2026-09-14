@@ -1,0 +1,21 @@
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Go
+*.test
+*.out
+*.zip
+bin/
+/microservice
+examples/microservice/microservice
+gh_*
+gosec.json
+scratch/
+graphify-out/
+testdata/fuzz/
+benchmarks/bench-current.txt
