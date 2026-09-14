@@ -129,7 +129,7 @@ PROTECTION_PAYLOAD=$(cat << JSON
     "require_last_push_approval": true
   },
   "restrictions": {
-    "users": [],
+    "users": ["umesh0492"],
     "teams": [],
     "apps": []
   },
