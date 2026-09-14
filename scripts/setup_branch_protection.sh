@@ -115,7 +115,7 @@ PROTECTION_PAYLOAD=$(cat << JSON
   "required_status_checks": {
     "strict": true,
     "contexts": [
-      "CI / Test & Race (1.25.x)",
+      "CI / Test & Race (1.26.x)",
       "CI / GolangCI-Lint",
       "CI / Documentation & Version Gate",
       "CI / Scale & Load Tests (-tags=scale)"
@@ -151,7 +151,7 @@ HTTP_STATUS=$(curl -sSL -o /tmp/branch_protection_res.json -w "%{http_code}" \
 
 if [[ "${HTTP_STATUS}" =~ ^2 ]]; then
   echo "   ✅ Branch protection applied successfully (HTTP ${HTTP_STATUS})!"
-  echo "      - Mandatory Status Checks: CI / Test & Race (1.25.x), CI / GolangCI-Lint, CI / Documentation & Version Gate, CI / Scale & Load Tests (-tags=scale)"
+  echo "      - Mandatory Status Checks: CI / Test & Race (1.26.x), CI / GolangCI-Lint, CI / Documentation & Version Gate, CI / Scale & Load Tests (-tags=scale)"
   echo "      - Enforce Admins:          true"
   echo "      - Require PR Reviews:      1 approval (stale review dismissal + Code Owners)"
   echo "      - Direct Push Access:      Restricted to repository collaborators only"

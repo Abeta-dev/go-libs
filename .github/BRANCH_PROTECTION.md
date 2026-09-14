@@ -15,7 +15,7 @@ To maintain production stability, zero-regression guarantees, and security compl
 ### 2. Mandatory Status Checks
 - **Require branches to be up to date before merging**: `Enabled` (Strict rebase/merge)
 - **Required Status Checks**:
-  1. `CI / Test & Race (1.25.x)` (unit tests with `-race`, coverage floor >= 85%, `ginmw` == 100%)
+  1. `CI / Test & Race (1.26.x)` (unit tests with `-race`, coverage floor >= 85%, `ginmw` == 100%)
   2. `CI / GolangCI-Lint` (static analysis, formatting, complexity)
   3. `CI / Documentation & Version Gate` (strict synchronization of versions, package counts, leaf-import boundaries)
   4. `CI / Scale & Load Tests (-tags=scale)` (1000 concurrent connection load tests)

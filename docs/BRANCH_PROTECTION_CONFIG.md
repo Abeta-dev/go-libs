@@ -16,7 +16,7 @@ To maintain truth-gate integrity and ensure no regression enters production, `ma
 2. **Require Status Checks to Pass Before Merging**:
    - Require branches to be up to date before merging: `true`
    - Required status checks (matching CI workflow context in `.github/workflows/ci.yml`):
-     - `CI / Test & Race (1.25.x)`
+     - `CI / Test & Race (1.26.x)`
      - `CI / GolangCI-Lint`
      - `CI / Documentation & Version Gate`
      - `CI / Scale & Load Tests (-tags=scale)`
@@ -94,7 +94,7 @@ curl -L \
     "required_status_checks": {
       "strict": true,
       "contexts": [
-        "CI / Test & Race (1.25.x)",
+        "CI / Test & Race (1.26.x)",
         "CI / GolangCI-Lint",
         "CI / Documentation & Version Gate",
         "CI / Scale & Load Tests (-tags=scale)"
@@ -134,7 +134,7 @@ curl -L \
    - **Require status checks to pass before merging**:
      - Require branches to be up to date before merging
      - Search and select:
-       * `CI / Test & Race (1.25.x)`
+       * `CI / Test & Race (1.26.x)`
        * `CI / GolangCI-Lint`
        * `CI / Documentation & Version Gate`
        * `CI / Scale & Load Tests (-tags=scale)`
