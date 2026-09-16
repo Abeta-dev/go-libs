@@ -130,14 +130,7 @@ func Middleware(store Store, opts ...MiddlewareOption) func(http.Handler) http.H
 				}
 
 				if record.Status == StatusCompleted && record.Response != nil {
-					for hKey, hVals := range record.Response.Headers {
-						for _, v := range hVals {
-							w.Header().Add(hKey, v)
-						}
-					}
-					w.Header().Set("X-Cache-Lookup", "HIT - Idempotency")
-					w.WriteHeader(record.Response.StatusCode)
-					_, _ = w.Write(record.Response.Body)
+					serveCachedResponse(w, record)
 					return
 				}
 			}
@@ -174,4 +167,16 @@ func Middleware(store Store, opts ...MiddlewareOption) func(http.Handler) http.H
 			}
 		})
 	}
+}
+
+func serveCachedResponse(w http.ResponseWriter, record *Record) {
+	for hKey, hVals := range record.Response.Headers {
+		for _, v := range hVals {
+			w.Header().Add(hKey, v)
+		}
+	}
+	w.Header().Set("X-Cache-Lookup", "HIT - Idempotency")
+	w.WriteHeader(record.Response.StatusCode)
+	// #nosec G705 -- Writing cached HTTP response body for idempotent request replay.
+	_, _ = w.Write(record.Response.Body)
 }

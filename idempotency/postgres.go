@@ -164,9 +164,16 @@ func (s *PGStore) Lock(ctx context.Context, key string) (bool, *Record, error) {
 		return false, nil, fmt.Errorf("idempotency: lock read failed: %w", err)
 	}
 
-	// Check if entire record has expired
+	// Check if entire record or lease has expired
+	if s.tryReclaimExpired(ctx, key, statusStr, now, rowLockedUntil, rowExpiresAt, lockedUntil, expiresAt) {
+		return false, nil, nil
+	}
+
+	return true, buildRecordFromRow(statusStr, statusCode, headersJSON, body), nil
+}
+
+func (s *PGStore) tryReclaimExpired(ctx context.Context, key, statusStr string, now, rowLockedUntil, rowExpiresAt, lockedUntil, expiresAt time.Time) bool {
 	if now.After(rowExpiresAt) {
-		// Record expired: atomically overwrite
 		updateQuery := fmt.Sprintf(
 			"UPDATE %s SET status = $2, status_code = NULL, headers = NULL, body = NULL, "+
 				"locked_until = $3, expires_at = $4, updated_at = $5 WHERE key = $1 AND expires_at = $6",
@@ -174,11 +181,10 @@ func (s *PGStore) Lock(ctx context.Context, key string) (bool, *Record, error) {
 		)
 		uTag, uErr := s.db.Exec(ctx, updateQuery, key, string(StatusInProgress), lockedUntil, expiresAt, now, rowExpiresAt)
 		if uErr == nil && uTag.RowsAffected() == 1 {
-			return false, nil, nil
+			return true
 		}
 	}
 
-	// Check if in-progress lock expired (lease timeout recovery)
 	if Status(statusStr) == StatusInProgress && now.After(rowLockedUntil) {
 		updateQuery := fmt.Sprintf(
 			"UPDATE %s SET locked_until = $2, expires_at = $3, updated_at = $4 "+
@@ -187,11 +193,14 @@ func (s *PGStore) Lock(ctx context.Context, key string) (bool, *Record, error) {
 		)
 		uTag, uErr := s.db.Exec(ctx, updateQuery, key, lockedUntil, expiresAt, now, string(StatusInProgress), rowLockedUntil)
 		if uErr == nil && uTag.RowsAffected() == 1 {
-			return false, nil, nil
+			return true
 		}
 	}
 
-	// Construct existing record
+	return false
+}
+
+func buildRecordFromRow(statusStr string, statusCode *int, headersJSON, body []byte) *Record {
 	record := &Record{
 		Status: Status(statusStr),
 	}
@@ -210,7 +219,7 @@ func (s *PGStore) Lock(ctx context.Context, key string) (bool, *Record, error) {
 		}
 	}
 
-	return true, record, nil
+	return record
 }
 
 // Save atomically marks the operation as StatusCompleted and stores the response payload.
