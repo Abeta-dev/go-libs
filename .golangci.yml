@@ -1,15 +1,13 @@
-version: "2"
 run:
   modules-download-mode: readonly
   tests: true
 output:
   formats:
-    text:
-      path: stdout
-      print-linter-name: true
-      print-issued-lines: true
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
 linters:
-  default: none
+  disable-all: true
   enable:
     - bodyclose
     - errcheck
@@ -27,90 +25,78 @@ linters:
     - unconvert
     - unparam
     - unused
-  settings:
-    errorlint:
-      errorf: true
-      asserts: true
-      comparison: true
-    goconst:
-      min-len: 3
-      min-occurrences: 3
-    gocritic:
-      disabled-checks:
-        - whyNoLint
-        - hugeParam
-      enabled-tags:
-        - diagnostic
-        - style
-        - performance
-    gocyclo:
-      min-complexity: 15
-    gosec:
-      excludes:
-        - G104
-    govet:
-      disable:
-        - fieldalignment
-        - shadow
-      enable-all: true
-    prealloc:
-      simple: true
-      range-loops: true
-      for-loops: true
-    revive:
-      severity: warning
-      rules:
-        - name: blank-imports
-        - name: context-as-argument
-        - name: context-keys-type
-        - name: dot-imports
-        - name: error-return
-        - name: error-strings
-        - name: error-naming
-        - name: exported
-        - name: if-return
-        - name: increment-decrement
-        - name: var-naming
-        - name: var-declaration
-        - name: package-comments
-        - name: range
-        - name: receiver-naming
-        - name: time-naming
-        - name: unexported-return
-        - name: indent-error-flow
-        - name: errorf
-        - name: empty-block
-        - name: superfluous-else
-        - name: unreachable-code
-        - name: redefines-builtin-id
-  exclusions:
-    generated: lax
+settings:
+  errorlint:
+    errorf: true
+    asserts: true
+    comparison: true
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  gocritic:
+    disabled-checks:
+      - whyNoLint
+      - hugeParam
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+  gocyclo:
+    min-complexity: 15
+  gosec:
+    excludes:
+      - G104
+  govet:
+    disable:
+      - fieldalignment
+      - shadow
+    enable-all: true
+  prealloc:
+    simple: true
+    range-loops: true
+    for-loops: true
+  revive:
+    severity: warning
     rules:
-      - linters:
-          - bodyclose
-          - errcheck
-          - gocritic
-          - gocyclo
-          - gosec
-          - noctx
-          - unparam
-        path: _test\.go
-      - linters:
-          - gocyclo
-          - gocritic
-          - revive
-        path: examples/.*
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unreachable-code
+      - name: redefines-builtin-id
+      - name: unused-parameter
+        disabled: true
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-formatters:
-  exclusions:
-    generated: lax
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - bodyclose
+        - errcheck
+        - gocritic
+        - gocyclo
+        - gosec
+        - noctx
+        - unparam
+        - revive
+    - path: examples/.*
+      linters:
+        - gocyclo
+        - gocritic
+        - revive

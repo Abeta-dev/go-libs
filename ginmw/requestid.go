@@ -15,7 +15,7 @@ import (
 func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var newCtx context.Context
-		wrapper := requestid.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		wrapper := requestid.Middleware(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 			newCtx = r.Context()
 		}))
 
