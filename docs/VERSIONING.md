@@ -6,7 +6,7 @@ This document outlines the versioning guarantees, breaking change communication 
 
 ## 1. Pre-1.0 Versioning Contract (`v0.x.y`)
 
-`go-libs` follows [Semantic Versioning 2.0.0](https://semver.org/). Because the library is currently pre-1.0 (`v0.1.x`), consumers should be aware of the following expectations:
+`go-libs` follows [Semantic Versioning 2.0.0](https://semver.org/). Because the library is currently pre-1.0 (`v0.2.x`), consumers should be aware of the following expectations:
 
 - **Minor Releases (`v0.X.0`)**: May introduce new packages, enhancements, or breaking API refactorings as APIs are consolidated for long-term maintainability.
 - **Patch Releases (`v0.x.Y`)**: Strictly reserved for backward-compatible bug fixes, performance improvements, and security patches. Zero breaking API changes occur in patch releases.

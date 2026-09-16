@@ -5,18 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-09-17
+
+### Highlights
+- **PostgreSQL Distributed Idempotency Store (`idempotency/postgres.go` with `db.DBTX`)**: High-performance, production-ready distributed idempotency store using two-phase atomic locking (`Lock` and `Save`) over any `db.DBTX` connection pool or transaction. Features automatic lock expiration recovery, status conflict detection, SHA-256 payload fingerprint validation, and configurable lock/response TTLs.
+- **PostgreSQL Atomic Distributed Rate Limiter (`db/ratelimit.go`)**: Clustered, atomic sliding-window rate limiter powered by PostgreSQL CTE queries over `db.DBTX`. Synchronizes request counters across multi-pod deployments without Redis or external infrastructure.
+- **Decoupled Universal `net/http` Standard Middleware**: Universal middleware implementations adhering strictly to standard Go `func(http.Handler) http.Handler` signatures:
+  - `httputil.CORS`: Flexible CORS handling with credential support, exposed headers, configurable max age, and wildcard/origin validation.
+  - `telemetry.Middleware`: W3C distributed tracing extraction and automatic OpenTelemetry span instrumentation.
+  - `logger.Middleware`: Structured access logging using standard library `log/slog` with latency tracking, status capture, and request ID correlation.
+  - `idempotency.Middleware`: End-to-end HTTP idempotency filter with in-memory or PostgreSQL stores, automatic payload caching, concurrent in-progress 409 Conflict handling, and replay headers.
+- **Pruning Standard Library Duplication from `sliceutil` & `maputil`**: Pruned redundant wrapper functions (`sliceutil.Map`, `sliceutil.Filter`, `maputil.Keys`, `maputil.Values`) in favor of idiomatic Go loops and standard library packages (`slices`, `maps`). Stabilized and expanded high-value algorithmic extensions: `sliceutil.Chunk`, `sliceutil.GroupBy`, `sliceutil.Unique`, `sliceutil.Flatten`, `sliceutil.Reduce`, and `maputil.Merge`.
+- **Reference Microservice (`examples/microservice`) Updates**: Enhanced reference implementation demonstrating production best practices, item batching via `sliceutil.Chunk`, clean loops, and composition of operational primitives.
 
 ### Compatibility Notice
 Clean-slate architecture: No backward compatibility preserved. Legacy deprecated interfaces and backwards-compatibility shims have been dropped, as no external developers or downstream production systems are actively consuming pre-release revisions.
 
+### Added
+- idempotency: PostgreSQL Distributed Idempotency Store (`PGStore`, `NewPGStore`, `WithPGLockTTL`, `WithPGResponseTTL`, `WithPGTableName`) backed by `db.DBTX` for distributed two-phase atomic locking, conflict mitigation, and crash recovery.
+- idempotency: Universal `net/http` standard idempotency middleware (`Middleware`, `MiddlewareOptions`, `MiddlewareOption`, `WithHeaderName`, `WithEnforceHeader`, `WithIgnoredMethods`, `WithStatusCodeMatcher`).
+- db: PostgreSQL Atomic Distributed Rate Limiter (`PGRateLimiter`, `NewPGRateLimiter`, `WithPGRateLimiterTableName`, `WithPGRateLimiterTimeout`) implementing sliding window rate limiting via `DBTX`.
+- httputil: Decoupled universal `net/http` standard CORS middleware (`CORS`, `CORSConfig`, `DefaultCORSConfig`).
+- telemetry: Decoupled universal `net/http` standard OpenTelemetry tracing middleware (`Middleware`, `MiddlewareOption`, `WithPropagator`).
+- logger: Decoupled universal `net/http` standard structured logging middleware (`Middleware`, `MiddlewareOption`, `WithLogger`, `WithRequestIDHeader`, `WithExtraAttributes`).
+
 ### Changed
+- `sliceutil`: Pruned redundant standard library duplication (`Map`, `Filter`) in favor of idiomatic Go loops and standard `slices`; expanded and stabilized algorithmic utilities: `Chunk`, `GroupBy`, `Unique`, `Flatten`, `Reduce`, `First`.
+- `maputil`: Pruned redundant standard library duplication (`Keys`, `Values`) in favor of standard `maps`; retained zero-dependency extensions: `Merge`, `Filter`.
+- `examples/microservice`: Updated reference microservice showcasing `sliceutil.Chunk` for item batch processing, clean standard filtering loops, and universal middleware composition.
 - `securityheaders`: Transitioned `securityheaders.New(cfg Config)` to functional options `securityheaders.New(opts ...Option)` with `WithServerName`, `WithHSTSMaxAge`, `WithCSP`, `WithPermissionsPolicy`.
 - `telemetry`: Transitioned `telemetry.NewTracerProvider(cfg Config)` to functional options `telemetry.NewTracerProvider(opts ...Option)` with `WithServiceName`, `WithServiceVersion`, `WithEnvironment`, `WithSampleRate`.
 - `cryptoutil`: `ComparePassword` wraps malformed password hashes with sentinel `ErrInvalidHash`.
 - `ginmw`: `Idempotency` logs store errors during `Lock`, `Unlock`, and `Save` operations.
 
 ### Removed (BREAKING)
+- `sliceutil`: Removed redundant wrappers `Map` and `Filter`.
+- `maputil`: Removed redundant wrappers `Keys` and `Values`.
 - `circuitbreaker`: Removed redundant type alias `CircuitBreaker` and deprecated `New(...)` constructor; use `ConsecutiveBreaker` and `NewConsecutiveBreaker(...)` instead.
 - `cache`: Removed redundant `NewTTL[T]` constructor; use `NewTypedCache[T]` instead.
 - `httpclient`: Removed redundant `WithTimeout` alias; use `WithTotalTimeout` instead.
