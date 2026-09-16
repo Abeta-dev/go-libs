@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Compatibility Notice
+Clean-slate architecture: No backward compatibility preserved. Legacy deprecated interfaces and backwards-compatibility shims have been dropped, as no external developers or downstream production systems are actively consuming pre-release revisions.
+
 ### Changed
 - `securityheaders`: Transitioned `securityheaders.New(cfg Config)` to functional options `securityheaders.New(opts ...Option)` with `WithServerName`, `WithHSTSMaxAge`, `WithCSP`, `WithPermissionsPolicy`.
 - `telemetry`: Transitioned `telemetry.NewTracerProvider(cfg Config)` to functional options `telemetry.NewTracerProvider(opts ...Option)` with `WithServiceName`, `WithServiceVersion`, `WithEnvironment`, `WithSampleRate`.
@@ -30,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SAST: Added automated GitHub CodeQL analysis workflow for continuous static application security testing.
 
 ## [0.1.0] - 2026-09-14
+
+### Compatibility Notice
+Clean-slate architecture: No backward compatibility preserved. Legacy deprecated interfaces and backwards-compatibility shims have been dropped, as no external developers or downstream production systems are actively consuming pre-release revisions.
 
 ### Added
 - apperror: Structured application errors with canonical machine-readable error codes (`Code`), human-readable messages, structured details, and cause wrapping.

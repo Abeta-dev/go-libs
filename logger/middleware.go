@@ -3,7 +3,6 @@
 package logger
 
 import (
-	"bytes"
 	"log/slog"
 	"net/http"
 	"time"
@@ -130,6 +129,3 @@ func Middleware(opts ...MiddlewareOption) func(http.Handler) http.Handler {
 		})
 	}
 }
-
-// Ensure bytes buffer doesn't cause unused import warning
-var _ = bytes.Buffer{}
