@@ -344,7 +344,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 Coverage across all 31 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
-> **Overall Repository Statement Coverage: 95.2%** (Zero data races across `-race`)
+> **Overall Repository Statement Coverage: 95.5%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
 > **Quality Standard: Strict per-package floor >= 85.0% enforced by `./scripts/check_coverage.sh`**
 
@@ -362,8 +362,8 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `health` | Parallel dependency health check and Kubernetes probe handler | **100.0%** |
 | `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.0%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
-| `idempotency` | Two-phase HTTP request deduplication | **100.0%** |
-| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **93.8%** |
+| `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
+| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **95.0%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |
 | `pagination` | Offset-based request query parser and generic response | **100.0%** |
@@ -381,7 +381,7 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |
 | `validation` | Declarative validation error formatter | **100.0%** |
 | `workerpool` | Bounded panic-safe concurrent worker pool with metrics & options | **92.1%** |
-| **Total Statement Coverage** | **Cumulative across all packages** | **95.2%** |
+| **Total Statement Coverage** | **Cumulative across all packages** | **95.5%** |
 
 > *Note: The standalone reference microservice (`examples/microservice`) achieves 87.4% integration statement coverage.*
 

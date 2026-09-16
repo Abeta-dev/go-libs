@@ -38,14 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - circuitbreaker: Consecutive-failure and failure-ratio circuit breakers with 3-state machine, single-probe half-open state, and context cancellation safety (`Breaker`, `ConsecutiveBreaker`, `RatioBreaker`, `NewConsecutiveBreaker`, `NewRatioBreaker`, `State`).
 - clock: Mockable time interfaces (`Clock`, `Timer`, `Ticker`) with production `RealClock` and deterministic advanceable `FakeClock` (`NewReal`, `NewFake`).
 - cryptoutil: Bcrypt password hashing (`HashPassword`, `ComparePassword`, `IsCorrectPassword`) and cryptographically secure password generation (`GenerateTempPassword`).
-- db: PostgreSQL connection pool lifecycle management and context-aware querier retrieval (`Connect`, `GetQuerier`, `DBTX`, `WithMaxConns`, `WithMinConns`).
+- db: PostgreSQL connection pool lifecycle management, context-aware querier retrieval, and distributed rate limiting (`Connect`, `GetQuerier`, `DBTX`, `WithMaxConns`, `WithMinConns`, `NewPGRateLimiter`, `PGRateLimiter`).
 - env: Type-safe environment variable parsing with defaults (`String`, `Int`, `Bool`, `Duration`, `MustString`, `MustInt`).
 - ginmw: HTTP middleware suite for Gin covering CORS (`CORS`), structured access logging (`Logger`), panic recovery (`Recovery`), correlation IDs (`RequestID`), security headers (`SecurityHeaders`), distributed tracing (`Telemetry`), and idempotency (`Idempotency`).
 - health: HTTP health, readiness, and liveness probe handlers with pluggable dependency checkers (`New`, `Checker`, `Service`, `LivenessHandler`, `ReadinessHandler`, `Response`).
 - httpclient: Resilient HTTP client pipeline composing rate limiting (`WithRateLimiter`), circuit breaking (`WithCircuitBreaker`), retry with backoff (`WithRetry`), timeouts (`WithTotalTimeout`, `WithPerAttemptTimeout`), and telemetry (`WithMetrics`, `WithTelemetry`, `New`, `NewRoundTripper`).
-- httputil: Standardized JSON envelope responses and domain error translation (`OK`, `Created`, `NoContent`, `Error`, `ErrorFromDomain`, `WriteJSON`, `APIError`).
-- idempotency: In-memory two-phase atomic idempotency locking and response caching with TTL expiration (`Store`, `MemoryStore`, `NewMemoryStore`, `Record`, `Response`).
-- logger: Context-aware structured logging with `slog` context propagation, log rate sampling, and sensitive field redaction (`Default`, `WithContext`, `FromContext`, `NewSamplingHandler`, `NewRedactingHandler`).
+- httputil: Standardized JSON envelope responses, domain error translation, and universal CORS middleware (`OK`, `Created`, `NoContent`, `Error`, `ErrorFromDomain`, `WriteJSON`, `APIError`, `CORS`, `CORSConfig`).
+- idempotency: Two-phase atomic idempotency locking, in-memory store, PostgreSQL distributed store, and universal HTTP middleware (`Store`, `MemoryStore`, `NewMemoryStore`, `PGStore`, `NewPGStore`, `Middleware`, `Record`, `Response`).
+- logger: Context-aware structured logging with `slog` context propagation, log rate sampling, sensitive field redaction, and HTTP middleware (`Default`, `WithContext`, `FromContext`, `NewSamplingHandler`, `NewRedactingHandler`, `Middleware`).
 - maputil: Generic, zero-dependency map operations (`Keys`, `Values`, `Merge`, `Filter`).
 - metrics: Framework-agnostic instrumentation interfaces (`Counter`, `Gauge`, `Histogram`) with zero-allocation no-op fallbacks (`NoopCounter`, `NoopGauge`, `NoopHistogram`).
 - pagination: Offset and cursor pagination parameter parsing, SQL calculations, and response envelopers (`Parse`, `Params`, `TotalPages`, `Response`, `ParseCursor`, `CursorResponse`).
@@ -59,13 +59,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - shutdown: Graceful OS signal interception and coordinated concurrent resource teardown manager (`Manager`, `New`, `Hook`).
 - sliceutil: Generic functional slice transforms (`Map`, `Filter`, `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`).
 - stringutil: Sensitive data masking (`MaskEmail`, `MaskPhone`), string truncation (`Truncate`), and cryptographically secure random string generation (`RandomSecureString`, `RandomAlphanumeric`).
-- telemetry: OpenTelemetry trace provider initialization with composite text map propagation and span lifecycle helpers (`InitProvider`, `NewTracerProvider`, `TracerProvider`, `Config`, `StartSpan`).
+- telemetry: OpenTelemetry trace provider initialization, composite text map propagation, span lifecycle helpers, and universal HTTP middleware (`InitProvider`, `NewTracerProvider`, `TracerProvider`, `Config`, `StartSpan`, `Middleware`).
 - timeutil: UTC and timezone conversions, heuristic date parsing (`ParseTime`), and business day calculations (`AddBusinessDays`, `BusinessDays`, `BusinessDaysBetween`).
 - validation: Request validation error formatting translating validator errors into structured client responses (`FieldError`, `FormatErrors`).
 - workerpool: Bounded concurrent worker pool with task queue and saturation handling (`Pool`, `New`, `Submit`, `SubmitContext`).
 
 ### Known limitations
 - In-memory cache: local per-process only, no distributed clustering.
-- Idempotency store: in-memory with bounded TTL eviction, does not persist across process restarts.
-- Rate limiting: per-process TokenBucket and SlidingWindow; does not synchronize across distributed clusters.
+- Idempotency store: in-memory store provided for single-node testing; production multi-pod clusters should use `PGStore` for distributed atomic locking.
+- Rate limiting: in-memory `TokenBucket` and `SlidingWindow` provided for single-node deployments; production multi-pod clusters should use `PGRateLimiter` for distributed PostgreSQL synchronization.
 - Packages in Early maturity tier: `cache`, `db`, `idempotency`, `logger`, `ratelimit`, `telemetry`, `clock`, `httpclient`.
