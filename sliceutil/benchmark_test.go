@@ -3,7 +3,6 @@
 package sliceutil_test
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/umesh0492/go-libs/sliceutil"
@@ -34,31 +33,33 @@ func BenchmarkReduce(b *testing.B) {
 	}
 }
 
-func BenchmarkMap(b *testing.B) {
+func BenchmarkGroupBy(b *testing.B) {
 	nums := make([]int, 100)
 	for i := range nums {
 		nums[i] = i
 	}
-	fn := func(n int) string { return strconv.Itoa(n) }
+	fn := func(n int) int { return n % 5 }
 	b.ResetTimer()
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		_ = sliceutil.Map(nums, fn)
+		_ = sliceutil.GroupBy(nums, fn)
 	}
 }
 
-func BenchmarkFilter(b *testing.B) {
-	nums := make([]int, 100)
-	for i := range nums {
-		nums[i] = i
+func BenchmarkFlatten(b *testing.B) {
+	chunks := make([][]int, 10)
+	for i := range chunks {
+		chunks[i] = make([]int, 10)
+		for j := range chunks[i] {
+			chunks[i][j] = i*10 + j
+		}
 	}
-	fn := func(n int) bool { return n%2 == 0 }
 	b.ResetTimer()
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		_ = sliceutil.Filter(nums, fn)
+		_ = sliceutil.Flatten(chunks)
 	}
 }
 

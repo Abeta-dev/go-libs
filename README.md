@@ -264,8 +264,8 @@ helm upgrade --install microservice ./deploy/helm/microservice
 
 | Package | Import suffix | Key exports & Description |
 |---|---|---|
-| `sliceutil` | `/sliceutil` | `Map`, `Filter`, `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten` — generic functional transforms (use stdlib `slices` for `Contains`) |
-| `maputil` | `/maputil` | `Keys`, `Values`, `Merge`, `Filter` — generic type-safe map operations |
+| `sliceutil` | `/sliceutil` | `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`, `First` — generic algorithmic slice primitives |
+| `maputil` | `/maputil` | `Merge`, `Filter` — generic type-safe map operations |
 | `apperror` | `/apperror` | `CodeNotFound`, `CodeUnauthorized`, `CodeConflict`, `New`, `Wrap`, `Is` — canonical structured domain errors |
 | `env` | `/env` | `String`, `Int`, `Bool`, `Duration`, `MustString`, `MustInt` — zero-dependency typed OS environment parsers |
 | `logger` | `/logger` | `Default()`, `FromContext(ctx)`, `WithContext(ctx, l)`, `WithField`, `WithFields` — context-aware structured `slog` |
@@ -375,7 +375,7 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `retry` | Context-aware backoff and retry execution algorithms | **90.7%** |
 | `securityheaders` | OWASP secure header injector middleware | **100.0%** |
 | `shutdown` | Graceful concurrent teardown manager | **100.0%** |
-| `sliceutil` | Functional slice transformations (Map, Filter, Reduce, etc.) | **100.0%** |
+| `sliceutil` | Algorithmic slice operations (Reduce, GroupBy, Chunk, Unique, Flatten, First) | **100.0%** |
 | `stringutil` | Sensitive info masking and text helpers | **100.0%** |
 | `telemetry` | OpenTelemetry distributed tracing wrapper | **100.0%** |
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |

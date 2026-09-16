@@ -9,20 +9,6 @@ import (
 	"github.com/umesh0492/go-libs/sliceutil"
 )
 
-func TestMap(t *testing.T) {
-	assert.Equal(t, []int{2, 4, 6}, sliceutil.Map([]int{1, 2, 3}, func(v int) int { return v * 2 }))
-	assert.Equal(t, []string{"1", "2"}, sliceutil.Map([]int{1, 2}, func(v int) string { return string(rune('0' + v)) }))
-	assert.Nil(t, sliceutil.Map[int, int](nil, func(v int) int { return v }))
-	assert.Equal(t, []int{}, sliceutil.Map([]int{}, func(v int) int { return v }))
-}
-
-func TestFilter(t *testing.T) {
-	evens := sliceutil.Filter([]int{1, 2, 3, 4, 5}, func(v int) bool { return v%2 == 0 })
-	assert.Equal(t, []int{2, 4}, evens)
-	assert.Equal(t, []int{}, sliceutil.Filter([]int{1, 3}, func(v int) bool { return v%2 == 0 }))
-	assert.Equal(t, []int{}, sliceutil.Filter([]int{}, func(v int) bool { return true }))
-}
-
 func TestReduce(t *testing.T) {
 	sum := sliceutil.Reduce([]int{1, 2, 3, 4}, 0, func(acc, v int) int { return acc + v })
 	assert.Equal(t, 10, sum)

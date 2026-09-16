@@ -1,32 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 // Package maputil provides generic, zero-dependency helpers for map
-// operations using Go generics (Go 1.18+).
+// operations that are omitted from the standard library `maps` package.
 package maputil
-
-// Keys returns all keys of m in undefined order.
-func Keys[K comparable, V any](m map[K]V) []K {
-	if m == nil {
-		return nil
-	}
-	keys := make([]K, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	return keys
-}
-
-// Values returns all values of m in undefined order.
-func Values[K comparable, V any](m map[K]V) []V {
-	if m == nil {
-		return nil
-	}
-	vals := make([]V, 0, len(m))
-	for _, v := range m {
-		vals = append(vals, v)
-	}
-	return vals
-}
 
 // Merge combines multiple maps into a new map. In case of key collisions,
 // later maps override earlier ones.

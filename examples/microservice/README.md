@@ -46,7 +46,7 @@ flowchart TD
         Handler --> Clk[clock.Clock Source]
         Handler --> Cache[cache.GetOrFetch]
         Handler --> Pool[workerpool.Submit]
-        Handler --> Slic[sliceutil.Filter]
+        Handler --> Slic[sliceutil.Chunk]
     end
 
     subgraph "Logging & System Lifecycle"
@@ -75,7 +75,7 @@ flowchart TD
 | **Type-safe Env** | `github.com/umesh0492/go-libs/env` | Environment configuration parsing with fallback defaults (`env.String`, `env.Duration`) |
 | **Domain AppErrors** | `github.com/umesh0492/go-libs/apperror` | Structured domain errors with canonical HTTP status mapping (`apperror.NotFound`, `apperror.BadRequest`) |
 | **Pagination** | `github.com/umesh0492/go-libs/pagination` | Type-safe query parsing and paginated response envelope generation (`pagination.Parse`) |
-| **Slice Utilities** | `github.com/umesh0492/go-libs/sliceutil` | Functional filtering and data transformation without boilerplate (`sliceutil.Filter`) |
+| **Slice Utilities** | `github.com/umesh0492/go-libs/sliceutil` | Batching, grouping, and algorithmic slice partitioning (`sliceutil.Chunk`) |
 | **HTTP Utilities** | `github.com/umesh0492/go-libs/httputil` | Standardized JSON envelopes for API responses and errors (`httputil.OK`, `httputil.Error`) |
 | **Panic Recovery** | `github.com/umesh0492/go-libs/recovery` | HTTP middleware intercepting uncaught panics and logging stack traces (`recovery.Middleware`) |
 

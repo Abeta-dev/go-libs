@@ -28,7 +28,7 @@ Reproducible with: `go test -bench=. -benchmem -run=^$ ./...`
 | `sliceutil.First` | 422,029,778 | 2.8 ns/op | **0 B/op** | **0 allocs/op** |
 | `sliceutil.Reduce` (100 items) | 35,211,697 | 32.9 ns/op | **0 B/op** | **0 allocs/op** |
 | `sliceutil.Chunk` (100 items) | 17,397,786 | 72.1 ns/op | 240 B/op | 1 allocs/op |
-| `sliceutil.Map` (100 items) | 2,275,623 | 527.3 ns/op | 1,792 B/op | 1 allocs/op |
+| `sliceutil.Flatten` (100 items) | 6,016,396 | 207.3 ns/op | 896 B/op | 1 allocs/op |
 | `workerpool.Submit` (Enqueued) | 5,000,000 | ~95 ns/op | **0 B/op** | **0 allocs/op** |
 | `workerpool.SubmitParallel` (Contended) | 7,120,000 | ~170 ns/op | **0 B/op** | **0 allocs/op** |
 | `retry.Do` (Immediate Success) | 100,000,000 | 10.5 ns/op | **0 B/op** | **0 allocs/op** |
@@ -66,9 +66,9 @@ Benchmarks executed with `go test -bench=. -benchmem` on Apple Silicon Darwin/am
 
 | Operation | Input Size | Speed (ns/op) | Memory (B/op) | Allocations |
 |---|---|---|---|---|
-| `sliceutil.Map` | 1,000 items | ~980 ns/op | 8,192 B/op | 1 allocs/op |
-| `sliceutil.Filter` | 1,000 items | ~850 ns/op | 4,096 B/op | 1 allocs/op |
-| `sliceutil.Unique` | 1,000 items | ~4,200 ns/op | 12,288 B/op | 4 allocs/op |
+| `sliceutil.Chunk` | 100 items | ~72 ns/op | 240 B/op | 1 allocs/op |
+| `sliceutil.Flatten` | 100 items | ~207 ns/op | 896 B/op | 1 allocs/op |
+| `sliceutil.Unique` | 15 items | ~418 ns/op | 616 B/op | 3 allocs/op |
 | `maputil.Merge` | 2 x 50 keys | ~1,800 ns/op | 3,072 B/op | 2 allocs/op |
 
 ---

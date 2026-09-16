@@ -52,7 +52,7 @@ Clean-slate architecture: No backward compatibility preserved. Legacy deprecated
 - httputil: Standardized JSON envelope responses, domain error translation, and universal CORS middleware (`OK`, `Created`, `NoContent`, `Error`, `ErrorFromDomain`, `WriteJSON`, `APIError`, `CORS`, `CORSConfig`).
 - idempotency: Two-phase atomic idempotency locking, in-memory store, PostgreSQL distributed store, and universal HTTP middleware (`Store`, `MemoryStore`, `NewMemoryStore`, `PGStore`, `NewPGStore`, `Middleware`, `Record`, `Response`).
 - logger: Context-aware structured logging with `slog` context propagation, log rate sampling, sensitive field redaction, and HTTP middleware (`Default`, `WithContext`, `FromContext`, `NewSamplingHandler`, `NewRedactingHandler`, `Middleware`).
-- maputil: Generic, zero-dependency map operations (`Keys`, `Values`, `Merge`, `Filter`).
+- maputil: Generic, zero-dependency map operations (`Merge`, `Filter`).
 - metrics: Framework-agnostic instrumentation interfaces (`Counter`, `Gauge`, `Histogram`) with zero-allocation no-op fallbacks (`NoopCounter`, `NoopGauge`, `NoopHistogram`).
 - pagination: Offset and cursor pagination parameter parsing, SQL calculations, and response envelopers (`Parse`, `Params`, `TotalPages`, `Response`, `ParseCursor`, `CursorResponse`).
 - ratelimit: Multi-algorithm rate limiting (`Limiter`, `TokenBucketLimiter`, `SlidingWindowLimiter`, `NewTokenBucket`, `NewSlidingWindow`, `NewWithLimiter`) with trusted proxy CIDR parsing.
@@ -63,7 +63,7 @@ Clean-slate architecture: No backward compatibility preserved. Legacy deprecated
 - retry: Context-aware retry execution supporting constant, linear, exponential, and full jitter backoff strategies (`Do`, `DoWithResult`, `Config`, `Strategy`, `Constant`, `Linear`, `Exponential`, `ExponentialJitter`).
 - securityheaders: OWASP recommended defensive HTTP security headers middleware (`New`, `Default`, `Config`, `DefaultConfig`).
 - shutdown: Graceful OS signal interception and coordinated concurrent resource teardown manager (`Manager`, `New`, `Hook`).
-- sliceutil: Generic functional slice transforms (`Map`, `Filter`, `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`).
+- sliceutil: Generic algorithmic slice operations (`Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`, `First`).
 - stringutil: Sensitive data masking (`MaskEmail`, `MaskPhone`), string truncation (`Truncate`), and cryptographically secure random string generation (`RandomSecureString`, `RandomAlphanumeric`).
 - telemetry: OpenTelemetry trace provider initialization, composite text map propagation, span lifecycle helpers, and universal HTTP middleware (`InitProvider`, `NewTracerProvider`, `TracerProvider`, `Config`, `StartSpan`, `Middleware`).
 - timeutil: UTC and timezone conversions, heuristic date parsing (`ParseTime`), and business day calculations (`AddBusinessDays`, `BusinessDays`, `BusinessDaysBetween`).
