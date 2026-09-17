@@ -363,7 +363,7 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.9%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
 | `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
-| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.5%** |
+| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.0%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |
 | `pagination` | Offset-based request query parser and generic response | **100.0%** |

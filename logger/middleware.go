@@ -5,6 +5,7 @@ package logger
 import (
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -63,12 +64,23 @@ func (r *statusRecorder) Write(b []byte) (int, error) {
 	return n, err
 }
 
+// isAllowedCorrelationHeader guards against extracting and logging arbitrary or sensitive headers.
+// Only standard, non-sensitive request correlation headers are permitted.
+func isAllowedCorrelationHeader(h string) bool {
+	switch strings.ToLower(strings.TrimSpace(h)) {
+	case "x-request-id", "x-correlation-id", "x-trace-id", "request-id", "traceparent":
+		return true
+	default:
+		return false
+	}
+}
+
 // sanitizeHeaderForLogging validates and sanitizes untrusted HTTP header values
 // before injecting into log records. Only safe alphanumeric and delimiter characters
 // (a-z, A-Z, 0-9, -, _, ., :, /) up to 128 characters are accepted, preventing log injection
 // and cleartext logging of sensitive header data.
 func sanitizeHeaderForLogging(raw string) string {
-	if len(raw) == 0 {
+	if raw == "" {
 		return ""
 	}
 	const maxLen = 128
@@ -108,7 +120,7 @@ func Middleware(opts ...MiddlewareOption) func(http.Handler) http.Handler {
 			}
 
 			var reqID string
-			if cfg.RequestIDHeader != "" {
+			if isAllowedCorrelationHeader(cfg.RequestIDHeader) {
 				reqID = sanitizeHeaderForLogging(r.Header.Get(cfg.RequestIDHeader))
 			}
 			reqLogger := baseLogger

@@ -57,7 +57,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `db` | **Early** | 100.0% | pgx connection pool wrapper and transaction runner. Hardened against connection leaks. |
 | `httpclient` | **Early** | 92.9% | Resilient composed HTTP client with rate limiting, circuit breaking, and retries. API undergoing stabilization. |
 | `idempotency` | **Early** | 98.8% | In-memory and PostgreSQL distributed idempotency key store with bounded TTL response eviction. |
-| `logger` | **Early** | 96.5% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
+| `logger` | **Early** | 96.0% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
 | `ratelimit` | **Early** | 100.0% | In-memory rate limiting with Token Bucket and Sliding Window algorithms. |
 | `telemetry` | **Early** | 100.0% | OpenTelemetry distributed tracing wrapper with global and instance-scoped provider support. |
 
