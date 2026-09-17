@@ -18,7 +18,9 @@ cd "${fixture_dir}/tagged-checkout"
 # The fixture has its own refs. This does not move, delete, or recreate tags in
 # the source checkout, including the known conflicting local v0.2.1 tag.
 git tag -d v0.2.1 >/dev/null 2>&1 || true
-git tag -a v0.2.1 -m 'tagged-checkout fixture' HEAD
+git -c user.name='go-libs release fixture' \
+  -c user.email='release-fixture@invalid.example' \
+  tag -a v0.2.1 -m 'tagged-checkout fixture' HEAD
 
 GIT_TAG=v0.2.1 ./scripts/check_version.sh >/dev/null
 
