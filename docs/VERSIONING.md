@@ -53,7 +53,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `validation` | **Stable** | 100.0% | Formatter translating validator/v10 errors into client JSON. |
 | `workerpool` | **Stable** | 92.1% | Bounded concurrent worker pool with task queue. Low risk. |
 | `cache` | **Early** | 87.5% | Singleflight cache unified into `TypedCache` with `EvictionPolicy`. API undergoing stabilization. |
-| `clock` | **Early** | 93.9% | Mockable time abstraction with RealClock and advanceable FakeClock. API undergoing stabilization. |
+| `clock` | **Early** | 95.2% | Mockable time abstraction with RealClock and advanceable FakeClock. API undergoing stabilization. |
 | `db` | **Early** | 100.0% | pgx connection pool wrapper and transaction runner. Hardened against connection leaks. |
 | `httpclient` | **Early** | 92.9% | Resilient composed HTTP client with rate limiting, circuit breaking, and retries. API undergoing stabilization. |
 | `idempotency` | **Early** | 98.8% | In-memory and PostgreSQL idempotency stores with bounded TTL response retention. |

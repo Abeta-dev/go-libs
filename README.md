@@ -354,7 +354,7 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `bodylimit` | Gin middleware to cap HTTP request body sizes | **100.0%** |
 | `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **87.5%** |
 | `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **93.3%** |
-| `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **93.9%** |
+| `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **95.2%** |
 | `cryptoutil` | Secure password hashing (`golang.org/x/crypto/bcrypt`) and CSPRNG password generation (`crypto/rand`) | **100.0%** |
 | `db` | Database Pool & Querier | **100.0%** |
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |

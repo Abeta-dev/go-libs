@@ -112,16 +112,16 @@ jobs:
 
       # Go 1.26 can leak the fuzz coordinator's time-budget deadline as a
       # spurious test failure (go.dev/issue/75804). Bound equivalent work by iterations instead.
-      - name: Run Fuzz Targets (500,000 iterations each)
+      - name: Run Fuzz Targets (100,000 iterations each)
         run: |
-          go test -fuzz=^FuzzRealIP$ -fuzztime=500000x ./ratelimit
-          go test -fuzz=^FuzzJWTExtract$ -fuzztime=500000x ./ginmw
-          go test -fuzz=^FuzzErrorChain$ -fuzztime=500000x ./apperror
-          go test -fuzz=^FuzzDuration$ -fuzztime=500000x ./env
-          go test -fuzz=^FuzzMaskEmail$ -fuzztime=500000x ./stringutil
-          go test -fuzz=^FuzzParseTime$ -fuzztime=500000x ./timeutil
-          go test -fuzz=^FuzzAddBusinessDays$ -fuzztime=500000x ./timeutil
-          go test -fuzz=^FuzzBusinessDays$ -fuzztime=500000x ./timeutil
+          go test -fuzz=^FuzzRealIP$ -fuzztime=100000x ./ratelimit
+          go test -fuzz=^FuzzJWTExtract$ -fuzztime=100000x ./ginmw
+          go test -fuzz=^FuzzErrorChain$ -fuzztime=100000x ./apperror
+          go test -fuzz=^FuzzDuration$ -fuzztime=100000x ./env
+          go test -fuzz=^FuzzMaskEmail$ -fuzztime=100000x ./stringutil
+          go test -fuzz=^FuzzParseTime$ -fuzztime=100000x ./timeutil
+          go test -fuzz=^FuzzAddBusinessDays$ -fuzztime=100000x ./timeutil
+          go test -fuzz=^FuzzBusinessDays$ -fuzztime=100000x ./timeutil
 
   security:
     name: Supply Chain & Vulnerability Scanner

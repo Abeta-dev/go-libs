@@ -262,6 +262,34 @@ func TestFakeClock_SleepAndBlockUntil(t *testing.T) {
 	}
 }
 
+func TestFakeClock_BlockUntilWaitsForRegistration(t *testing.T) {
+	fc := clock.NewFake()
+	started := make(chan struct{})
+	registered := make(chan struct{})
+
+	go func() {
+		close(started)
+		fc.BlockUntil(1)
+		close(registered)
+	}()
+
+	<-started
+	select {
+	case <-registered:
+		t.Fatal("BlockUntil returned before a waiter registered")
+	default:
+	}
+
+	timer := fc.NewTimer(time.Hour)
+	defer timer.Stop()
+
+	select {
+	case <-registered:
+	case <-time.After(time.Second):
+		t.Fatal("BlockUntil did not return after a waiter registered")
+	}
+}
+
 func TestFakeClock_After(t *testing.T) {
 	fc := clock.NewFake()
 	ch := fc.After(3 * time.Second)
