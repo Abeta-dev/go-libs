@@ -10,6 +10,8 @@ GLOBAL_FLOOR=90.0
 PACKAGE_FLOOR=85.0
 GINMW_REQUIRED=100.0
 
+command -v bc >/dev/null || { echo "bc must be available on PATH" >&2; exit 1; }
+
 echo "========================================================"
 echo "🛡️ Running Comprehensive Statement Coverage Gate"
 echo "   - Global Floor:       >= ${GLOBAL_FLOOR}%"

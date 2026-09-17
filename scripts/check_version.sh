@@ -170,7 +170,7 @@ if [ -z "${GO_BASELINE}" ]; then
   exit 1
 fi
 
-STALE_GO_REFS=$(grep -n -E 'Go 1\.25\+|Go 1\.25\.0|go1\.25\+' README.md CONTRIBUTING.md docs/*.md docs/adr/*.md 2>/dev/null || true)
+STALE_GO_REFS=$(grep -n -E 'Go `?1\.25(\.0|\+)?`?|go1\.25\+' README.md CONTRIBUTING.md docs/*.md docs/adr/*.md 2>/dev/null || true)
 if [ -n "${STALE_GO_REFS}" ]; then
   echo "❌ Error: Found current documentation claims below the Go ${GO_BASELINE} baseline:"
   echo "${STALE_GO_REFS}"

@@ -18,7 +18,7 @@ REMOTE="${RELEASE_REMOTE:-${GIT_REMOTE:-${DEFAULT_REMOTE}}}"
 PROXY_URL="${GOPROXY_URL:-${DEFAULT_PROXY}}"
 MANIFEST_PATH="${RELEASE_MANIFEST:-${DEFAULT_MANIFEST}}"
 
-for command in go git curl; do
+for command in go git curl python3; do
   command -v "${command}" >/dev/null || {
     echo "${command} must be available on PATH" >&2
     exit 1
@@ -80,7 +80,8 @@ finish() {
   MANIFEST_GOMOD_SUM="${gomod_sum}" \
   MANIFEST_ERROR="${error_message}" \
   write_manifest
-  rm -rf "${tmp_dir:-}"
+  chmod -R u+w "${tmp_dir:-}" 2>/dev/null || true
+  rm -rf "${tmp_dir:-}" 2>/dev/null || true
   trap - EXIT
   exit "${exit_code}"
 }
@@ -117,7 +118,7 @@ fetch_with_retry() {
   local url="$1"
   local output="$2"
   local attempt=1
-  local max_attempts=4
+  local max_attempts=5
   local delay=1
   local curl_error_file="${tmp_dir}/curl-error"
 
@@ -161,7 +162,7 @@ proxy_mod_sha256="$(sha256 "${tmp_dir}/module.mod")"
 
 download_module_with_retry() {
   local attempt=1
-  local max_attempts=4
+  local max_attempts=5
   local delay=1
   local module_cache
   local download_error_file="${tmp_dir}/go-download-error"
@@ -171,9 +172,11 @@ download_module_with_retry() {
     module_cache="${tmp_dir}/gomodcache-${attempt}"
     rm -rf "${module_cache}" "${download_error_file}"
     if module_json="$(GOWORK=off GOMODCACHE="${module_cache}" GOPROXY="${PROXY_URL}" go mod download -json "${MODULE}@${TAG}" 2>"${download_error_file}")"; then
+      chmod -R u+w "${module_cache}" 2>/dev/null || true
       rm -rf "${module_cache}"
       return 0
     fi
+    chmod -R u+w "${module_cache}" 2>/dev/null || true
     rm -rf "${module_cache}"
     if (( attempt == max_attempts )); then
       echo "Go proxy resolution failed after ${max_attempts} attempts: $(tr '\n' ' ' < "${download_error_file}")" >&2
