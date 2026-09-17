@@ -31,7 +31,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | :--- | :--- | :--- | :--- |
 | `apperror` | **Stable** | 100.0% | Canonical domain error types and JSON encoders. API frozen. |
 | `bodylimit` | **Stable** | 100.0% | Request body cap Gin middleware. Complete and stable. |
-| `circuitbreaker` | **Stable** | 92.2% | Consecutive-failure and failure-ratio state machines. Low risk. |
+| `circuitbreaker` | **Stable** | 93.3% | Consecutive-failure and failure-ratio state machines. Low risk. |
 | `cryptoutil` | **Stable** | 100.0% | Bcrypt password hashing and CSPRNG token generators. API frozen. |
 | `env` | **Stable** | 100.0% | Zero-dependency typed environment variable parser. API frozen. |
 | `ginmw` | **Stable** | 100.0% | Unified Gin middleware chain; guarded by strict 100% CI gate. |
@@ -55,9 +55,9 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `cache` | **Early** | 87.5% | Singleflight cache unified into `TypedCache` with `EvictionPolicy`. API undergoing stabilization. |
 | `clock` | **Early** | 93.9% | Mockable time abstraction with RealClock and advanceable FakeClock. API undergoing stabilization. |
 | `db` | **Early** | 100.0% | pgx connection pool wrapper and transaction runner. Hardened against connection leaks. |
-| `httpclient` | **Early** | 92.0% | Resilient composed HTTP client with rate limiting, circuit breaking, and retries. API undergoing stabilization. |
-| `idempotency` | **Early** | 100.0% | In-memory idempotency key store with bounded TTL response eviction. |
-| `logger` | **Early** | 93.8% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
+| `httpclient` | **Early** | 92.9% | Resilient composed HTTP client with rate limiting, circuit breaking, and retries. API undergoing stabilization. |
+| `idempotency` | **Early** | 98.8% | In-memory idempotency key store with bounded TTL response eviction. |
+| `logger` | **Early** | 96.0% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
 | `ratelimit` | **Early** | 100.0% | In-memory rate limiting with Token Bucket and Sliding Window algorithms. |
 | `telemetry` | **Early** | 100.0% | OpenTelemetry distributed tracing wrapper with global and instance-scoped provider support. |
 
