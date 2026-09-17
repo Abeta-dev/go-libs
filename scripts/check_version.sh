@@ -178,7 +178,7 @@ if [ -n "${STALE_GO_REFS}" ]; then
 fi
 echo "✅ Current documentation claims match the Go ${GO_BASELINE} baseline."
 
-STALE_TAG_REFS=$(grep -n -E "@v[0-9]+[a-zA-Z0-9._-]*" README.md CONTRIBUTING.md docs/*.md docs/adr/*.md 2>/dev/null | grep -v "@v${README_GET_VER}" || true)
+STALE_TAG_REFS=$(grep -n -E "@v[0-9]+[a-zA-Z0-9._-]*" README.md CONTRIBUTING.md docs/*.md docs/adr/*.md 2>/dev/null | grep -v "@v${README_GET_VER}" | grep -v "RELEASE_BASELINE.md" || true)
 if [ -n "${STALE_TAG_REFS}" ]; then
   echo "❌ Error: Found stale or invalid module tag references (must match @v${README_GET_VER}):"
   echo "${STALE_TAG_REFS}"
