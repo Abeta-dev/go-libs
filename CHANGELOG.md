@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-17
+
+### Highlights
+- **Pre-1.0 Minor Reconciliation & Release Baseline**: Reconciled branch history following PR #18 integration and cut monotonic minor version `v0.3.0` to establish clean-slate architecture and prevent version drift across downstream consumers.
+- **Cryptographic Release Verification & Manifest Provenance**: Integrated `scripts/verify_release.sh` into release workflows, generating cryptographically verified `release-manifest.json` with bounded exponential proxy retry backoff (5 attempts, isolated `GOMODCACHE`), SHA-256 module digests, and read-only cache permission safety.
+- **Downstream Baseline Audit**: Added `scripts/verify_release_baseline.sh` and `docs/RELEASE_BASELINE.md` for historical release verification against Go module proxy and checksum database.
+- **Automated Shell & Release Verification Guards**: Introduced `scripts/test_shell_compatibility.sh`, `scripts/test_release_scripts.sh`, and `scripts/test_release_workflow.sh` ensuring strict Bash 3.2 portability, 90-day manifest artifact retention, and release immutability.
+- **Dynamic Truth-Gate & Coverage Enforcement**: Fully synchronized 95.8% measured statement coverage across all documentation, meta tags, and web portal, enforced by AST-based `docs_truth_test.go` and Go 1.26.0+ toolchain baseline assertions.
+
+### Added
+- logger: Decoupled `Sampler` interface and `WithSampler` functional option for custom log sampling algorithms.
+- httpclient: `DefaultMaxRetryBodySize` constant defining 10MB memory threshold for retry body buffering.
+- db: `CopyDBTX` interface extending `DBTX` with `CopyFrom` bulk ingestion.
+- CI & Release Pipelines: Added `scripts/verify_release.sh` generating `release-manifest.json` with multi-attempt proxy backoff.
+- Baseline Verifier: Added `scripts/verify_release_baseline.sh` and `docs/RELEASE_BASELINE.md` for downstream module integrity checks.
+- Test Guards: Added `scripts/test_shell_compatibility.sh`, `scripts/test_release_scripts.sh`, and `scripts/test_release_workflow.sh`.
+
+### Changed
+- `logger`: Decoupled `SamplingHandler` from `ratelimit`; instantiates an internal token-bucket sampler when no custom sampler is supplied.
+- `httpclient`: Bounded retry buffering using `io.LimitReader`; streams exceeding `DefaultMaxRetryBodySize` are executed as a single attempt without replay buffering.
+- `db`: Streamlined `DBTX` interface to `Exec`, `Query`, and `QueryRow`; batch `CopyFrom` moved to segregated `CopyDBTX` interface.
+- Release Workflow: Configured `.github/workflows/release.yml` to automatically verify immutable release artifacts, attach `release-manifest.json` to GitHub releases, and retain artifacts for 90 days.
+- Documentation: Updated baseline toolchain to Go 1.26.0+ and synchronized overall statement coverage to 95.8%.
+
+### Fixed
+- Cache Cleanup Permissions: Prepended `chmod -R u+w` before `rm -rf` on temporary module caches and test fixtures, preventing permission errors on read-only Go cache trees.
+- Prerequisite Validation: Added checks for `python3` in `verify_release.sh` and `bc` in `check_coverage.sh`.
+- Version Check Regex: Hardened stale version regex in `check_version.sh` to be backtick-tolerant.
+- `httputil`: Preserved raw error transparency in `ErrorFromDomain` returning `err.Error()` verbatim.
+
 ## [0.2.1] - 2026-09-17
 
 ### Highlights

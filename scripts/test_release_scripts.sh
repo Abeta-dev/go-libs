@@ -17,12 +17,13 @@ chmod +x "${fixture_dir}/tagged-checkout/scripts/check_version.sh"
 cd "${fixture_dir}/tagged-checkout"
 # The fixture has its own refs. This does not move, delete, or recreate tags in
 # the source checkout, including the known conflicting local v0.2.1 tag.
-git tag -d v0.2.1 >/dev/null 2>&1 || true
+TARGET_TAG="v$(grep -E 'go get github.com/umesh0492/go-libs@v' "${ROOT_DIR}/README.md" | head -n1 | sed -E 's/.*go-libs@v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?).*/\1/')"
+git tag -d "${TARGET_TAG}" >/dev/null 2>&1 || true
 git -c user.name='go-libs release fixture' \
   -c user.email='release-fixture@invalid.example' \
-  tag -a v0.2.1 -m 'tagged-checkout fixture' HEAD
+  tag -a "${TARGET_TAG}" -m 'tagged-checkout fixture' HEAD
 
-GIT_TAG=v0.2.1 ./scripts/check_version.sh >/dev/null
+GIT_TAG="${TARGET_TAG}" ./scripts/check_version.sh >/dev/null
 
 # A successful baseline audit must remain successful after Go creates read-only
 # files in its temporary module cache. The baseline script uses the source
@@ -32,15 +33,17 @@ cd "${ROOT_DIR}"
 
 cd "${fixture_dir}/tagged-checkout"
 # A populated Unreleased section must take precedence over the latest release.
-python3 - <<'PY'
+python3 - "${TARGET_TAG#v}" <<'PY'
+import sys
 from pathlib import Path
+target_ver = sys.argv[1]
 path = Path("CHANGELOG.md")
 text = path.read_text()
-path.write_text(text.replace("## [0.2.1]", "## [Unreleased]\n\n### Added\n- logger: `WithSampler` remains available.\n\n## [0.2.1]", 1))
+path.write_text(text.replace(f"## [{target_ver}]", f"## [Unreleased]\n\n### Added\n- logger: `WithSampler` remains available.\n\n## [{target_ver}]", 1))
 PY
-GIT_TAG=v0.2.1 ./scripts/check_version.sh >/dev/null
+GIT_TAG="${TARGET_TAG}" ./scripts/check_version.sh >/dev/null
 
-if GIT_TAG=v0.2.1-not-semver ./scripts/check_version.sh >/dev/null 2>&1; then
+if GIT_TAG="${TARGET_TAG}-not-semver" ./scripts/check_version.sh >/dev/null 2>&1; then
   echo 'check_version.sh accepted an invalid tagged-checkout version' >&2
   exit 1
 fi
