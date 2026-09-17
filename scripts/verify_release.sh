@@ -119,15 +119,19 @@ fetch_with_retry() {
   local attempt=1
   local max_attempts=4
   local delay=1
+  local curl_error_file="${tmp_dir}/curl-error"
 
   while (( attempt <= max_attempts )); do
-    if curl --fail --silent --show-error --location --retry 0 "${url}" -o "${output}"; then
+    rm -f "${output}" "${curl_error_file}"
+    if curl --fail --silent --show-error --location --retry 0 "${url}" -o "${output}" 2>"${curl_error_file}"; then
       return 0
     fi
     if (( attempt == max_attempts )); then
-      fail "unable to fetch ${url} after ${max_attempts} attempts"
+      error_message="unable to fetch ${url} after ${max_attempts} attempts: $(tr '\n' ' ' < "${curl_error_file}")"
+      echo "ERROR: ${error_message}" >&2
+      exit 1
     fi
-    echo "Retrying ${url} in ${delay}s (attempt ${attempt}/${max_attempts})..." >&2
+    echo "Retrying ${url} in ${delay}s (attempt ${attempt}/${max_attempts}): $(tr '\n' ' ' < "${curl_error_file}")" >&2
     sleep "${delay}"
     delay=$((delay * 2))
     attempt=$((attempt + 1))
@@ -155,7 +159,36 @@ fetch_with_retry "${proxy_base}.mod" "${tmp_dir}/module.mod"
 proxy_zip_sha256="$(sha256 "${tmp_dir}/module.zip")"
 proxy_mod_sha256="$(sha256 "${tmp_dir}/module.mod")"
 
-module_json="$(GOWORK=off GOPROXY="${PROXY_URL}" go mod download -json "${MODULE}@${TAG}")" || fail "Go could not resolve ${MODULE}@${TAG}"
+download_module_with_retry() {
+  local attempt=1
+  local max_attempts=4
+  local delay=1
+  local module_cache
+  local download_error_file="${tmp_dir}/go-download-error"
+
+  module_json=''
+  while (( attempt <= max_attempts )); do
+    module_cache="${tmp_dir}/gomodcache-${attempt}"
+    rm -rf "${module_cache}" "${download_error_file}"
+    if module_json="$(GOWORK=off GOMODCACHE="${module_cache}" GOPROXY="${PROXY_URL}" go mod download -json "${MODULE}@${TAG}" 2>"${download_error_file}")"; then
+      rm -rf "${module_cache}"
+      return 0
+    fi
+    rm -rf "${module_cache}"
+    if (( attempt == max_attempts )); then
+      echo "Go proxy resolution failed after ${max_attempts} attempts: $(tr '\n' ' ' < "${download_error_file}")" >&2
+      return 1
+    fi
+    echo "Retrying Go proxy resolution in ${delay}s (attempt ${attempt}/${max_attempts}): $(tr '\n' ' ' < "${download_error_file}")" >&2
+    sleep "${delay}"
+    delay=$((delay * 2))
+    attempt=$((attempt + 1))
+  done
+}
+
+if ! download_module_with_retry; then
+  fail "Go could not resolve ${MODULE}@${TAG}"
+fi
 module_sum="$(printf '%s\n' "${module_json}" | sed -n 's/^[[:space:]]*"Sum": "\([^"]*\)".*/\1/p')"
 gomod_sum="$(printf '%s\n' "${module_json}" | sed -n 's/^[[:space:]]*"GoModSum": "\([^"]*\)".*/\1/p')"
 [[ -n "${module_sum}" && -n "${gomod_sum}" ]] || fail "Go did not return checksums for ${MODULE}@${TAG}"

@@ -93,4 +93,18 @@ jobs:
             echo "No CHANGELOG section found for $TAG" >&2
             exit 1
           }
-          gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$NOTES"
+          gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$NOTES" release-manifest.json
+
+      - name: Replace release verification manifest on rerun
+        if: steps.release-status.outputs.exists == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          test -s release-manifest.json || {
+            echo 'Release verification manifest is missing or empty.' >&2
+            exit 1
+          }
+          # Preserve release metadata and all unrelated assets. Only this verifier
+          # output is refreshed when an immutable tag's workflow is rerun.
+          gh release upload "$TAG" release-manifest.json --clobber

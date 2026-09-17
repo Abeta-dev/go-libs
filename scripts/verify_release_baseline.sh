@@ -41,16 +41,20 @@ fetch_with_retry() {
   local url="$1"
   local output="$2"
   local attempt=1
+  local max_attempts=4
   local delay=1
-  while (( attempt <= 4 )); do
-    if curl --fail --silent --show-error --location --retry 0 "${url}" -o "${output}"; then
+  local curl_error_file="${tmp_dir}/curl-error"
+
+  while (( attempt <= max_attempts )); do
+    rm -f "${output}" "${curl_error_file}"
+    if curl --fail --silent --show-error --location --retry 0 "${url}" -o "${output}" 2>"${curl_error_file}"; then
       return 0
     fi
-    if (( attempt == 4 )); then
-      echo "unable to fetch ${url} after 4 attempts" >&2
+    if (( attempt == max_attempts )); then
+      echo "unable to fetch ${url} after ${max_attempts} attempts: $(tr '\n' ' ' < "${curl_error_file}")" >&2
       return 1
     fi
-    echo "Retrying ${url} in ${delay}s (attempt ${attempt}/4)..." >&2
+    echo "Retrying ${url} in ${delay}s (attempt ${attempt}/${max_attempts}): $(tr '\n' ' ' < "${curl_error_file}")" >&2
     sleep "${delay}"
     delay=$((delay * 2))
     attempt=$((attempt + 1))
