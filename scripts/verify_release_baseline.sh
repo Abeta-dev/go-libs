@@ -103,11 +103,14 @@ download_module_with_retry() {
   module_json=''
   while (( attempt <= max_attempts )); do
     module_cache="${tmp_dir}/gomodcache-${attempt}"
+    chmod -R u+w "${module_cache}" 2>/dev/null || true
     rm -rf "${module_cache}" "${download_error_file}"
     if module_json="$(GOWORK=off GOMODCACHE="${module_cache}" GOPROXY="${PROXY_URL}" go mod download -json "${MODULE}@${VERSION}" 2>"${download_error_file}")"; then
+      chmod -R u+w "${module_cache}" 2>/dev/null || true
       rm -rf "${module_cache}"
       return 0
     fi
+    chmod -R u+w "${module_cache}" 2>/dev/null || true
     rm -rf "${module_cache}"
     if (( attempt == max_attempts )); then
       echo "Go proxy resolution failed after ${max_attempts} attempts: $(tr '\n' ' ' < "${download_error_file}")" >&2

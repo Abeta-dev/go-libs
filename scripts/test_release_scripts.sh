@@ -7,7 +7,7 @@ command -v git >/dev/null || { echo 'git must be available on PATH' >&2; exit 1;
 command -v go >/dev/null || { echo 'go must be available on PATH' >&2; exit 1; }
 
 fixture_dir="$(mktemp -d)"
-trap 'rm -rf "${fixture_dir}"' EXIT
+trap 'chmod -R u+w "${fixture_dir}" 2>/dev/null || true; rm -rf "${fixture_dir}"' EXIT
 
 git clone --quiet --no-local "${ROOT_DIR}" "${fixture_dir}/tagged-checkout"
 # Exercise the current gate against an isolated checkout; uncommitted review fixes
