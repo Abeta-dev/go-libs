@@ -150,7 +150,7 @@ func markdownAndHTMLFiles(t *testing.T, path string) []string {
 		if err != nil {
 			return err
 		}
-		if entry.IsDir() || !(strings.HasSuffix(path, ".md") || strings.HasSuffix(path, ".html")) {
+		if entry.IsDir() || (!strings.HasSuffix(path, ".md") && !strings.HasSuffix(path, ".html")) {
 			return nil
 		}
 		files = append(files, path)
