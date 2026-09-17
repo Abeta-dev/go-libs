@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-17
+
+### Highlights
+- **Pre-1.0 Minor Reconciliation & Release Baseline**: Reconciled branch history following PR #18 integration and cut monotonic minor version `v0.3.0` to establish clean-slate architecture and prevent version drift across downstream consumers.
+- **Cryptographic Release Verification & Manifest Provenance**: Integrated `scripts/verify_release.sh` into release workflows, generating cryptographically verified `release-manifest.json` with bounded exponential proxy retry backoff (5 attempts, isolated `GOMODCACHE`), SHA-256 module digests, and read-only cache permission safety.
+- **Downstream Baseline Audit**: Added `scripts/verify_release_baseline.sh` and `docs/RELEASE_BASELINE.md` for historical release verification against Go module proxy and checksum database.
+- **Automated Shell & Release Verification Guards**: Introduced `scripts/test_shell_compatibility.sh`, `scripts/test_release_scripts.sh`, and `scripts/test_release_workflow.sh` ensuring strict Bash 3.2 portability, 90-day manifest artifact retention, and release immutability.
+- **Dynamic Truth-Gate & Coverage Enforcement**: Fully synchronized 95.8% measured statement coverage across all documentation, meta tags, and web portal, enforced by AST-based `docs_truth_test.go` and Go 1.26.0+ toolchain baseline assertions.
+
+### Added
+- logger: Decoupled `Sampler` interface and `WithSampler` functional option for custom log sampling algorithms.
+- httpclient: `DefaultMaxRetryBodySize` constant defining 10MB memory threshold for retry body buffering.
+- db: `CopyDBTX` interface extending `DBTX` with `CopyFrom` bulk ingestion.
+- CI & Release Pipelines: Added `scripts/verify_release.sh` generating `release-manifest.json` with multi-attempt proxy backoff.
+- Baseline Verifier: Added `scripts/verify_release_baseline.sh` and `docs/RELEASE_BASELINE.md` for downstream module integrity checks.
+- Test Guards: Added `scripts/test_shell_compatibility.sh`, `scripts/test_release_scripts.sh`, and `scripts/test_release_workflow.sh`.
+
+### Changed
+- `logger`: Decoupled `SamplingHandler` from `ratelimit`; instantiates an internal token-bucket sampler when no custom sampler is supplied.
+- `httpclient`: Bounded retry buffering using `io.LimitReader`; streams exceeding `DefaultMaxRetryBodySize` are executed as a single attempt without replay buffering.
+- `db`: Streamlined `DBTX` interface to `Exec`, `Query`, and `QueryRow`; batch `CopyFrom` moved to segregated `CopyDBTX` interface.
+- Release Workflow: Configured `.github/workflows/release.yml` to automatically verify immutable release artifacts, attach `release-manifest.json` to GitHub releases, and retain artifacts for 90 days.
+- Documentation: Updated baseline toolchain to Go 1.26.0+ and synchronized overall statement coverage to 95.8%.
+
+### Fixed
+- Cache Cleanup Permissions: Prepended `chmod -R u+w` before `rm -rf` on temporary module caches and test fixtures, preventing permission errors on read-only Go cache trees.
+- Prerequisite Validation: Added checks for `python3` in `verify_release.sh` and `bc` in `check_coverage.sh`.
+- Version Check Regex: Hardened stale version regex in `check_version.sh` to be backtick-tolerant.
+- `httputil`: Preserved raw error transparency in `ErrorFromDomain` returning `err.Error()` verbatim.
+
 ## [0.2.1] - 2026-09-17
 
 ### Highlights
@@ -37,7 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `telemetry.Middleware`: W3C distributed tracing extraction and automatic OpenTelemetry span instrumentation.
   - `logger.Middleware`: Structured access logging using standard library `log/slog` with latency tracking, status capture, and request ID correlation.
   - `idempotency.Middleware`: End-to-end HTTP idempotency filter with in-memory or PostgreSQL stores, automatic payload caching, concurrent in-progress 409 Conflict handling, and replay headers.
-- **Pruning Standard Library Duplication from `sliceutil` & `maputil`**: Pruned redundant wrapper functions (`sliceutil.Map`, `sliceutil.Filter`, `maputil.Keys`, `maputil.Values`) in favor of idiomatic Go loops and standard library packages (`slices`, `maps`). Stabilized and expanded high-value algorithmic extensions: `sliceutil.Chunk`, `sliceutil.GroupBy`, `sliceutil.Unique`, `sliceutil.Flatten`, `sliceutil.Reduce`, and `maputil.Merge`.
+- **Utility API Consolidation**: Removed redundant standard-library wrappers in favor of idiomatic Go loops and the `slices` and `maps` packages. Stabilized and expanded high-value algorithmic extensions: `sliceutil.Chunk`, `sliceutil.GroupBy`, `sliceutil.Unique`, `sliceutil.Flatten`, `sliceutil.Reduce`, and `maputil.Merge`.
 - **Reference Microservice (`examples/microservice`) Updates**: Enhanced reference implementation demonstrating production best practices, item batching via `sliceutil.Chunk`, clean loops, and composition of operational primitives.
 
 ### Compatibility Notice
@@ -52,8 +82,8 @@ Clean-slate architecture: No backward compatibility preserved. Legacy deprecated
 - logger: Decoupled universal `net/http` standard structured logging middleware (`Middleware`, `MiddlewareOption`, `WithLogger`, `WithRequestIDHeader`, `WithExtraAttributes`).
 
 ### Changed
-- `sliceutil`: Pruned redundant standard library duplication (`Map`, `Filter`) in favor of idiomatic Go loops and standard `slices`; expanded and stabilized algorithmic utilities: `Chunk`, `GroupBy`, `Unique`, `Flatten`, `Reduce`, `First`.
-- `maputil`: Pruned redundant standard library duplication (`Keys`, `Values`) in favor of standard `maps`; retained zero-dependency extensions: `Merge`, `Filter`.
+- `sliceutil`: Pruned redundant standard-library duplication; expanded and stabilized algorithmic utilities: `Chunk`, `GroupBy`, `Unique`, `Flatten`, `Reduce`, `First`.
+- `maputil`: Pruned redundant standard-library duplication in favor of `maps`; retained zero-dependency extensions: `Merge`, `Filter`.
 - `examples/microservice`: Updated reference microservice showcasing `sliceutil.Chunk` for item batch processing, clean standard filtering loops, and universal middleware composition.
 - `securityheaders`: Transitioned `securityheaders.New(cfg Config)` to functional options `securityheaders.New(opts ...Option)` with `WithServerName`, `WithHSTSMaxAge`, `WithCSP`, `WithPermissionsPolicy`.
 - `telemetry`: Transitioned `telemetry.NewTracerProvider(cfg Config)` to functional options `telemetry.NewTracerProvider(opts ...Option)` with `WithServiceName`, `WithServiceVersion`, `WithEnvironment`, `WithSampleRate`.
@@ -61,8 +91,8 @@ Clean-slate architecture: No backward compatibility preserved. Legacy deprecated
 - `ginmw`: `Idempotency` logs store errors during `Lock`, `Unlock`, and `Save` operations.
 
 ### Removed (BREAKING)
-- `sliceutil`: Removed redundant wrappers `Map` and `Filter`.
-- `maputil`: Removed redundant wrappers `Keys` and `Values`.
+- `sliceutil`: Removed redundant standard-library wrapper APIs.
+- `maputil`: Removed redundant standard-library wrapper APIs.
 - `circuitbreaker`: Removed redundant type alias `CircuitBreaker` and deprecated `New(...)` constructor; use `ConsecutiveBreaker` and `NewConsecutiveBreaker(...)` instead.
 - `cache`: Removed redundant `NewTTL[T]` constructor; use `NewTypedCache[T]` instead.
 - `httpclient`: Removed redundant `WithTimeout` alias; use `WithTotalTimeout` instead.

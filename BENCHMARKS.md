@@ -3,7 +3,8 @@
 `go-libs` is designed for high-throughput, low-latency cloud-native microservices. Below are representative performance benchmarks run on modern hardware.
 
 ### Benchmark Setup
-- Go Version: `go1.25+`
+- Supported Go baseline: `go1.26.0` (from `go.mod`)
+- Historical measurement toolchain: `go1.25.0`
 - OS/Arch: `darwin/arm64`
 - Hardware: Apple Silicon (ARM64)
 
@@ -39,7 +40,7 @@ Reproducible with: `go test -bench=. -benchmem -run=^$ ./...`
 
 ### Head-to-Head Comparative Analysis vs Ecosystem Standards
 
-Benchmarks executed with `go test -bench=. -benchmem` on Apple Silicon Darwin/amd64 (Go 1.25.0):
+Benchmarks executed with `go test -bench=. -benchmem` on Apple Silicon Darwin/amd64 using the historical Go 1.25.0 measurement toolchain:
 
 #### 1. Outbound Circuit Breaker: `go-libs/circuitbreaker` vs `sony/gobreaker`
 
