@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Verifies immutable upstream release identity without trusting local tags.
-# The local v0.2.1 ref may be stale or conflicting; this script never modifies it.
+# Audits the historical v0.2.1 publication whose local tag conflicts with origin.
+# This is migration evidence, not a future-release gate. Use verify_release.sh
+# with the release tag for recurring release validation.
 
 readonly MODULE='github.com/umesh0492/go-libs'
 readonly VERSION='v0.2.1'
-readonly REMOTE='origin'
+readonly REMOTE="${RELEASE_BASELINE_REMOTE:-${GIT_REMOTE:-origin}}"
+readonly PROXY_URL="${GOPROXY_URL:-https://proxy.golang.org}"
 readonly EXPECTED_TAG_OBJECT='6df2ebb2d229dd82b2f95a6c9cc5a6b3b4542b43'
 readonly EXPECTED_COMMIT='b75acc6d82e47189ef174a4ea80134fed8cd392f'
 readonly EXPECTED_ZIP_SHA256='d519b6624138503f1cbe8f3de071f0fe685b521ad5f1f9634a0a85a1992fc9db'
@@ -17,24 +19,48 @@ readonly EXPECTED_GOMOD_SUM='h1:R7gQaadUNwpnavd5P96ThNbhYyUUKyVbfKCR/mu29/o='
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-command -v go >/dev/null || {
-  echo 'go must be available on PATH' >&2
-  exit 1
-}
-command -v curl >/dev/null || {
-  echo 'curl must be available on PATH' >&2
-  exit 1
-}
+for command in go git curl; do
+  command -v "${command}" >/dev/null || {
+    echo "${command} must be available on PATH" >&2
+    exit 1
+  }
+done
 
 sha256() {
-  sha256sum "$1" | awk '{print $1}'
+  if command -v sha256sum >/dev/null; then
+    sha256sum "$1" | awk '{print $1}'
+  elif command -v shasum >/dev/null; then
+    shasum -a 256 "$1" | awk '{print $1}'
+  else
+    echo 'either sha256sum or shasum -a 256 must be available' >&2
+    exit 1
+  fi
+}
+
+fetch_with_retry() {
+  local url="$1"
+  local output="$2"
+  local attempt=1
+  local delay=1
+  while (( attempt <= 4 )); do
+    if curl --fail --silent --show-error --location --retry 0 "${url}" -o "${output}"; then
+      return 0
+    fi
+    if (( attempt == 4 )); then
+      echo "unable to fetch ${url} after 4 attempts" >&2
+      return 1
+    fi
+    echo "Retrying ${url} in ${delay}s (attempt ${attempt}/4)..." >&2
+    sleep "${delay}"
+    delay=$((delay * 2))
+    attempt=$((attempt + 1))
+  done
 }
 
 assert_equals() {
   local label="$1"
   local want="$2"
   local got="$3"
-
   if [[ "${got}" != "${want}" ]]; then
     printf 'ERROR: %s mismatch\n  expected: %s\n  got:      %s\n' "${label}" "${want}" "${got}" >&2
     exit 1
@@ -50,13 +76,13 @@ remote_commit="$(git ls-remote "${REMOTE}" "refs/tags/${VERSION}^{}" | awk 'NR =
 assert_equals 'remote tag object' "${EXPECTED_TAG_OBJECT}" "${remote_tag_object}"
 assert_equals 'remote tagged commit' "${EXPECTED_COMMIT}" "${remote_commit}"
 
-proxy_base="https://proxy.golang.org/${MODULE}/@v/${VERSION}"
-curl --fail --silent --show-error --location "${proxy_base}.zip" -o "${tmp_dir}/module.zip"
-curl --fail --silent --show-error --location "${proxy_base}.mod" -o "${tmp_dir}/module.mod"
+proxy_base="${PROXY_URL%/}/${MODULE}/@v/${VERSION}"
+fetch_with_retry "${proxy_base}.zip" "${tmp_dir}/module.zip"
+fetch_with_retry "${proxy_base}.mod" "${tmp_dir}/module.mod"
 assert_equals 'proxy zip SHA-256' "${EXPECTED_ZIP_SHA256}" "$(sha256 "${tmp_dir}/module.zip")"
 assert_equals 'proxy module file SHA-256' "${EXPECTED_MOD_SHA256}" "$(sha256 "${tmp_dir}/module.mod")"
 
-module_json="$(GOWORK=off go mod download -json "${MODULE}@${VERSION}")"
+module_json="$(GOWORK=off GOPROXY="${PROXY_URL}" go mod download -json "${MODULE}@${VERSION}")"
 resolved_sum="$(printf '%s\n' "${module_json}" | sed -n 's/^[[:space:]]*"Sum": "\([^"]*\)".*/\1/p')"
 resolved_gomod_sum="$(printf '%s\n' "${module_json}" | sed -n 's/^[[:space:]]*"GoModSum": "\([^"]*\)".*/\1/p')"
 assert_equals 'Go module checksum' "${EXPECTED_SUM}" "${resolved_sum}"
@@ -72,4 +98,4 @@ if git rev-parse --verify --quiet "refs/tags/${VERSION}" >/dev/null; then
   fi
 fi
 
-printf 'Release baseline verification passed for %s@%s.\n' "${MODULE}" "${VERSION}"
+printf 'Historical release baseline audit passed for %s@%s.\n' "${MODULE}" "${VERSION}"

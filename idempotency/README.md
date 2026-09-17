@@ -32,8 +32,14 @@ import (
     "github.com/umesh0492/go-libs/ginmw"
 )
 
-// In production, implement idempotency.Store using Redis or PostgreSQL
-store := idempotency.NewMemoryStore()
+// NewMemoryStore is suitable for one process. Use PGStore for multi-replica deployments.
+store, err := idempotency.NewPGStore(pool,
+    idempotency.WithPGLockTTL(30*time.Second),
+    idempotency.WithPGResponseTTL(24*time.Hour),
+)
+if err != nil {
+    return err
+}
 
 r := gin.New()
 
@@ -67,8 +73,23 @@ Content-Type: application/json
 
 ---
 
+## PostgreSQL Store for Multi-Replica Deployments
+
+`PGStore` is the built-in PostgreSQL implementation of `Store`. It accepts any `db.DBTX`, so callers may provide either a pool or a transaction. Apply `IdempotencySchemaDDL` through the application's migration system before serving requests; `NewPGStore` does not execute DDL.
+
+```go
+store, err := idempotency.NewPGStore(pool,
+    idempotency.WithPGLockTTL(30*time.Second),
+    idempotency.WithPGResponseTTL(24*time.Hour),
+    idempotency.WithPGTableName("idempotency_keys"), // optional; identifiers are validated
+)
+```
+
+`Lock` first uses `INSERT ... ON CONFLICT DO NOTHING`, then reads the conflicting row. An expired record or `IN_PROGRESS` lease is reclaimed with a conditional update, so only one replica obtains the next lease. `Save` persists the status code, headers, body, and response expiry; `Unlock` removes only an in-progress record. `PGStore` does not create a transaction around the business handler: when response persistence must be coupled to application writes, pass the transaction as `db.DBTX` and commit according to the application's transaction boundary.
+
 ## Known Limitations & Memory Characteristics
 
-- **In-Memory Retention Eviction**: `MemoryStore` stores cached responses in process memory. By default, completed responses persist until process shutdown. To prevent unbounded memory growth in long-running services, always configure bounded retention using `WithResponseTTL` (e.g. 24 hours) and `WithMaxEntries` (e.g. 50,000 keys) to automatically evict expired and oldest entries.
-- **Single-Process Scope**: `MemoryStore` is scoped to a single Go process. In horizontally scaled environments across multiple server instances, use a distributed store backed by Redis or PostgreSQL so all instances share the same idempotency locks and responses.
+- **In-Memory Retention Eviction**: `MemoryStore` stores cached responses in process memory. By default, completed responses persist until process shutdown. To prevent unbounded memory growth in long-running services, configure bounded retention using `WithResponseTTL` (for example, 24 hours) and `WithMaxEntries` (for example, 50,000 keys).
+- **Single-Process Scope**: `MemoryStore` is scoped to one Go process. In horizontally scaled deployments, use `PGStore` so replicas share locks and cached responses.
+- **Client key semantics**: The store keys only on the supplied idempotency key. Scope and validate keys (for example, by authenticated principal and operation) before calling the middleware; do not reuse a key for different requests.
 

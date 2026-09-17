@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `telemetry.Middleware`: W3C distributed tracing extraction and automatic OpenTelemetry span instrumentation.
   - `logger.Middleware`: Structured access logging using standard library `log/slog` with latency tracking, status capture, and request ID correlation.
   - `idempotency.Middleware`: End-to-end HTTP idempotency filter with in-memory or PostgreSQL stores, automatic payload caching, concurrent in-progress 409 Conflict handling, and replay headers.
-- **Pruning Standard Library Duplication from `sliceutil` & `maputil`**: Pruned redundant wrapper functions (`sliceutil.Map`, `sliceutil.Filter`, `maputil.Keys`, `maputil.Values`) in favor of idiomatic Go loops and standard library packages (`slices`, `maps`). Stabilized and expanded high-value algorithmic extensions: `sliceutil.Chunk`, `sliceutil.GroupBy`, `sliceutil.Unique`, `sliceutil.Flatten`, `sliceutil.Reduce`, and `maputil.Merge`.
+- **Utility API Consolidation**: Removed redundant standard-library wrappers in favor of idiomatic Go loops and the `slices` and `maps` packages. Stabilized and expanded high-value algorithmic extensions: `sliceutil.Chunk`, `sliceutil.GroupBy`, `sliceutil.Unique`, `sliceutil.Flatten`, `sliceutil.Reduce`, and `maputil.Merge`.
 - **Reference Microservice (`examples/microservice`) Updates**: Enhanced reference implementation demonstrating production best practices, item batching via `sliceutil.Chunk`, clean loops, and composition of operational primitives.
 
 ### Compatibility Notice
@@ -52,8 +52,8 @@ Clean-slate architecture: No backward compatibility preserved. Legacy deprecated
 - logger: Decoupled universal `net/http` standard structured logging middleware (`Middleware`, `MiddlewareOption`, `WithLogger`, `WithRequestIDHeader`, `WithExtraAttributes`).
 
 ### Changed
-- `sliceutil`: Pruned redundant standard library duplication (`Map`, `Filter`) in favor of idiomatic Go loops and standard `slices`; expanded and stabilized algorithmic utilities: `Chunk`, `GroupBy`, `Unique`, `Flatten`, `Reduce`, `First`.
-- `maputil`: Pruned redundant standard library duplication (`Keys`, `Values`) in favor of standard `maps`; retained zero-dependency extensions: `Merge`, `Filter`.
+- `sliceutil`: Pruned redundant standard-library duplication; expanded and stabilized algorithmic utilities: `Chunk`, `GroupBy`, `Unique`, `Flatten`, `Reduce`, `First`.
+- `maputil`: Pruned redundant standard-library duplication in favor of `maps`; retained zero-dependency extensions: `Merge`, `Filter`.
 - `examples/microservice`: Updated reference microservice showcasing `sliceutil.Chunk` for item batch processing, clean standard filtering loops, and universal middleware composition.
 - `securityheaders`: Transitioned `securityheaders.New(cfg Config)` to functional options `securityheaders.New(opts ...Option)` with `WithServerName`, `WithHSTSMaxAge`, `WithCSP`, `WithPermissionsPolicy`.
 - `telemetry`: Transitioned `telemetry.NewTracerProvider(cfg Config)` to functional options `telemetry.NewTracerProvider(opts ...Option)` with `WithServiceName`, `WithServiceVersion`, `WithEnvironment`, `WithSampleRate`.
@@ -61,8 +61,8 @@ Clean-slate architecture: No backward compatibility preserved. Legacy deprecated
 - `ginmw`: `Idempotency` logs store errors during `Lock`, `Unlock`, and `Save` operations.
 
 ### Removed (BREAKING)
-- `sliceutil`: Removed redundant wrappers `Map` and `Filter`.
-- `maputil`: Removed redundant wrappers `Keys` and `Values`.
+- `sliceutil`: Removed redundant standard-library wrapper APIs.
+- `maputil`: Removed redundant standard-library wrapper APIs.
 - `circuitbreaker`: Removed redundant type alias `CircuitBreaker` and deprecated `New(...)` constructor; use `ConsecutiveBreaker` and `NewConsecutiveBreaker(...)` instead.
 - `cache`: Removed redundant `NewTTL[T]` constructor; use `NewTypedCache[T]` instead.
 - `httpclient`: Removed redundant `WithTimeout` alias; use `WithTotalTimeout` instead.

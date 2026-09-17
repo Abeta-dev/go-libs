@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing immutable tag to release (for example v0.3.0)'
+        description: 'Existing immutable SemVer tag to release (for example v0.3.0 or v0.3.0-rc.1)'
         required: true
         type: string
 
@@ -22,32 +22,47 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          fetch-depth: 0
-
       - name: Resolve release tag
         id: release
         env:
           INPUT_TAG: ${{ inputs.tag }}
         run: |
           TAG="${INPUT_TAG:-${GITHUB_REF_NAME}}"
-          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Release tag must use vMAJOR.MINOR.PATCH: $TAG" >&2
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+            echo "Release tag must use vMAJOR.MINOR.PATCH or a SemVer prerelease: $TAG" >&2
             exit 1
           fi
-          git rev-parse --verify --quiet "refs/tags/$TAG" >/dev/null || {
-            echo "Tag $TAG does not exist in this checkout." >&2
-            exit 1
-          }
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Verify source
+      - name: Checkout immutable release tag
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        with:
+          go-version: '1.26.x'
+          cache: true
+
+      - name: Verify source and immutable release artifact
+        env:
+          GIT_TAG: ${{ steps.release.outputs.tag }}
         run: |
           go mod verify
+          ./scripts/check_version.sh
           go test ./...
-          ./scripts/verify_release_baseline.sh
+          ./scripts/verify_release.sh "$GIT_TAG"
+
+      - name: Upload release verification manifest
+        if: always()
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: release-manifest-${{ steps.release.outputs.tag }}
+          path: release-manifest.json
+          if-no-files-found: warn
+          retention-days: 90
 
       - name: Check release status
         id: release-status
@@ -57,7 +72,7 @@ jobs:
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Release $TAG already exists; leaving its immutable artifact unchanged."
+            echo "Release $TAG already exists; leaving its immutable release notes unchanged."
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
@@ -68,5 +83,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.release.outputs.tag }}
         run: |
-          gh release create "$TAG" --verify-tag --title "$TAG" \
-            --notes-file <(awk -v ver="${TAG#v}" 'index($0, "## [" ver "]") == 1 { flag=1; print; next } /^## \[/ { flag=0 } flag' CHANGELOG.md)
+          NOTES=$(mktemp)
+          awk -v ver="${TAG#v}" '
+            index($0, "## [" ver "]") == 1 { found=1; print; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > "$NOTES"
+          test -s "$NOTES" || {
+            echo "No CHANGELOG section found for $TAG" >&2
+            exit 1
+          }
+          gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$NOTES"

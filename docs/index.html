@@ -1339,8 +1339,8 @@ func main() {
         name: "idempotency",
         category: "http",
         coverage: "100.0%",
-        desc: "Two-phase HTTP request deduplication and response caching for network resilience.",
-        exports: ["Store", "MemoryStore", "NewMemoryStore", "Record", "Response"]
+        desc: "Two-phase HTTP request deduplication and response caching with in-memory or PostgreSQL stores.",
+        exports: ["Store", "MemoryStore", "NewMemoryStore", "PGStore", "NewPGStore", "Record", "Response"]
       },
       {
         name: "logger",
@@ -1353,8 +1353,8 @@ func main() {
         name: "maputil",
         category: "primitives",
         coverage: "100.0%",
-        desc: "Generic type-safe map operations (keys, values, merge, filter) with zero reflection overhead.",
-        exports: ["Keys", "Values", "Merge", "Filter"]
+        desc: "Generic type-safe map operations (merge and filter) with zero reflection overhead.",
+        exports: ["Merge", "Filter"]
       },
       {
         name: "metrics",
@@ -1430,8 +1430,8 @@ func main() {
         name: "sliceutil",
         category: "primitives",
         coverage: "100.0%",
-        desc: "Generic functional collection utilities (Map, Filter, Reduce, GroupBy, Chunk, Unique, Flatten).",
-        exports: ["Map", "Filter", "Reduce", "GroupBy", "Chunk", "Unique", "Flatten"]
+        desc: "Generic slice algorithms beyond standard slices with zero reflection overhead.",
+        exports: ["Reduce", "GroupBy", "Chunk", "Unique", "Flatten", "First"]
       },
       {
         name: "stringutil",

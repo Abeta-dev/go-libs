@@ -17,7 +17,7 @@ This document records the release facts used to normalize the dependency baselin
 | Checksum database module hash | `h1:9Fzm2GZMkd+rnFAFOd5MURnOorqM98O4H/zcVUb6uoY=` |
 | Checksum database `go.mod` hash | `h1:R7gQaadUNwpnavd5P96ThNbhYyUUKyVbfKCR/mu29/o=` |
 
-`go mod download -json github.com/umesh0492/go-libs@v0.2.1` is the independent module-resolution check. `scripts/verify_release_baseline.sh` revalidates the remote tag object and commit, proxy artifact hashes, checksum-database hashes, and Go's resolved module sums. The recorded published release notes are in the immutable artifact at [`v0.2.1`](https://github.com/Abeta-dev/go-libs/releases/tag/v0.2.1), rather than this checkout's unreleased changelog section.
+`go mod download -json github.com/umesh0492/go-libs@v0.2.1` is the independent module-resolution check. `scripts/verify_release_baseline.sh` revalidates this historical remote-tag, proxy, and checksum-database evidence. It is an audit only and is deliberately not a recurring release-workflow gate. `scripts/verify_release.sh <tag>` validates the actual immutable tag being released and emits `release-manifest.json`. The recorded published release notes are in the immutable artifact at [`v0.2.1`](https://github.com/Abeta-dev/go-libs/releases/tag/v0.2.1), rather than this checkout's unreleased changelog section.
 
 ## Checkout status
 
@@ -28,5 +28,6 @@ This local clone also contains a conflicting pre-existing `v0.2.1` annotated tag
 ## Release policy
 
 - Do not move, recreate, or republish an existing version or tag. The release workflow treats an existing GitHub release as an already-published artifact and exits without mutation.
+- Every release workflow run validates the selected tag, its exact remote target, the Go proxy archive and module file, and Go's resolved sums. It writes a retained `release-manifest.json` workflow artifact whether verification passes or fails.
 - The source and API differences between the published `v0.2.1` line and this checkout require reconciliation before publishing this line. A future release from the reconciled branch must use a new monotonic **pre-1.0 minor** version, starting at `v0.3.0`; a `v0.2.2` patch would incorrectly imply compatibility with `v0.2.1`.
 - The `go 1.26.0` directive is the supported toolchain baseline. Historical benchmark measurements retain their recorded toolchain so that they remain reproducible measurements rather than claims about current validation.

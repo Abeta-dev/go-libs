@@ -37,7 +37,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `ginmw` | **Stable** | 100.0% | Unified Gin middleware chain; guarded by strict 100% CI gate. |
 | `health` | **Stable** | 100.0% | Parallel dependency checks and Kubernetes HTTP probes. API frozen. |
 | `httputil` | **Stable** | 100.0% | Standardized JSON envelopes and error responders. API frozen. |
-| `maputil` | **Stable** | 100.0% | Generic map helpers (Keys, Values, Merge, Filter). API frozen. |
+| `maputil` | **Stable** | 100.0% | Generic map helpers (Merge, Filter). API frozen. |
 | `metrics` | **Stable** | *Interfaces* | Framework-agnostic Counter, Gauge, Histogram interfaces. API frozen. |
 | `pagination` | **Stable** | 100.0% | Offset and page query parsing and envelopes. API frozen. |
 | `rbac` | **Stable** | 100.0% | Role-based access control engine with wildcard matching. Low risk. |
@@ -47,7 +47,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `retry` | **Stable** | 90.7% | Context-aware exponential backoff with full jitter. Low risk. |
 | `securityheaders` | **Stable** | 100.0% | OWASP recommended defensive HTTP security headers. Low risk. |
 | `shutdown` | **Stable** | 100.0% | Graceful OS signal interception and teardown coordinator. Low risk. |
-| `sliceutil` | **Stable** | 100.0% | Generic functional slice transforms (Map, Filter, Reduce). API frozen. |
+| `sliceutil` | **Stable** | 100.0% | Generic slice algorithms (Reduce, GroupBy, Chunk, Unique, Flatten, First). API frozen. |
 | `stringutil` | **Stable** | 100.0% | Masking and cryptographically secure random strings. API frozen. |
 | `timeutil` | **Stable** | 100.0% | UTC/location time arithmetic, business day calculation, and heuristic parsing. |
 | `validation` | **Stable** | 100.0% | Formatter translating validator/v10 errors into client JSON. |
@@ -56,7 +56,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `clock` | **Early** | 93.9% | Mockable time abstraction with RealClock and advanceable FakeClock. API undergoing stabilization. |
 | `db` | **Early** | 100.0% | pgx connection pool wrapper and transaction runner. Hardened against connection leaks. |
 | `httpclient` | **Early** | 92.9% | Resilient composed HTTP client with rate limiting, circuit breaking, and retries. API undergoing stabilization. |
-| `idempotency` | **Early** | 98.8% | In-memory idempotency key store with bounded TTL response eviction. |
+| `idempotency` | **Early** | 98.8% | In-memory and PostgreSQL idempotency stores with bounded TTL response retention. |
 | `logger` | **Early** | 96.0% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
 | `ratelimit` | **Early** | 100.0% | In-memory rate limiting with Token Bucket and Sliding Window algorithms. |
 | `telemetry` | **Early** | 100.0% | OpenTelemetry distributed tracing wrapper with global and instance-scoped provider support. |

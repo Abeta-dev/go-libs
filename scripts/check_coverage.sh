@@ -17,8 +17,8 @@ echo "   - Per-Package Floor:  >= ${PACKAGE_FLOOR}%"
 echo "   - ginmw Gate:         == ${GINMW_REQUIRED}%"
 echo "========================================================"
 
-# List packages excluding loadgen
-PACKAGES=$(go list ./... | grep -v loadgen)
+# List library packages, excluding the root documentation-test package and load generators.
+PACKAGES=$(go list ./... | grep -vE '^github\.com/umesh0492/go-libs$|/loadgen$')
 PKGS_COMMA=$(echo "${PACKAGES}" | tr '\n' ',' | sed 's/,$//')
 
 # Generate merged coverage profile across all packages
