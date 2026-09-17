@@ -46,6 +46,31 @@ if GIT_TAG=v0.2.1-not-semver ./scripts/check_version.sh >/dev/null 2>&1; then
 fi
 
 cd "${ROOT_DIR}"
+
+# Coverage generation must fail closed instead of accepting a stale profile.
+coverage_fixture="${fixture_dir}/coverage-fixture"
+mkdir -p "${coverage_fixture}/bin"
+cp "${ROOT_DIR}/scripts/check_coverage.sh" "${coverage_fixture}/check_coverage.sh"
+sed -i.bak '/^"${SCRIPT_DIR}\/check_version.sh"$/d' "${coverage_fixture}/check_coverage.sh"
+rm -f "${coverage_fixture}/check_coverage.sh.bak"
+printf 'mode: set\nstale.go:1.1,1.2 1 1\n' >"${coverage_fixture}/coverage.out"
+cat >"${coverage_fixture}/bin/go" <<'EOF'
+#!/usr/bin/env bash
+if [[ "$1" == "list" ]]; then
+  echo 'example.invalid/package'
+  exit 0
+fi
+if [[ "$1" == "test" && "$2" == -coverprofile=* ]]; then
+  exit 1
+fi
+exit 1
+EOF
+chmod +x "${coverage_fixture}/bin/go"
+if (cd "${coverage_fixture}" && PATH="${coverage_fixture}/bin:${PATH}" ./check_coverage.sh >/dev/null 2>&1); then
+  echo 'check_coverage.sh accepted a failed coverage run and stale profile' >&2
+  exit 1
+fi
+
 rm -f release-manifest.json
 if ./scripts/verify_release.sh invalid >/dev/null 2>&1; then
   echo 'verify_release.sh accepted an invalid release tag' >&2

@@ -21,8 +21,11 @@ echo "========================================================"
 PACKAGES=$(go list ./... | grep -vE '^github\.com/umesh0492/go-libs$|/loadgen$')
 PKGS_COMMA=$(echo "${PACKAGES}" | tr '\n' ',' | sed 's/,$//')
 
-# Generate merged coverage profile across all packages
-go test -coverprofile=coverage.out ${PACKAGES} >/dev/null 2>&1 || true
+# Generate merged coverage profile across all packages. Never continue with a
+# stale ignored profile when the test command or output write fails.
+rm -f coverage.out
+go test -coverprofile=coverage.out ${PACKAGES}
+test -s coverage.out
 
 # Extract global coverage percentage
 GLOBAL_COV_STR=$(go tool cover -func=coverage.out | grep total | awk '{print $3}')
