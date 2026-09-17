@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v0.1.0)'
+        required: false
+        default: 'v0.1.0'
 
 permissions: read-all
 
@@ -22,7 +28,7 @@ jobs:
       - name: Create or Re-create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           EXISTING_IDS=$(gh api "repos/${{ github.repository }}/releases" --jq ".[] | select(.tag_name == \"$TAG\") | .id" 2>/dev/null || true)
           for REL_ID in $EXISTING_IDS; do
@@ -32,4 +38,5 @@ jobs:
             fi
           done
           echo "Creating fresh release $TAG..."
-          gh release create "$TAG" --title "$TAG" --notes-file <(awk '/^## \[/{n++} n==1' CHANGELOG.md)
+          gh release create "$TAG" --title "$TAG" --notes-file <(awk -v ver="${TAG#v}" 'index($0, "## [" ver "]") == 1 {flag=1; print; next} /^## \[/ {flag=0} flag' CHANGELOG.md)
+

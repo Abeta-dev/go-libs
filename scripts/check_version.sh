@@ -17,7 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${ROOT_DIR}"
 
-EXPECTED_VER="0.1.0"
+EXPECTED_VER="0.2.1"
 
 CHANGELOG_VER=$(grep -E '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -n1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\].*/\1/')
 README_HEADER_VER=$(grep -E '^# go-libs · v' README.md | head -n1 | sed -E 's/# go-libs · v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')

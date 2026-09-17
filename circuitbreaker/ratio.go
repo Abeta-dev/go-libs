@@ -4,6 +4,7 @@ package circuitbreaker
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -221,6 +222,9 @@ func (rb *RatioBreaker) recordResult(isProbe bool, err error, now time.Time) fun
 	if isProbe {
 		rb.decrementHalfOpen()
 		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				return nil
+			}
 			rb.openedAt = now
 			rb.metrics.Failures.Inc()
 			return rb.transition(StateOpen)
@@ -231,6 +235,9 @@ func (rb *RatioBreaker) recordResult(isProbe bool, err error, now time.Time) fun
 	}
 
 	if rb.state == StateClosed {
+		if errors.Is(err, context.Canceled) {
+			return nil
+		}
 		failed := err != nil
 		rb.records = append(rb.records, reqRecord{
 			ts:     now,

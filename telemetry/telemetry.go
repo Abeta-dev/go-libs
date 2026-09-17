@@ -94,7 +94,7 @@ func (tp *TracerProvider) Tracer(name string, opts ...trace.TracerOption) trace.
 }
 
 // Shutdown gracefully flushes and stops the tracer provider.
-func (tp *TracerProvider) Shutdown(ctx context.Context) error {
+func (tp *TracerProvider) Shutdown(_ context.Context) error {
 	return nil
 }
 

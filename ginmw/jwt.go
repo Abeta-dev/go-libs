@@ -125,7 +125,7 @@ func AuthMiddleware(opts ...AuthOption) gin.HandlerFunc {
 		}
 
 		claims := &Claims{}
-		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenStr, claims, func(_ *jwt.Token) (interface{}, error) {
 			return secret, nil
 		}, jwt.WithValidMethods([]string{"HS256"}))
 		if err != nil || !token.Valid {

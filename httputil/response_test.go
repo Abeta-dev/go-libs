@@ -78,6 +78,10 @@ func TestErrorFromDomain_FallsBackTo500(t *testing.T) {
 	httputil.ErrorFromDomain(w, errors.New("some raw error"))
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	var body httputil.ErrResponse
+	require.NoError(t, json.NewDecoder(w.Body).Decode(&body))
+	assert.Equal(t, "some raw error", body.Error)
+	assert.Equal(t, "INTERNAL_ERROR", body.Code)
 }
 
 func TestValidationError(t *testing.T) {

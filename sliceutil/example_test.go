@@ -4,25 +4,42 @@ package sliceutil_test
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/umesh0492/go-libs/sliceutil"
 )
 
-func ExampleMap() {
-	names := []string{"alice", "bob", "carol"}
-	upper := sliceutil.Map(names, strings.ToUpper)
-	fmt.Println(upper)
+func ExampleChunk() {
+	nums := []int{1, 2, 3, 4, 5}
+	chunks := sliceutil.Chunk(nums, 2)
+	fmt.Println(chunks)
 	// Output:
-	// [ALICE BOB CAROL]
+	// [[1 2] [3 4] [5]]
 }
 
-func ExampleFilter() {
-	nums := []int{1, 2, 3, 4, 5, 6}
-	evens := sliceutil.Filter(nums, func(n int) bool { return n%2 == 0 })
-	fmt.Println(evens)
+func ExampleGroupBy() {
+	words := []string{"apple", "banana", "avocado", "blueberry"}
+	grouped := sliceutil.GroupBy(words, func(s string) byte { return s[0] })
+	fmt.Println(grouped['a'])
+	fmt.Println(grouped['b'])
 	// Output:
-	// [2 4 6]
+	// [apple avocado]
+	// [banana blueberry]
+}
+
+func ExampleFlatten() {
+	nested := [][]int{{1, 2}, {3, 4}, {5}}
+	flat := sliceutil.Flatten(nested)
+	fmt.Println(flat)
+	// Output:
+	// [1 2 3 4 5]
+}
+
+func ExampleFirst() {
+	nums := []int{1, 3, 5, 8, 9}
+	val, ok := sliceutil.First(nums, func(n int) bool { return n%2 == 0 })
+	fmt.Println(val, ok)
+	// Output:
+	// 8 true
 }
 
 func ExampleReduce() {

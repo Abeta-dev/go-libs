@@ -1,4 +1,4 @@
-# go-libs · v0.1.0
+# go-libs · v0.2.1
 
 Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 31 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
@@ -14,7 +14,7 @@ Shared, zero-business-logic Go libraries and middleware for cloud-native microse
 > 📖 **Engineering Documentation & Architecture Blueprint**  
 > Complete subsystem guides, module selection flowcharts, architectural rationales, and execution topologies:  
 > - 🏛️ **[System Architecture & Blueprint](docs/ARCHITECTURE.md)** (Topology, Layering Boundaries, Middleware Order)  
-> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (v0.1.0 release ledger, API errata, and evolution)  
+> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (v0.2.1 release ledger, API errata, and evolution)  
 > - 🏷️ **[Versioning & Stability Matrix](docs/VERSIONING.md)** (Semantic versioning contracts and package tiers)  
 > - ⚡ **[Performance Benchmarks](BENCHMARKS.md)**  
 > - 📝 **[Decisions & Architecture Records](docs/adr/0001-domain-decoupling-and-audit-sink.md)**  
@@ -26,7 +26,7 @@ Each package is independently importable, fully tested with verified statement c
 This repository uses a **Single Module Monorepo** pattern. There is only *one* `go.mod` file at the root of `go-libs`. 
 
 **Why is this the best "BOM" (Bill of Materials) way?**
-By having a single `github.com/umesh0492/go-libs@v0.1.0` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
+By having a single `github.com/umesh0492/go-libs@v0.2.1` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
 
 ### Minimal-Footprint Imports
 
@@ -56,7 +56,7 @@ func main() {
 EOF
 
 # 3. Resolve dependencies
-go get github.com/umesh0492/go-libs@v0.1.0
+go get github.com/umesh0492/go-libs@v0.2.1
 go mod tidy
 
 # 4. Prove no heavy frameworks exist in go.sum (exits 0 with zero output if clean)
@@ -70,7 +70,7 @@ grep -E 'gin-gonic|jackc/pgx|opentelemetry' go.sum || echo "VERIFIED: Zero heavy
 ## Installation
 
 ```bash
-go get github.com/umesh0492/go-libs@v0.1.0
+go get github.com/umesh0492/go-libs@v0.2.1
 ```
 
 Requirements:
@@ -264,8 +264,8 @@ helm upgrade --install microservice ./deploy/helm/microservice
 
 | Package | Import suffix | Key exports & Description |
 |---|---|---|
-| `sliceutil` | `/sliceutil` | `Map`, `Filter`, `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten` — generic functional transforms (use stdlib `slices` for `Contains`) |
-| `maputil` | `/maputil` | `Keys`, `Values`, `Merge`, `Filter` — generic type-safe map operations |
+| `sliceutil` | `/sliceutil` | `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`, `First` — generic algorithmic slice primitives |
+| `maputil` | `/maputil` | `Merge`, `Filter` — generic type-safe map operations |
 | `apperror` | `/apperror` | `CodeNotFound`, `CodeUnauthorized`, `CodeConflict`, `New`, `Wrap`, `Is` — canonical structured domain errors |
 | `env` | `/env` | `String`, `Int`, `Bool`, `Duration`, `MustString`, `MustInt` — zero-dependency typed OS environment parsers |
 | `logger` | `/logger` | `Default()`, `FromContext(ctx)`, `WithContext(ctx, l)`, `WithField`, `WithFields` — context-aware structured `slog` |
@@ -344,7 +344,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 Coverage across all 31 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
-> **Overall Repository Statement Coverage: 95.2%** (Zero data races across `-race`)
+> **Overall Repository Statement Coverage: 95.7%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
 > **Quality Standard: Strict per-package floor >= 85.0% enforced by `./scripts/check_coverage.sh`**
 
@@ -353,17 +353,17 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `apperror` | Canonical structured application error codes and helpers | **100.0%** |
 | `bodylimit` | Gin middleware to cap HTTP request body sizes | **100.0%** |
 | `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **87.5%** |
-| `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **92.2%** |
+| `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **93.3%** |
 | `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **93.9%** |
 | `cryptoutil` | Secure password hashing (`golang.org/x/crypto/bcrypt`) and CSPRNG password generation (`crypto/rand`) | **100.0%** |
 | `db` | Database Pool & Querier | **100.0%** |
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |
 | `ginmw` | Unified Gin HTTP middleware chain & helper | **100.0%** |
 | `health` | Parallel dependency health check and Kubernetes probe handler | **100.0%** |
-| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.0%** |
+| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.9%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
-| `idempotency` | Two-phase HTTP request deduplication | **100.0%** |
-| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **93.8%** |
+| `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
+| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.0%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |
 | `pagination` | Offset-based request query parser and generic response | **100.0%** |
@@ -375,13 +375,13 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `retry` | Context-aware backoff and retry execution algorithms | **90.7%** |
 | `securityheaders` | OWASP secure header injector middleware | **100.0%** |
 | `shutdown` | Graceful concurrent teardown manager | **100.0%** |
-| `sliceutil` | Functional slice transformations (Map, Filter, Reduce, etc.) | **100.0%** |
+| `sliceutil` | Algorithmic slice operations (Reduce, GroupBy, Chunk, Unique, Flatten, First) | **100.0%** |
 | `stringutil` | Sensitive info masking and text helpers | **100.0%** |
 | `telemetry` | OpenTelemetry distributed tracing wrapper | **100.0%** |
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |
 | `validation` | Declarative validation error formatter | **100.0%** |
 | `workerpool` | Bounded panic-safe concurrent worker pool with metrics & options | **92.1%** |
-| **Total Statement Coverage** | **Cumulative across all packages** | **95.2%** |
+| **Total Statement Coverage** | **Cumulative across all packages** | **95.7%** |
 
 > *Note: The standalone reference microservice (`examples/microservice`) achieves 87.4% integration statement coverage.*
 

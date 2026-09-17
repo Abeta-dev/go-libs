@@ -1,33 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-// Package sliceutil provides generic, zero-dependency helpers for slice
-// operations using Go generics (Go 1.18+).
-//
-// These complement the stdlib slices package with functional-style transforms.
+// Package sliceutil provides generic, zero-dependency algorithmic helpers for slice
+// operations that are intentionally omitted from the standard library `slices` package.
 package sliceutil
-
-// Map applies fn to every element of s and returns a new slice of results.
-func Map[T, U any](s []T, fn func(T) U) []U {
-	if s == nil {
-		return nil
-	}
-	out := make([]U, len(s))
-	for i, v := range s {
-		out[i] = fn(v)
-	}
-	return out
-}
-
-// Filter returns a new slice containing only elements for which fn returns true.
-func Filter[T any](s []T, fn func(T) bool) []T {
-	out := make([]T, 0)
-	for _, v := range s {
-		if fn(v) {
-			out = append(out, v)
-		}
-	}
-	return out
-}
 
 // Reduce accumulates a result by applying fn to each element in s,
 // starting from init.

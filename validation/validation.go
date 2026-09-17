@@ -20,6 +20,10 @@ type FieldError struct {
 // FormatErrors takes an error (expected to be validator.ValidationErrors)
 // and returns a structured slice of FieldErrors.
 func FormatErrors(err error) []FieldError {
+	if err == nil {
+		return nil
+	}
+
 	var fieldErrs []FieldError
 
 	var validationErrors validator.ValidationErrors

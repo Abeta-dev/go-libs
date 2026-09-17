@@ -15,7 +15,6 @@ import (
 	"github.com/umesh0492/go-libs/cache"
 	"github.com/umesh0492/go-libs/circuitbreaker"
 	"github.com/umesh0492/go-libs/ginmw"
-	"github.com/umesh0492/go-libs/recovery"
 	"github.com/umesh0492/go-libs/workerpool"
 )
 
@@ -96,7 +95,7 @@ func Benchmark_04_CORS(b *testing.B) {
 
 func Benchmark_05_Recovery(b *testing.B) {
 	r := gin.New()
-	r.Use(recovery.Middleware())
+	r.Use(ginmw.Recovery())
 	r.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
 
 	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
@@ -259,7 +258,7 @@ func Benchmark_14_Composed_Full_Pipeline(b *testing.B) {
 		ginmw.RequestID(),
 		ginmw.SecurityHeaders(),
 		ginmw.CORS([]string{"*"}),
-		recovery.Middleware(),
+		ginmw.Recovery(),
 		ginmw.Telemetry("order-service"),
 		ginmw.GlobalRateLimit(),
 		ginmw.LimitBodyDefault(),

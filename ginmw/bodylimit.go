@@ -12,7 +12,7 @@ import (
 
 // noopHandler is a no-op http.Handler used as the final handler when wrapping
 // net/http middleware with gin.WrapH (the middleware calls Next itself).
-var noopHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+var noopHandler = http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
 
 // LimitBodyDefault applies a 2 MB maximum body to all API requests.
 func LimitBodyDefault() gin.HandlerFunc {

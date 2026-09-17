@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -27,7 +28,6 @@ import (
 	"github.com/umesh0492/go-libs/httputil"
 	"github.com/umesh0492/go-libs/logger"
 	"github.com/umesh0492/go-libs/pagination"
-	"github.com/umesh0492/go-libs/recovery"
 	"github.com/umesh0492/go-libs/retry"
 	"github.com/umesh0492/go-libs/shutdown"
 	"github.com/umesh0492/go-libs/sliceutil"
@@ -316,7 +316,7 @@ func NewApp(opts ...AppOption) *App {
 		ginmw.RequestID(),
 		ginmw.SecurityHeaders(),
 		ginmw.CORS([]string{"*"}),
-		recovery.Middleware(recovery.WithLogger(appLogger)),
+		ginmw.Recovery(ginmw.WithRecoveryLogger(appLogger)),
 		ginmw.Logger(),
 		ginmw.Telemetry("order-service"),
 		ginmw.GlobalRateLimit(),
@@ -502,13 +502,29 @@ func (a *App) handleGetItems(c *gin.Context) {
 		return
 	}
 
-	// Filter results dynamically using sliceutil
+	// Filter results dynamically using idiomatic Go loop
 	categoryFilter := c.Query("category")
 	filtered := items
 	if categoryFilter != "" {
-		filtered = sliceutil.Filter(items, func(it Item) bool {
-			return strings.EqualFold(it.Category, categoryFilter)
-		})
+		filtered = make([]Item, 0, len(items))
+		for _, it := range items {
+			if strings.EqualFold(it.Category, categoryFilter) {
+				filtered = append(filtered, it)
+			}
+		}
+	}
+
+	// Demonstrate sliceutil.Chunk for batching/chunking items
+	if chunkSizeStr := c.Query("chunk_size"); chunkSizeStr != "" {
+		if size, err := strconv.Atoi(chunkSizeStr); err == nil && size > 0 {
+			chunks := sliceutil.Chunk(filtered, size)
+			httputil.OK(c.Writer, map[string]any{
+				"chunks":     chunks,
+				"num_chunks": len(chunks),
+				"total":      len(filtered),
+			})
+			return
+		}
 	}
 
 	resp := pagination.NewTypedResponse(filtered, 100, params)

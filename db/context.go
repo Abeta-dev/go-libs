@@ -10,13 +10,18 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// DBTX is an interface that both *pgxpool.Pool, *pgxpool.Conn, and pgx.Tx implement.
+// DBTX is an interface that both *pgxpool.Pool, *pgxpool.Conn, and pgx.Tx implement for query execution.
 //
 //nolint:revive // DBTX is the standard interface name in the Go PostgreSQL ecosystem
 type DBTX interface {
 	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
+}
+
+// CopyDBTX extends DBTX with high-throughput batch CopyFrom operations.
+type CopyDBTX interface {
+	DBTX
 	CopyFrom(ctx context.Context, tableName pgx.Identifier, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error)
 }
 

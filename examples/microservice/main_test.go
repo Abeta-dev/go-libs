@@ -97,6 +97,24 @@ func TestReferenceMicroservice(t *testing.T) {
 		for _, it := range filteredBody.Items {
 			assert.Equal(t, "premium", it.Category)
 		}
+
+		// Chunking with sliceutil.Chunk
+		reqChunk := httptest.NewRequest(http.MethodGet, "/api/v1/items?chunk_size=2", nil)
+		recChunk := httptest.NewRecorder()
+		app.Router.ServeHTTP(recChunk, reqChunk)
+		assert.Equal(t, http.StatusOK, recChunk.Code)
+
+		var chunkResp struct {
+			Chunks    [][]Item `json:"chunks"`
+			NumChunks int      `json:"num_chunks"`
+			Total     int      `json:"total"`
+		}
+		err = json.Unmarshal(recChunk.Body.Bytes(), &chunkResp)
+		require.NoError(t, err)
+		assert.Greater(t, chunkResp.NumChunks, 0)
+		for _, chunk := range chunkResp.Chunks {
+			assert.LessOrEqual(t, len(chunk), 2)
+		}
 	})
 
 	t.Run("Get Item by ID - AppError Mapping", func(t *testing.T) {

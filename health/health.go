@@ -173,7 +173,7 @@ func (s *Service) Handler(w http.ResponseWriter, r *http.Request) {
 
 // LivenessHandler returns 200 OK with {"status":"ok"} — no dependency checks.
 // Kubernetes liveness probes should point here. It NEVER returns 503.
-func LivenessHandler(w http.ResponseWriter, r *http.Request) {
+func LivenessHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusOK)
@@ -182,7 +182,7 @@ func LivenessHandler(w http.ResponseWriter, r *http.Request) {
 
 // ReadinessHandler returns 200 OK with runtime stats. No dependency checks.
 // Use as a readiness probe before registering with load balancers.
-func ReadinessHandler(w http.ResponseWriter, r *http.Request) {
+func ReadinessHandler(w http.ResponseWriter, _ *http.Request) {
 	resp := Response{
 		Status:    "ready",
 		Timestamp: time.Now().UTC(),

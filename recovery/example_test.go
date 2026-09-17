@@ -7,22 +7,18 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/gin-gonic/gin"
 	"github.com/umesh0492/go-libs/recovery"
 )
 
 func ExampleMiddleware() {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
-	router.Use(recovery.Middleware())
-
-	router.GET("/panic", func(c *gin.Context) {
+	mw := recovery.Middleware()
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		panic("unexpected system failure")
-	})
+	}))
 
 	req := httptest.NewRequest(http.MethodGet, "/panic", nil)
 	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
 	fmt.Println("Status:", rec.Code)
 	// Output:
