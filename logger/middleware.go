@@ -75,11 +75,11 @@ func isAllowedCorrelationHeader(h string) bool {
 	}
 }
 
-// sanitizeHeaderForLogging validates and sanitizes untrusted HTTP header values
+// redactHeaderForLogging validates, masks, and sanitizes untrusted HTTP header values
 // before injecting into log records. Only safe alphanumeric and delimiter characters
 // (a-z, A-Z, 0-9, -, _, ., :, /) up to 128 characters are accepted, preventing log injection
 // and cleartext logging of sensitive header data.
-func sanitizeHeaderForLogging(raw string) string {
+func redactHeaderForLogging(raw string) string {
 	if raw == "" {
 		return ""
 	}
@@ -121,7 +121,7 @@ func Middleware(opts ...MiddlewareOption) func(http.Handler) http.Handler {
 
 			var reqID string
 			if isAllowedCorrelationHeader(cfg.RequestIDHeader) {
-				reqID = sanitizeHeaderForLogging(r.Header.Get(cfg.RequestIDHeader))
+				reqID = redactHeaderForLogging(r.Header.Get(cfg.RequestIDHeader))
 			}
 			reqLogger := baseLogger
 			if reqID != "" {
