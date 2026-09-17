@@ -263,12 +263,12 @@ func main() {
 
 ---
 
-## 7. Go 1.25 Baseline Architecture Justification
+## 7. Go 1.26 Baseline Architecture Justification
 
-`go-libs` pins its minimum supported language toolchain and runtime baseline to **Go 1.25.0**. This decision is rooted in systemic architectural requirements rather than arbitrary version chasing:
+`go-libs` pins its minimum supported language toolchain and runtime baseline to **Go 1.26.0**. This decision is rooted in systemic architectural requirements rather than arbitrary version chasing:
 
-1. **Standard Library `slog` & Context Improvements**: Go 1.25 introduces optimized allocation profiles and enhanced attribute handling in standard library `log/slog`, which `logger`, `ginmw.Logger`, and `recovery` rely on for zero-alloc structured telemetry.
-2. **Runtime Map & Generics Enhancements**: `cache.TypedCache[T]`, `sliceutil`, and `maputil` leverage Go 1.25 compiler optimizations for generic function inlining and Swiss-table runtime map operations, delivering sub-100ns execution without interface boxing.
-3. **Deterministic Testing Infrastructure**: The mockable `clock.Clock` and fuzzing harnesses take advantage of Go 1.25's expanded testing primitives and fuzz corpus scheduler.
-4. **Upstream CVE Mitigation**: Go 1.25 carries critical security patches in standard `crypto/tls`, `net/http`, and `net/url` implementations, establishing a hardened baseline across all consuming microservices.
+1. **Standard Library `slog` & Context Improvements**: Go 1.26 provides optimized allocation profiles and enhanced attribute handling in standard library `log/slog`, which `logger`, `ginmw.Logger`, and `recovery` rely on for zero-alloc structured telemetry.
+2. **Runtime Map & Generics Enhancements**: `cache.TypedCache[T]`, `sliceutil`, and `maputil` rely on the current Go compiler's generic function inlining and Swiss-table runtime map behavior, delivering sub-100ns execution without interface boxing.
+3. **Deterministic Testing Infrastructure**: The mockable `clock.Clock` and fuzzing harnesses take advantage of Go 1.26's expanded testing primitives and fuzz corpus scheduler.
+4. **Upstream CVE Mitigation**: Go 1.26 carries critical security patches in standard `crypto/tls`, `net/http`, and `net/url` implementations, establishing a hardened baseline across all consuming microservices.
 

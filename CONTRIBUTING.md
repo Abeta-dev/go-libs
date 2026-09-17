@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to `go-libs`!
 
-`go-libs` is an open-source, domain-agnostic foundation of Go 1.25+ libraries for building resilient microservices (resilience, concurrency, security, and transport middleware). We welcome contributions ranging from bug fixes and documentation clarifications to performance optimizations and test coverage improvements.
+`go-libs` is an open-source, domain-agnostic foundation of Go 1.26+ libraries for building resilient microservices (resilience, concurrency, security, and transport middleware). We welcome contributions ranging from bug fixes and documentation clarifications to performance optimizations and test coverage improvements.
 
 This guide provides everything you need to know to get started, run the test suite, understand our automated quality gates, and submit a pull request that can be merged smoothly.
 
@@ -21,8 +21,8 @@ This guide provides everything you need to know to get started, run the test sui
 ## 2. Development Setup & Prerequisites
 
 ### Prerequisites
-- **Go**: Version `1.25.0` or higher (`go version`)
-- **golangci-lint**: Version `v1.64.0` or higher (`golangci-lint version`)
+- **Go**: Version `1.26.0` (the module toolchain baseline) (`go version`)
+- **golangci-lint**: Version `v2.13.2` (`golangci-lint version`)
 - **make**: Standard GNU Make (`make --version`)
 
 ### Quickstart

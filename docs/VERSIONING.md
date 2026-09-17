@@ -6,7 +6,7 @@ This document outlines the versioning guarantees, breaking change communication 
 
 ## 1. Pre-1.0 Versioning Contract (`v0.x.y`)
 
-`go-libs` follows [Semantic Versioning 2.0.0](https://semver.org/). Because the library is currently pre-1.0 (`v0.2.x`, latest release `v0.2.1`), consumers should be aware of the following expectations:
+`go-libs` follows [Semantic Versioning 2.0.0](https://semver.org/). Because the library is currently pre-1.0 (`v0.2.x`), consumers should be aware of the following expectations:
 
 - **Minor Releases (`v0.X.0`)**: May introduce new packages, enhancements, or breaking API refactorings as APIs are consolidated for long-term maintainability.
 - **Patch Releases (`v0.x.Y`)**: Strictly reserved for backward-compatible bug fixes, performance improvements, and security patches. Zero breaking API changes occur in patch releases.
@@ -31,13 +31,13 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | :--- | :--- | :--- | :--- |
 | `apperror` | **Stable** | 100.0% | Canonical domain error types and JSON encoders. API frozen. |
 | `bodylimit` | **Stable** | 100.0% | Request body cap Gin middleware. Complete and stable. |
-| `circuitbreaker` | **Stable** | 93.3% | Consecutive-failure and failure-ratio state machines. Low risk. |
+| `circuitbreaker` | **Stable** | 92.2% | Consecutive-failure and failure-ratio state machines. Low risk. |
 | `cryptoutil` | **Stable** | 100.0% | Bcrypt password hashing and CSPRNG token generators. API frozen. |
 | `env` | **Stable** | 100.0% | Zero-dependency typed environment variable parser. API frozen. |
 | `ginmw` | **Stable** | 100.0% | Unified Gin middleware chain; guarded by strict 100% CI gate. |
 | `health` | **Stable** | 100.0% | Parallel dependency checks and Kubernetes HTTP probes. API frozen. |
 | `httputil` | **Stable** | 100.0% | Standardized JSON envelopes and error responders. API frozen. |
-| `maputil` | **Stable** | 100.0% | Generic map helpers (Merge, Filter). API frozen. |
+| `maputil` | **Stable** | 100.0% | Generic map helpers (Keys, Values, Merge, Filter). API frozen. |
 | `metrics` | **Stable** | *Interfaces* | Framework-agnostic Counter, Gauge, Histogram interfaces. API frozen. |
 | `pagination` | **Stable** | 100.0% | Offset and page query parsing and envelopes. API frozen. |
 | `rbac` | **Stable** | 100.0% | Role-based access control engine with wildcard matching. Low risk. |
@@ -47,7 +47,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `retry` | **Stable** | 90.7% | Context-aware exponential backoff with full jitter. Low risk. |
 | `securityheaders` | **Stable** | 100.0% | OWASP recommended defensive HTTP security headers. Low risk. |
 | `shutdown` | **Stable** | 100.0% | Graceful OS signal interception and teardown coordinator. Low risk. |
-| `sliceutil` | **Stable** | 100.0% | Generic algorithmic slice primitives (Reduce, GroupBy, Chunk, Unique, Flatten, First). API frozen. |
+| `sliceutil` | **Stable** | 100.0% | Generic functional slice transforms (Map, Filter, Reduce). API frozen. |
 | `stringutil` | **Stable** | 100.0% | Masking and cryptographically secure random strings. API frozen. |
 | `timeutil` | **Stable** | 100.0% | UTC/location time arithmetic, business day calculation, and heuristic parsing. |
 | `validation` | **Stable** | 100.0% | Formatter translating validator/v10 errors into client JSON. |
@@ -55,9 +55,9 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `cache` | **Early** | 87.5% | Singleflight cache unified into `TypedCache` with `EvictionPolicy`. API undergoing stabilization. |
 | `clock` | **Early** | 93.9% | Mockable time abstraction with RealClock and advanceable FakeClock. API undergoing stabilization. |
 | `db` | **Early** | 100.0% | pgx connection pool wrapper and transaction runner. Hardened against connection leaks. |
-| `httpclient` | **Early** | 92.9% | Resilient composed HTTP client with rate limiting, circuit breaking, and retries. API undergoing stabilization. |
-| `idempotency` | **Early** | 98.8% | In-memory and PostgreSQL distributed idempotency key store with bounded TTL response eviction. |
-| `logger` | **Early** | 96.0% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
+| `httpclient` | **Early** | 92.0% | Resilient composed HTTP client with rate limiting, circuit breaking, and retries. API undergoing stabilization. |
+| `idempotency` | **Early** | 100.0% | In-memory idempotency key store with bounded TTL response eviction. |
+| `logger` | **Early** | 93.8% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
 | `ratelimit` | **Early** | 100.0% | In-memory rate limiting with Token Bucket and Sliding Window algorithms. |
 | `telemetry` | **Early** | 100.0% | OpenTelemetry distributed tracing wrapper with global and instance-scoped provider support. |
 

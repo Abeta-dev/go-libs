@@ -4,65 +4,42 @@ set -euo pipefail
 # ==============================================================================
 # Version, Symbol & Documentation Synchronization Gate
 # Guarantees that:
-#   1. README.md, CHANGELOG.md, and git tags never drift out of sync.
-#   2. Dynamic coverage badge and README claims match actual toolchain measurements.
-#   3. README package count matches actual repository package count.
-#   4. Code formatting is clean across all files (gofmt).
-#   5. All Go runtime references adhere to Go 1.25+ baseline.
-#   6. Module import tags strictly match @v<EXPECTED_VER>.
-#   7. Every package and exported symbol in CHANGELOG under "### Added" exists.
+#   1. README install examples use the verified published module version.
+#   2. The current source checkout does not pretend to be a published tag.
+#   3. Dynamic coverage badge and README claims match actual toolchain measurements.
+#   4. README package count matches actual repository package count.
+#   5. Code formatting is clean across all files (gofmt).
+#   6. All current toolchain claims match the go.mod baseline.
+#   7. Every package and exported symbol in the unreleased CHANGELOG section exists.
 # ==============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${ROOT_DIR}"
 
-EXPECTED_VER="0.2.1"
+PUBLISHED_VER="0.2.1"
 
-CHANGELOG_VER=$(grep -E '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -n1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\].*/\1/')
-README_HEADER_VER=$(grep -E '^# go-libs · v' README.md | head -n1 | sed -E 's/# go-libs · v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 README_GET_VER=$(grep -E 'go get github.com/umesh0492/go-libs@v' README.md | head -n1 | sed -E 's/.*go-libs@v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+CURRENT_TAG="${GIT_TAG:-$(git describe --tags --exact-match 2>/dev/null || true)}"
 
-echo "========================================================"
-echo "🔒 Verifying Version Synchronization (go-libs)"
-echo "   - Expected Version: v$EXPECTED_VER"
-echo "   - CHANGELOG.md:     v$CHANGELOG_VER"
-echo "   - README.md Header: v$README_HEADER_VER"
-echo "   - README.md go get: v$README_GET_VER"
+printf '%s\n' '========================================================'
+printf '%s\n' '🔒 Verifying Published Module and Checkout Identity'
+printf '   - Published module version: v%s\n' "${PUBLISHED_VER}"
+printf '   - README.md go get:        v%s\n' "${README_GET_VER:-N/A}"
+printf '   - Current source tag:      %s\n' "${CURRENT_TAG:-untagged}"
+printf '%s\n' '========================================================'
 
-GIT_TAG_REF="${GIT_TAG:-}"
-if [ -z "$GIT_TAG_REF" ]; then
-  GIT_TAG_REF=$(git describe --tags --exact-match 2>/dev/null || true)
-fi
-
-if [ -n "$GIT_TAG_REF" ]; then
-  echo "   - Git Tag:          $GIT_TAG_REF"
-fi
-echo "========================================================"
-
-if [ "$CHANGELOG_VER" != "$EXPECTED_VER" ]; then
-  echo "❌ Error: CHANGELOG.md version (v$CHANGELOG_VER) does not match expected version (v$EXPECTED_VER)"
+if [ "${README_GET_VER}" != "${PUBLISHED_VER}" ]; then
+  echo "❌ Error: README.md go get version (v${README_GET_VER}) does not match the verified published module version (v${PUBLISHED_VER})"
   exit 1
 fi
 
-if [ "$CHANGELOG_VER" != "$README_HEADER_VER" ]; then
-  echo "❌ Error: Version mismatch between CHANGELOG.md (v$CHANGELOG_VER) and README.md header (v$README_HEADER_VER)"
+if [ -n "${CURRENT_TAG}" ]; then
+  echo "❌ Error: source checkout is tagged (${CURRENT_TAG}); release verification must run from an untagged reconciliation commit before creating a new version"
   exit 1
 fi
 
-if [ "$CHANGELOG_VER" != "$README_GET_VER" ]; then
-  echo "❌ Error: Version mismatch between CHANGELOG.md (v$CHANGELOG_VER) and README.md go get (v$README_GET_VER)"
-  exit 1
-fi
-
-if [ -n "$GIT_TAG_REF" ]; then
-  STRIPPED_TAG=$(echo "$GIT_TAG_REF" | sed -E 's/^v//')
-  if [ "$STRIPPED_TAG" != "$CHANGELOG_VER" ]; then
-    echo "❌ Error: Git tag ($GIT_TAG_REF) does not match CHANGELOG.md version (v$CHANGELOG_VER)"
-    exit 1
-  fi
-  echo "✅ Git tag matches repository version ($GIT_TAG_REF)."
-fi
+echo "✅ Published module reference and untagged checkout identity are correct."
 
 echo "========================================================"
 echo "📦 Verifying Package Inventory & Count Synchronization"
@@ -168,41 +145,54 @@ fi
 echo "✅ Code formatting is clean across all files."
 
 echo "========================================================"
-echo "🔍 Verifying Documentation Version Consistency & Baseline"
+echo "🔍 Verifying Documentation Toolchain Baseline"
 echo "========================================================"
 
 DOC_FILES=(README.md docs/*.md docs/adr/*.md BENCHMARKS.md CHANGELOG.md)
 
-# Check for stale Go versions < 1.25
-STALE_GO_REFS=$(grep -n -E "Go 1\.([0-9]|1[0-9]|2[0-4])\b|go1\.([0-9]|1[0-9]|2[0-4])\b" "${DOC_FILES[@]}" 2>/dev/null || true)
-if [ -n "$STALE_GO_REFS" ]; then
-  echo "❌ Error: Found stale Go runtime references prior to Go 1.25 baseline:"
-  echo "$STALE_GO_REFS"
+GO_BASELINE=$(sed -n -E 's/^go ([0-9]+\.[0-9]+(\.[0-9]+)?).*/\1/p' go.mod | head -n1)
+if [ -z "${GO_BASELINE}" ]; then
+  echo '❌ Error: unable to read the Go baseline from go.mod'
   exit 1
 fi
-echo "✅ Go runtime references adhere to Go 1.25+ baseline."
 
-# Check for stale @v[0-9] import references that drift from EXPECTED_VER
-STALE_TAG_REFS=$(grep -n -E "@v[0-9]+[a-zA-Z0-9._-]*" "${DOC_FILES[@]}" 2>/dev/null | grep -v "@v${EXPECTED_VER}" || true)
-if [ -n "$STALE_TAG_REFS" ]; then
-  echo "❌ Error: Found stale or invalid module tag references (must match @v${EXPECTED_VER}):"
-  echo "$STALE_TAG_REFS"
+STALE_GO_REFS=$(grep -n -E 'Go 1\.25\+|Go 1\.25\.0|go1\.25\+' README.md CONTRIBUTING.md docs/*.md docs/adr/*.md 2>/dev/null || true)
+if [ -n "${STALE_GO_REFS}" ]; then
+  echo "❌ Error: Found current documentation claims below the Go ${GO_BASELINE} baseline:"
+  echo "${STALE_GO_REFS}"
   exit 1
 fi
-echo "✅ Module import tags strictly match @v${EXPECTED_VER}."
+echo "✅ Current documentation claims match the Go ${GO_BASELINE} baseline."
+
+STALE_TAG_REFS=$(grep -n -E "@v[0-9]+[a-zA-Z0-9._-]*" README.md CONTRIBUTING.md docs/*.md docs/adr/*.md 2>/dev/null | grep -v "@v${PUBLISHED_VER}" || true)
+if [ -n "${STALE_TAG_REFS}" ]; then
+  echo "❌ Error: Found stale or invalid module tag references (must match @v${PUBLISHED_VER}):"
+  echo "${STALE_TAG_REFS}"
+  exit 1
+fi
+echo "✅ Module import tags strictly match @v${PUBLISHED_VER}."
 
 echo "========================================================"
 echo "🔍 Verifying CHANGELOG [### Added] Exported Symbols"
 echo "========================================================"
 
 CHANGELOG_FILE="CHANGELOG.md"
+IN_UNRELEASED=0
 IN_ADDED=0
 FAILED_SYMBOLS=0
 CHECKED_SYMBOLS=0
 CHECKED_PACKAGES=0
 
 while IFS= read -r line; do
-  if [[ "${line}" =~ ^"### Added" ]]; then
+  if [[ "${line}" =~ ^"## [Unreleased]" ]]; then
+    IN_UNRELEASED=1
+    continue
+  fi
+  if [ "${IN_UNRELEASED}" -eq 1 ] && [[ "${line}" =~ ^"## " ]]; then
+    IN_UNRELEASED=0
+    IN_ADDED=0
+  fi
+  if [ "${IN_UNRELEASED}" -eq 1 ] && [[ "${line}" =~ ^"### Added" ]]; then
     IN_ADDED=1
     continue
   fi

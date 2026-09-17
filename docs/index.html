@@ -681,7 +681,7 @@
   <header class="hero">
     <div class="container">
       <div class="hero-pill">
-        <span>🚀 Public Open Source Release · v0.2.1 · Go 1.25+</span>
+        <span>🚀 Public Open Source Release · v0.2.1 · Go 1.26+</span>
       </div>
       <h1>Enterprise-Grade Go Microservice Foundations</h1>
       <p class="hero-sub">
@@ -1104,7 +1104,7 @@ func main() {
   <section id="benchmarks" class="container" style="padding: 40px 0;">
     <div class="section-head">
       <h2>Performance Benchmarks & Zero-Alloc Guarantees</h2>
-      <p>Benchmarked on Go 1.25+ Apple Silicon / ARM64. Microsecond predictability under extreme concurrency.</p>
+      <p>Supported on Go 1.26+; published benchmark measurements retain their historical Apple Silicon / ARM64 toolchain details.</p>
     </div>
 
     <div class="bench-card">
@@ -1244,7 +1244,7 @@ func main() {
         <a href="https://github.com/umesh0492/go-libs/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a>
         <a href="https://github.com/umesh0492/go-libs/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a>
       </div>
-      <p>© 2026 Umesh. Released under the MIT License. Built for Go 1.25+ cloud-native microservices.</p>
+      <p>© 2026 Umesh. Released under the MIT License. Built for Go 1.26+ cloud-native microservices.</p>
     </div>
   </footer>
 
@@ -1353,8 +1353,8 @@ func main() {
         name: "maputil",
         category: "primitives",
         coverage: "100.0%",
-        desc: "Generic type-safe map operations (merge, filter) with zero reflection overhead.",
-        exports: ["Merge", "Filter"]
+        desc: "Generic type-safe map operations (keys, values, merge, filter) with zero reflection overhead.",
+        exports: ["Keys", "Values", "Merge", "Filter"]
       },
       {
         name: "metrics",
@@ -1430,8 +1430,8 @@ func main() {
         name: "sliceutil",
         category: "primitives",
         coverage: "100.0%",
-        desc: "Generic algorithmic collection utilities (Reduce, GroupBy, Chunk, Unique, Flatten, First).",
-        exports: ["Reduce", "GroupBy", "Chunk", "Unique", "Flatten", "First"]
+        desc: "Generic functional collection utilities (Map, Filter, Reduce, GroupBy, Chunk, Unique, Flatten).",
+        exports: ["Map", "Filter", "Reduce", "GroupBy", "Chunk", "Unique", "Flatten"]
       },
       {
         name: "stringutil",

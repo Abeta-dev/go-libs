@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release (e.g. v0.1.0)'
-        required: false
-        default: 'v0.1.0'
+        description: 'Existing immutable tag to release (for example v0.3.0)'
+        required: true
+        type: string
 
 permissions: read-all
 
@@ -24,19 +24,49 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
 
-      - name: Create or Re-create GitHub Release
+      - name: Resolve release tag
+        id: release
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          TAG="${INPUT_TAG:-${GITHUB_REF_NAME}}"
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must use vMAJOR.MINOR.PATCH: $TAG" >&2
+            exit 1
+          fi
+          git rev-parse --verify --quiet "refs/tags/$TAG" >/dev/null || {
+            echo "Tag $TAG does not exist in this checkout." >&2
+            exit 1
+          }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Verify source
+        run: |
+          go mod verify
+          go test ./...
+          ./scripts/verify_release_baseline.sh
+
+      - name: Check release status
+        id: release-status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
-          EXISTING_IDS=$(gh api "repos/${{ github.repository }}/releases" --jq ".[] | select(.tag_name == \"$TAG\") | .id" 2>/dev/null || true)
-          for REL_ID in $EXISTING_IDS; do
-            if [ -n "$REL_ID" ]; then
-              echo "Deleting existing release ID $REL_ID for $TAG..."
-              gh api -X DELETE "repos/${{ github.repository }}/releases/$REL_ID"
-            fi
-          done
-          echo "Creating fresh release $TAG..."
-          gh release create "$TAG" --title "$TAG" --notes-file <(awk -v ver="${TAG#v}" 'index($0, "## [" ver "]") == 1 {flag=1; print; next} /^## \[/ {flag=0} flag' CHANGELOG.md)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release $TAG already exists; leaving its immutable artifact unchanged."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
+      - name: Create GitHub release
+        if: steps.release-status.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          gh release create "$TAG" --verify-tag --title "$TAG" \
+            --notes-file <(awk -v ver="${TAG#v}" 'index($0, "## [" ver "]") == 1 { flag=1; print; next } /^## \[/ { flag=0 } flag' CHANGELOG.md)
