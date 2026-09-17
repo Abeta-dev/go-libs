@@ -4,13 +4,13 @@
 package recovery
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"runtime/debug"
 
-	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -30,54 +30,64 @@ func WithLogger(l *slog.Logger) Option {
 	}
 }
 
-// Middleware returns a Gin middleware that recovers from any panics and writes a generic 500 JSON API contract.
+// Middleware returns a standard net/http middleware that recovers from any panics and writes a generic 500 JSON API contract.
 // It structurally logs the stack trace and marks active OpenTelemetry spans with codes.Error and exception events.
-func Middleware(opts ...Option) gin.HandlerFunc {
+func Middleware(opts ...Option) func(http.Handler) http.Handler {
 	cfg := &config{
 		logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
 	}
 	for _, opt := range opts {
-		opt(cfg)
+		if opt != nil {
+			opt(cfg)
+		}
 	}
 
-	return func(c *gin.Context) {
-		defer func() {
-			if err := recover(); err != nil {
-				route := c.FullPath()
-				if route == "" {
-					route = "unmatched"
-				}
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				if rec := recover(); rec != nil {
+					route := r.Pattern
+					if route == "" {
+						route = r.URL.Path
+					}
+					if route == "" {
+						route = "unmatched"
+					}
 
-				var recErr error
-				if e, ok := err.(error); ok {
-					recErr = e
-				} else {
-					recErr = fmt.Errorf("panic: %v", err)
-				}
+					var recErr error
+					if e, ok := rec.(error); ok {
+						recErr = e
+					} else {
+						recErr = fmt.Errorf("panic: %v", rec)
+					}
 
-				span := trace.SpanFromContext(c.Request.Context())
-				if span != nil {
-					span.SetStatus(codes.Error, fmt.Sprintf("panic: %v", err))
-					span.RecordError(recErr, trace.WithStackTrace(true))
-					span.SetAttributes(
-						attribute.String("http.route", route),
-						attribute.Int("http.status_code", http.StatusInternalServerError),
+					span := trace.SpanFromContext(r.Context())
+					if span != nil {
+						span.SetStatus(codes.Error, fmt.Sprintf("panic: %v", rec))
+						span.RecordError(recErr, trace.WithStackTrace(true))
+						span.SetAttributes(
+							attribute.String("http.route", route),
+							attribute.Int("http.status_code", http.StatusInternalServerError),
+						)
+					}
+
+					cfg.logger.Error("PANIC RECOVERED",
+						slog.Any("error", rec),
+						slog.String("stack", string(debug.Stack())),
+						slog.String("route", route),
+						slog.String("path", r.URL.Path),
 					)
+
+					w.Header().Set("Content-Type", "application/json; charset=utf-8")
+					w.WriteHeader(http.StatusInternalServerError)
+					_ = json.NewEncoder(w).Encode(map[string]string{
+						"error":   "Internal Server Error",
+						"message": "The server encountered an unexpected condition that prevented it from fulfilling the request.",
+					})
 				}
+			}()
 
-				cfg.logger.Error("PANIC RECOVERED",
-					slog.Any("error", err),
-					slog.String("stack", string(debug.Stack())),
-					slog.String("route", route),
-					slog.String("path", c.Request.URL.Path),
-				)
-
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-					"error":   "Internal Server Error",
-					"message": "The server encountered an unexpected condition that prevented it from fulfilling the request.",
-				})
-			}
-		}()
-		c.Next()
+			next.ServeHTTP(w, r)
+		})
 	}
 }

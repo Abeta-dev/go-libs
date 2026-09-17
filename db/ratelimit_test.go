@@ -266,3 +266,92 @@ func TestPGRateLimiter_Remaining_ExceededCount(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 0, l.Remaining("over-limit-user"))
 }
+
+func TestPGRateLimiter_ContextSupport(t *testing.T) {
+	var capturedCtx context.Context
+	mock := &mockDBTX{
+		queryRowFunc: func(ctx context.Context, sql string, args ...any) pgx.Row {
+			capturedCtx = ctx
+			return &mockRow{
+				scanFunc: func(dest ...any) error {
+					*dest[0].(*bool) = true
+					return nil
+				},
+			}
+		},
+	}
+
+	l, err := db.NewPGRateLimiter(mock, 10, time.Minute)
+	require.NoError(t, err)
+
+	// Normal context
+	ctx := context.WithValue(context.Background(), "trace", "123")
+	assert.True(t, l.AllowWithContext(ctx, "user-ctx"))
+	assert.NotNil(t, capturedCtx)
+	assert.Equal(t, "123", capturedCtx.Value("trace"))
+
+	// Pre-cancelled context should fail closed
+	cancelledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	mockCancelled := &mockDBTX{
+		queryRowFunc: func(ctx context.Context, sql string, args ...any) pgx.Row {
+			return &mockRow{
+				scanFunc: func(dest ...any) error {
+					return ctx.Err()
+				},
+			}
+		},
+	}
+	lCancelled, err := db.NewPGRateLimiter(mockCancelled, 10, time.Minute)
+	require.NoError(t, err)
+
+	assert.False(t, lCancelled.AllowWithContext(cancelledCtx, "user-ctx"))
+	assert.False(t, lCancelled.AllowNWithContext(cancelledCtx, "user-ctx", 2))
+}
+
+func TestPGRateLimiter_LimitOneWindowReset(t *testing.T) {
+	// Test limit = 1 window reset behavior and query generation
+	var executedSQL string
+	var capturedArgs []any
+
+	mock := &mockDBTX{
+		queryRowFunc: func(ctx context.Context, sql string, args ...any) pgx.Row {
+			executedSQL = sql
+			capturedArgs = args
+			return &mockRow{
+				scanFunc: func(dest ...any) error {
+					*dest[0].(*bool) = true
+					return nil
+				},
+			}
+		},
+	}
+
+	l, err := db.NewPGRateLimiter(mock, 1, time.Second)
+	require.NoError(t, err)
+
+	// First request: limit = 1 allowed
+	assert.True(t, l.Allow("limit-1-user"))
+	assert.Contains(t, executedSQL, "WHERE ($3 - ratelimit_windows.window_start >= $4::interval) OR (ratelimit_windows.current_count + $2 <= $5)")
+	assert.Contains(t, executedSQL, "ratelimit_windows.window_start = $3")
+	assert.Contains(t, executedSQL, "ratelimit_windows.current_count <= $5")
+	require.Len(t, capturedArgs, 5)
+	assert.Equal(t, "limit-1-user", capturedArgs[0])
+	assert.Equal(t, 1, capturedArgs[1]) // n = 1
+	assert.Equal(t, 1, capturedArgs[4]) // limit = 1
+
+	// When limit exceeded and WHERE clause prevents row update, PostgreSQL returns 0 rows (ErrNoRows)
+	mockNoRows := &mockDBTX{
+		queryRowFunc: func(ctx context.Context, sql string, args ...any) pgx.Row {
+			return &mockRow{
+				scanFunc: func(dest ...any) error {
+					return pgx.ErrNoRows
+				},
+			}
+		},
+	}
+	lNoRows, err := db.NewPGRateLimiter(mockNoRows, 1, time.Second)
+	require.NoError(t, err)
+	assert.False(t, lNoRows.Allow("limit-1-user"), "ErrNoRows due to WHERE clause must return false without failing open")
+}

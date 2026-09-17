@@ -96,11 +96,21 @@ func NewPGRateLimiter(dbtx DBTX, limit int, window time.Duration, opts ...PGRate
 
 // Allow reports whether a single event may occur under key.
 func (l *PGRateLimiter) Allow(key string) bool {
-	return l.AllowN(key, 1)
+	return l.AllowWithContext(context.Background(), key)
+}
+
+// AllowWithContext reports whether a single event may occur under key using the provided context.
+func (l *PGRateLimiter) AllowWithContext(ctx context.Context, key string) bool {
+	return l.AllowNWithContext(ctx, key, 1)
 }
 
 // AllowN reports whether n events may occur under key.
 func (l *PGRateLimiter) AllowN(key string, n int) bool {
+	return l.AllowNWithContext(context.Background(), key, n)
+}
+
+// AllowNWithContext reports whether n events may occur under key using the provided context.
+func (l *PGRateLimiter) AllowNWithContext(ctx context.Context, key string, n int) bool {
 	if key == "" || n <= 0 {
 		return false
 	}
@@ -108,7 +118,7 @@ func (l *PGRateLimiter) AllowN(key string, n int) bool {
 		return false
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), l.timeout)
+	callCtx, cancel := context.WithTimeout(ctx, l.timeout)
 	defer cancel()
 
 	now := l.nowFunc()
@@ -122,23 +132,26 @@ func (l *PGRateLimiter) AllowN(key string, n int) bool {
 		"ON CONFLICT (key) DO UPDATE SET " +
 		"  current_count = CASE " +
 		"    WHEN $3 - {{TABLE}}.window_start >= $4::interval THEN $2 " +
-		"    WHEN {{TABLE}}.current_count + $2 <= $5 THEN {{TABLE}}.current_count + $2 " +
-		"    ELSE {{TABLE}}.current_count " +
+		"    ELSE {{TABLE}}.current_count + $2 " +
 		"  END, " +
 		"  window_start = CASE " +
 		"    WHEN $3 - {{TABLE}}.window_start >= $4::interval THEN $3 " +
 		"    ELSE {{TABLE}}.window_start " +
 		"  END " +
+		"WHERE ($3 - {{TABLE}}.window_start >= $4::interval) OR ({{TABLE}}.current_count + $2 <= $5) " +
 		"RETURNING ( " +
-		"  ($3 - {{TABLE}}.window_start >= $4::interval) OR " +
-		"  ({{TABLE}}.current_count + $2 <= $5) " +
+		"  ({{TABLE}}.window_start = $3) OR " +
+		"  ({{TABLE}}.current_count <= $5) " +
 		");"
 
 	query := strings.ReplaceAll(queryTmpl, "{{TABLE}}", l.tableName)
 
 	var allowed bool
-	err := l.db.QueryRow(ctx, query, key, n, now, windowSeconds, l.limit).Scan(&allowed)
+	err := l.db.QueryRow(callCtx, query, key, n, now, windowSeconds, l.limit).Scan(&allowed)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false
+		}
 		// Fail-closed on database error to protect downstream infrastructure
 		return false
 	}

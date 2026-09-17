@@ -28,12 +28,29 @@ const Header = "X-Request-ID"
 
 type contextKey struct{}
 
+func isValidRequestID(id string) bool {
+	if len(id) < 1 || len(id) > 128 {
+		return false
+	}
+	for i := 0; i < len(id); i++ {
+		b := id[i]
+		if (b >= 'a' && b <= 'z') ||
+			(b >= 'A' && b <= 'Z') ||
+			(b >= '0' && b <= '9') ||
+			b == '-' || b == '_' || b == '.' || b == ':' || b == '/' {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
 // Middleware injects a request ID into the request context and response headers.
 // It is safe to use with any net/http compatible router.
 func Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := r.Header.Get(Header)
-		if id == "" {
+		if !isValidRequestID(id) {
 			id = uuid.New().String()
 		}
 

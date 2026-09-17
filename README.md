@@ -344,7 +344,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 Coverage across all 31 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
-> **Overall Repository Statement Coverage: 95.5%** (Zero data races across `-race`)
+> **Overall Repository Statement Coverage: 95.6%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
 > **Quality Standard: Strict per-package floor >= 85.0% enforced by `./scripts/check_coverage.sh`**
 
@@ -353,14 +353,14 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `apperror` | Canonical structured application error codes and helpers | **100.0%** |
 | `bodylimit` | Gin middleware to cap HTTP request body sizes | **100.0%** |
 | `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **87.5%** |
-| `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **92.2%** |
+| `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **93.3%** |
 | `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **93.9%** |
 | `cryptoutil` | Secure password hashing (`golang.org/x/crypto/bcrypt`) and CSPRNG password generation (`crypto/rand`) | **100.0%** |
 | `db` | Database Pool & Querier | **100.0%** |
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |
 | `ginmw` | Unified Gin HTTP middleware chain & helper | **100.0%** |
 | `health` | Parallel dependency health check and Kubernetes probe handler | **100.0%** |
-| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.0%** |
+| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.4%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
 | `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
 | `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **95.0%** |
@@ -381,7 +381,7 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |
 | `validation` | Declarative validation error formatter | **100.0%** |
 | `workerpool` | Bounded panic-safe concurrent worker pool with metrics & options | **92.1%** |
-| **Total Statement Coverage** | **Cumulative across all packages** | **95.5%** |
+| **Total Statement Coverage** | **Cumulative across all packages** | **95.6%** |
 
 > *Note: The standalone reference microservice (`examples/microservice`) achieves 87.4% integration statement coverage.*
 

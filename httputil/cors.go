@@ -27,21 +27,27 @@ func DefaultCORSConfig(allowedOrigins ...string) CORSConfig {
 	}
 }
 
-func isOriginAllowed(origin string, allowedOrigins []string) bool {
+func checkOrigin(origin string, allowedOrigins []string, allowCredentials bool) (bool, bool) {
 	for _, o := range allowedOrigins {
 		trimmed := strings.TrimSpace(o)
-		if trimmed == "*" || trimmed == origin {
-			return true
+		if trimmed == "*" {
+			if !allowCredentials {
+				return true, true
+			}
+			continue
+		}
+		if trimmed == origin {
+			return true, false
 		}
 		// Wildcard suffix check: "*.example.com"
 		if strings.HasPrefix(trimmed, "*.") {
 			suffix := trimmed[1:] // ".example.com"
 			if strings.HasSuffix(origin, suffix) {
-				return true
+				return true, false
 			}
 		}
 	}
-	return false
+	return false, false
 }
 
 // CORS creates universal standard net/http middleware that enforces CORS headers and handles preflight OPTIONS requests.
@@ -54,19 +60,26 @@ func CORS(cfg CORSConfig) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := r.Header.Get("Origin")
 
-			if origin != "" && isOriginAllowed(origin, cfg.AllowedOrigins) {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
-				if cfg.AllowCredentials {
-					w.Header().Set("Access-Control-Allow-Credentials", "true")
-				}
-				if methods != "" {
-					w.Header().Set("Access-Control-Allow-Methods", methods)
-				}
-				if headers != "" {
-					w.Header().Set("Access-Control-Allow-Headers", headers)
-				}
-				if exposed != "" {
-					w.Header().Set("Access-Control-Expose-Headers", exposed)
+			if origin != "" {
+				allowed, isStar := checkOrigin(origin, cfg.AllowedOrigins, cfg.AllowCredentials)
+				if allowed {
+					if isStar {
+						w.Header().Set("Access-Control-Allow-Origin", "*")
+					} else {
+						w.Header().Set("Access-Control-Allow-Origin", origin)
+						if cfg.AllowCredentials {
+							w.Header().Set("Access-Control-Allow-Credentials", "true")
+						}
+					}
+					if methods != "" {
+						w.Header().Set("Access-Control-Allow-Methods", methods)
+					}
+					if headers != "" {
+						w.Header().Set("Access-Control-Allow-Headers", headers)
+					}
+					if exposed != "" {
+						w.Header().Set("Access-Control-Expose-Headers", exposed)
+					}
 				}
 			}
 

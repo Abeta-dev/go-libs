@@ -27,22 +27,24 @@ The `recovery` package provides panic-trapping HTTP middleware with structured s
 ```go
 import (
     "log/slog"
+    "net/http"
     "os"
-    "github.com/gin-gonic/gin"
+
     "github.com/umesh0492/go-libs/recovery"
 )
 
 func main() {
-    r := gin.New()
+    mux := http.NewServeMux()
+    mux.HandleFunc("/api/v1/orders", orderHandler)
 
     // 1. Basic usage with default JSON logger
-    r.Use(recovery.Middleware())
+    handler := recovery.Middleware()(mux)
 
     // 2. Or configure with a custom slog instance
     customLogger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-    r.Use(recovery.Middleware(recovery.WithLogger(customLogger)))
+    handler = recovery.Middleware(recovery.WithLogger(customLogger))(mux)
 
-    r.GET("/api/v1/orders", orderHandler)
+    _ = http.ListenAndServe(":8080", handler)
 }
 ```
 

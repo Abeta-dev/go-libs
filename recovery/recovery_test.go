@@ -3,15 +3,16 @@
 package recovery_test
 
 import (
+	"encoding/json"
 	"errors"
 	"log/slog"
+	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/umesh0492/go-libs/recovery"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -41,90 +42,91 @@ func (s *mockSpan) SetAttributes(kvs ...attribute.KeyValue) {
 }
 
 func TestMiddleware(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
-	r.Use(recovery.Middleware())
-	r.GET("/", func(c *gin.Context) {
+	mw := recovery.Middleware()
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		panic("test panic")
-	})
+	}))
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/test", nil)
 	rec := httptest.NewRecorder()
-	r.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
-	assert.Equal(t, 500, rec.Code)
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	assert.Equal(t, "application/json; charset=utf-8", rec.Header().Get("Content-Type"))
+
+	var body map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &body)
+	require.NoError(t, err)
+	assert.Equal(t, "Internal Server Error", body["error"])
+	assert.NotEmpty(t, body["message"])
 }
 
 func TestWithLogger(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
 	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
-	r.Use(recovery.Middleware(recovery.WithLogger(logger)))
-	r.GET("/", func(c *gin.Context) {
+	mw := recovery.Middleware(recovery.WithLogger(logger))
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		panic("test panic logger")
-	})
+	}))
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/test-logger", nil)
 	rec := httptest.NewRecorder()
-	r.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
-	assert.Equal(t, 500, rec.Code)
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 }
 
 func TestMiddlewareSafe(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
-	r.Use(recovery.Middleware())
-	r.GET("/", func(c *gin.Context) {
-		c.Status(200)
-	})
+	mw := recovery.Middleware()
+	called := false
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ok"))
+	}))
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/safe", nil)
 	rec := httptest.NewRecorder()
-	r.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
-	assert.Equal(t, 200, rec.Code)
-	time.Sleep(1 * time.Millisecond)
+	assert.True(t, called)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "ok", rec.Body.String())
 }
 
 func TestMiddleware_PanicErrorAndSpanRecording(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
-	r.Use(recovery.Middleware())
-
 	span := &mockSpan{}
-	r.GET("/crash", func(c *gin.Context) {
-		c.Request = c.Request.WithContext(trace.ContextWithSpan(c.Request.Context(), span))
+	mw := recovery.Middleware()
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		panic(errors.New("fatal database crash"))
-	})
+	}))
 
-	req := httptest.NewRequest("GET", "/crash", nil)
+	req := httptest.NewRequest(http.MethodGet, "/crash", nil)
+	req = req.WithContext(trace.ContextWithSpan(req.Context(), span))
 	rec := httptest.NewRecorder()
-	r.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
-	assert.Equal(t, 500, rec.Code)
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 	assert.Equal(t, codes.Error, span.status)
 	assert.Len(t, span.errors, 1)
 	assert.Equal(t, "fatal database crash", span.errors[0].Error())
 	assert.Equal(t, "/crash", span.attrs["http.route"].AsString())
+	assert.Equal(t, int64(http.StatusInternalServerError), span.attrs["http.status_code"].AsInt64())
 }
 
 func TestMiddleware_PanicUnmatchedRoute(t *testing.T) {
-	gin.SetMode(gin.TestMode)
 	span := &mockSpan{}
+	mw := recovery.Middleware()
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		panic("panic on empty path")
+	}))
 
-	r := gin.New()
-	r.Use(recovery.Middleware())
-	r.NoRoute(func(c *gin.Context) {
-		c.Request = c.Request.WithContext(trace.ContextWithSpan(c.Request.Context(), span))
-		panic("panic on empty fullpath")
-	})
-
-	req := httptest.NewRequest("GET", "/unhandled", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.URL.Path = ""
+	req = req.WithContext(trace.ContextWithSpan(req.Context(), span))
 	rec := httptest.NewRecorder()
-	r.ServeHTTP(rec, req)
+	handler.ServeHTTP(rec, req)
 
-	assert.Equal(t, 500, rec.Code)
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 	assert.Equal(t, codes.Error, span.status)
 	assert.Equal(t, "unmatched", span.attrs["http.route"].AsString())
 }

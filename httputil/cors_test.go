@@ -80,10 +80,9 @@ func TestCORS_AllowedOrigins(t *testing.T) {
 		assert.Equal(t, "https://app.example.com", rec.Header().Get("Access-Control-Allow-Origin"))
 	})
 
-	t.Run("star origin allowed", func(t *testing.T) {
-		starCfg := httputil.CORSConfig{
-			AllowedOrigins: []string{"*"},
-		}
+	t.Run("star origin allowed without credentials sets star header", func(t *testing.T) {
+		starCfg := httputil.DefaultCORSConfig("*")
+		starCfg.AllowCredentials = false
 		starMw := httputil.CORS(starCfg)
 		starHandler := starMw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -93,6 +92,46 @@ func TestCORS_AllowedOrigins(t *testing.T) {
 		req.Header.Set("Origin", "https://any.site.io")
 		rec := httptest.NewRecorder()
 		starHandler.ServeHTTP(rec, req)
-		assert.Equal(t, "https://any.site.io", rec.Header().Get("Access-Control-Allow-Origin"))
+		assert.Equal(t, "*", rec.Header().Get("Access-Control-Allow-Origin"))
+		assert.Empty(t, rec.Header().Get("Access-Control-Allow-Credentials"))
+		assert.Contains(t, rec.Header().Get("Access-Control-Allow-Methods"), "GET")
+	})
+
+	t.Run("wildcard with credentials does not reflect untrusted origin", func(t *testing.T) {
+		cfg := httputil.CORSConfig{
+			AllowedOrigins:   []string{"*"},
+			AllowCredentials: true,
+		}
+		mw := httputil.CORS(cfg)
+		handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/data", nil)
+		req.Header.Set("Origin", "https://untrusted.com")
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		assert.Empty(t, rec.Header().Get("Access-Control-Allow-Origin"))
+		assert.Empty(t, rec.Header().Get("Access-Control-Allow-Credentials"))
+	})
+
+	t.Run("explicit origin with credentials reflects properly", func(t *testing.T) {
+		cfg := httputil.CORSConfig{
+			AllowedOrigins:   []string{"*", "https://trusted.com"},
+			AllowCredentials: true,
+		}
+		mw := httputil.CORS(cfg)
+		handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/data", nil)
+		req.Header.Set("Origin", "https://trusted.com")
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		assert.Equal(t, "https://trusted.com", rec.Header().Get("Access-Control-Allow-Origin"))
+		assert.Equal(t, "true", rec.Header().Get("Access-Control-Allow-Credentials"))
 	})
 }

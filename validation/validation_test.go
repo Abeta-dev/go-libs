@@ -61,3 +61,8 @@ func TestFormatErrors(t *testing.T) {
 	assert.Equal(t, "unknown", fallbackErrs[0].Field)
 	assert.Equal(t, "some other error", fallbackErrs[0].Message)
 }
+
+func TestFormatErrors_Nil(t *testing.T) {
+	errs := validation.FormatErrors(nil)
+	assert.Nil(t, errs)
+}

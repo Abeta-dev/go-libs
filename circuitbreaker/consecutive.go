@@ -4,6 +4,7 @@ package circuitbreaker
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -178,6 +179,9 @@ func (cb *ConsecutiveBreaker) recordResult(isProbe bool, err error) (func(), err
 	if isProbe {
 		cb.decrementHalfOpen()
 		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				return nil, err
+			}
 			cb.openedAt = now
 			cb.metrics.Failures.Inc()
 			notify := cb.transition(StateOpen)
@@ -190,6 +194,9 @@ func (cb *ConsecutiveBreaker) recordResult(isProbe bool, err error) (func(), err
 
 	if cb.state == StateClosed {
 		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				return nil, err
+			}
 			cb.failures++
 			cb.metrics.Failures.Inc()
 			if cb.failures >= cb.maxFailures {

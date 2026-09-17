@@ -28,7 +28,6 @@ import (
 	"github.com/umesh0492/go-libs/httputil"
 	"github.com/umesh0492/go-libs/logger"
 	"github.com/umesh0492/go-libs/pagination"
-	"github.com/umesh0492/go-libs/recovery"
 	"github.com/umesh0492/go-libs/retry"
 	"github.com/umesh0492/go-libs/shutdown"
 	"github.com/umesh0492/go-libs/sliceutil"
@@ -317,7 +316,7 @@ func NewApp(opts ...AppOption) *App {
 		ginmw.RequestID(),
 		ginmw.SecurityHeaders(),
 		ginmw.CORS([]string{"*"}),
-		recovery.Middleware(recovery.WithLogger(appLogger)),
+		ginmw.Recovery(ginmw.WithRecoveryLogger(appLogger)),
 		ginmw.Logger(),
 		ginmw.Telemetry("order-service"),
 		ginmw.GlobalRateLimit(),
