@@ -285,10 +285,12 @@ func TestPGRateLimiter_ContextSupport(t *testing.T) {
 	require.NoError(t, err)
 
 	// Normal context
-	ctx := context.WithValue(context.Background(), "trace", "123")
+	type testCtxKey string
+	const traceKey testCtxKey = "trace"
+	ctx := context.WithValue(context.Background(), traceKey, "123")
 	assert.True(t, l.AllowWithContext(ctx, "user-ctx"))
 	assert.NotNil(t, capturedCtx)
-	assert.Equal(t, "123", capturedCtx.Value("trace"))
+	assert.Equal(t, "123", capturedCtx.Value(traceKey))
 
 	// Pre-cancelled context should fail closed
 	cancelledCtx, cancel := context.WithCancel(context.Background())

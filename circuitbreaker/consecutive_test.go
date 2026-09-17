@@ -117,4 +117,3 @@ func TestRatioBreaker_ClientCancellation(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, circuitbreaker.StateClosed, rb.State())
 }
-

@@ -3,6 +3,7 @@
 package httpclient_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"io"
@@ -87,3 +88,47 @@ func TestRoundTrip_BodyReadError(t *testing.T) {
 	assert.Contains(t, err.Error(), "read broken pipe")
 }
 
+func TestRoundTrip_BodyExceedingMaxRetrySizeNotRewound(t *testing.T) {
+	// Generate payload exceeding DefaultMaxRetryBodySize (10MB + 1024 bytes)
+	largePayloadSize := httpclient.DefaultMaxRetryBodySize + 1024
+	largePayload := make([]byte, largePayloadSize)
+	for i := range largePayload {
+		largePayload[i] = 'A'
+	}
+
+	var attemptCount int32
+	var receivedBytes int64
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		atomic.AddInt32(&attemptCount, 1)
+		n, err := io.Copy(io.Discard, r.Body)
+		if err == nil {
+			atomic.StoreInt64(&receivedBytes, n)
+		}
+		// Server returns 500
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	rt := httpclient.NewRoundTripper(
+		httpclient.WithRetry(retry.Config{
+			Attempts:    3,
+			Strategy:    retry.Constant,
+			InitialWait: 5 * time.Millisecond,
+		}),
+	)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, io.NopCloser(bytes.NewReader(largePayload)))
+	require.NoError(t, err)
+	req.GetBody = nil
+
+	resp, err := rt.RoundTrip(req)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+	defer resp.Body.Close()
+	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+	// Because body exceeded DefaultMaxRetryBodySize, only 1 attempt should have been made
+	assert.Equal(t, int32(1), atomic.LoadInt32(&attemptCount))
+	assert.Equal(t, int64(largePayloadSize), atomic.LoadInt64(&receivedBytes))
+}

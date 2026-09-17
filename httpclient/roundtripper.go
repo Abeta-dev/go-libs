@@ -19,21 +19,21 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// DefaultMaxRetryBodySize defines the maximum request body size (10MB) buffered into memory for retry rewind.
+const DefaultMaxRetryBodySize = 10 * 1024 * 1024 // 10MB
+
+type multiReadCloser struct {
+	io.Reader
+	io.Closer
+}
+
 type resilientTransport struct {
 	opts options
 }
 
 func (rt *resilientTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if req.Body != nil && req.Body != http.NoBody && req.GetBody == nil {
-		bodyBytes, err := io.ReadAll(req.Body)
-		if err != nil {
-			return nil, err
-		}
-		_ = req.Body.Close()
-		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-		req.GetBody = func() (io.ReadCloser, error) {
-			return io.NopCloser(bytes.NewReader(bodyBytes)), nil
-		}
+	if err := prepareRequestBody(req); err != nil {
+		return nil, err
 	}
 
 	ctx := req.Context()
@@ -45,9 +45,49 @@ func (rt *resilientTransport) RoundTrip(req *http.Request) (*http.Response, erro
 
 	// Layer 1 (Outermost): Rate Limiting
 	// Drop excess requests immediately before spending circuit breaker or retry budget.
+	if err := rt.checkRateLimit(req); err != nil {
+		return nil, err
+	}
+
+	// Layer 2: Circuit Breaker
+	// Fail fast immediately if downstream is known dead, avoiding unnecessary network attempts.
+	if rt.opts.circuitBreaker != nil {
+		return rt.roundTripCircuitBreaker(ctx, req)
+	}
+
+	return rt.executeRetries(ctx, req)
+}
+
+func prepareRequestBody(req *http.Request) error {
+	if req.Body == nil || req.Body == http.NoBody || req.GetBody != nil {
+		return nil
+	}
+	lr := io.LimitReader(req.Body, int64(DefaultMaxRetryBodySize)+1)
+	bodyBytes, err := io.ReadAll(lr)
+	if err != nil {
+		return err
+	}
+	if len(bodyBytes) > DefaultMaxRetryBodySize {
+		// Exceeds limit: do NOT buffer for replay into memory; restore original body stream
+		// and execute as a single attempt without rewind.
+		req.Body = &multiReadCloser{
+			Reader: io.MultiReader(bytes.NewReader(bodyBytes), req.Body),
+			Closer: req.Body,
+		}
+		return nil
+	}
+	_ = req.Body.Close()
+	req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+	req.GetBody = func() (io.ReadCloser, error) {
+		return io.NopCloser(bytes.NewReader(bodyBytes)), nil
+	}
+	return nil
+}
+
+func (rt *resilientTransport) checkRateLimit(req *http.Request) error {
 	if rt.opts.rateLimiterFunc != nil {
 		if !rt.opts.rateLimiterFunc(req) {
-			return nil, ErrRateLimited
+			return ErrRateLimited
 		}
 	} else if rt.opts.rateLimiter != nil {
 		key := req.URL.Host
@@ -55,44 +95,44 @@ func (rt *resilientTransport) RoundTrip(req *http.Request) (*http.Response, erro
 			key = rt.opts.rateLimiterKeyFunc(req)
 		}
 		if !rt.opts.rateLimiter.Allow(key) {
-			return nil, ErrRateLimited
+			return ErrRateLimited
 		}
 	}
+	return nil
+}
 
-	// Layer 2: Circuit Breaker
-	// Fail fast immediately if downstream is known dead, avoiding unnecessary network attempts.
-	if rt.opts.circuitBreaker != nil {
-		var resp *http.Response
-		var execErr error
-		cbErr := rt.opts.circuitBreaker.Execute(ctx, func() error {
-			//nolint:bodyclose // response body is passed to caller for deferred closure
-			resp, execErr = rt.executeRetries(ctx, req)
-			if execErr != nil {
-				return execErr
-			}
-			if resp != nil && resp.StatusCode >= 500 {
-				return fmt.Errorf("httpclient: downstream returned HTTP %d", resp.StatusCode)
-			}
-			return nil
-		})
-		if cbErr != nil {
-			if errors.Is(cbErr, circuitbreaker.ErrCircuitOpen) {
-				return nil, cbErr
-			}
-			if resp != nil {
-				return resp, nil
-			}
+func (rt *resilientTransport) roundTripCircuitBreaker(ctx context.Context, req *http.Request) (*http.Response, error) {
+	var resp *http.Response
+	var execErr error
+	cbErr := rt.opts.circuitBreaker.Execute(ctx, func() error {
+		//nolint:bodyclose // response body is passed to caller for deferred closure
+		resp, execErr = rt.executeRetries(ctx, req)
+		if execErr != nil {
+			return execErr
+		}
+		if resp != nil && resp.StatusCode >= 500 {
+			return fmt.Errorf("httpclient: downstream returned HTTP %d", resp.StatusCode)
+		}
+		return nil
+	})
+	if cbErr != nil {
+		if errors.Is(cbErr, circuitbreaker.ErrCircuitOpen) {
 			return nil, cbErr
 		}
-		return resp, nil
+		if resp != nil {
+			return resp, nil
+		}
+		return nil, cbErr
 	}
-
-	return rt.executeRetries(ctx, req)
+	return resp, nil
 }
 
 func (rt *resilientTransport) executeRetries(ctx context.Context, req *http.Request) (*http.Response, error) {
 	attempts := rt.opts.retryCfg.Attempts
 	if attempts <= 0 {
+		attempts = 1
+	}
+	if req.Body != nil && req.Body != http.NoBody && req.GetBody == nil {
 		attempts = 1
 	}
 

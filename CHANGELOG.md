@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-09-17
+
+### Highlights
+- **Decoupled Logger Sampler (`logger/sampler.go`)**: Eliminated architectural layering breach by removing dependency on `ratelimit`. Defined standalone `Sampler` interface and an internal lock-synchronized token-bucket sampler with zero third-party dependencies.
+- **Bounded HTTP Client Retry Buffering (`httpclient/roundtripper.go`)**: Bounded memory ingestion on retries with `DefaultMaxRetryBodySize` (10MB) via `io.LimitReader`. Oversized streaming request bodies bypass buffering and execute as a single attempt without rewind to prevent process OOM.
+- **Interface Segregation on `db.DBTX` (`db/context.go`)**: Segregated core querier interface `DBTX` (`Exec`, `Query`, `QueryRow`) from bulk copy operations, introducing `CopyDBTX` for `CopyFrom`.
+- **Raw Error Transparency (`httputil/response.go`)**: Preserved transparent `err.Error()` propagation in `ErrorFromDomain` without unrequested sanitization.
+
+### Added
+- logger: Decoupled `Sampler` interface and `WithSampler` functional option for custom log sampling algorithms.
+- httpclient: `DefaultMaxRetryBodySize` constant defining 10MB memory threshold for retry body buffering.
+- db: `CopyDBTX` interface extending `DBTX` with `CopyFrom` bulk ingestion.
+
+### Changed
+- `logger`: Decoupled `SamplingHandler` from `ratelimit`; instantiates an internal token-bucket sampler when no custom sampler is supplied.
+- `httpclient`: Bounded retry buffering using `io.LimitReader`; streams exceeding `DefaultMaxRetryBodySize` are executed as a single attempt without replay buffering.
+- `db`: Streamlined `DBTX` interface to `Exec`, `Query`, and `QueryRow`; batch `CopyFrom` moved to segregated `CopyDBTX` interface.
+
+### Fixed
+- Source Formatting: Applied canonical `gofmt` to `circuitbreaker/consecutive_test.go` and `httpclient/roundtripper_test.go`.
+- `httputil`: Verified raw error transparency in `ErrorFromDomain` returning `err.Error()` verbatim.
+
 ## [0.2.0] - 2026-09-17
 
 ### Highlights

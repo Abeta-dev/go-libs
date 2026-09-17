@@ -27,7 +27,7 @@ func DefaultCORSConfig(allowedOrigins ...string) CORSConfig {
 	}
 }
 
-func checkOrigin(origin string, allowedOrigins []string, allowCredentials bool) (bool, bool) {
+func checkOrigin(origin string, allowedOrigins []string, allowCredentials bool) (allowed, isWildcard bool) {
 	for _, o := range allowedOrigins {
 		trimmed := strings.TrimSpace(o)
 		if trimmed == "*" {
