@@ -73,7 +73,14 @@ assert_equals() {
 }
 
 tmp_dir="$(mktemp -d)"
-trap 'rm -rf "${tmp_dir}"' EXIT
+cleanup() {
+  local exit_code=$?
+  chmod -R u+w "${tmp_dir}" 2>/dev/null || true
+  rm -rf "${tmp_dir}" 2>/dev/null || true
+  trap - EXIT
+  exit "${exit_code}"
+}
+trap cleanup EXIT
 
 remote_tag_object="$(git ls-remote --tags --refs "${REMOTE}" "refs/tags/${VERSION}" | awk 'NR == 1 { print $1 }')"
 remote_commit="$(git ls-remote "${REMOTE}" "refs/tags/${VERSION}^{}" | awk 'NR == 1 { print $1 }')"

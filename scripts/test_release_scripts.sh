@@ -24,6 +24,13 @@ git -c user.name='go-libs release fixture' \
 
 GIT_TAG=v0.2.1 ./scripts/check_version.sh >/dev/null
 
+# A successful baseline audit must remain successful after Go creates read-only
+# files in its temporary module cache. The baseline script uses the source
+# checkout's configured remote, so run it there rather than in the fixture clone.
+cd "${ROOT_DIR}"
+./scripts/verify_release_baseline.sh >/dev/null
+
+cd "${fixture_dir}/tagged-checkout"
 # A populated Unreleased section must take precedence over the latest release.
 python3 - <<'PY'
 from pathlib import Path
