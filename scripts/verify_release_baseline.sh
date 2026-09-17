@@ -86,7 +86,37 @@ fetch_with_retry "${proxy_base}.mod" "${tmp_dir}/module.mod"
 assert_equals 'proxy zip SHA-256' "${EXPECTED_ZIP_SHA256}" "$(sha256 "${tmp_dir}/module.zip")"
 assert_equals 'proxy module file SHA-256' "${EXPECTED_MOD_SHA256}" "$(sha256 "${tmp_dir}/module.mod")"
 
-module_json="$(GOWORK=off GOPROXY="${PROXY_URL}" go mod download -json "${MODULE}@${VERSION}")"
+download_module_with_retry() {
+  local attempt=1
+  local max_attempts=4
+  local delay=1
+  local module_cache
+  local download_error_file="${tmp_dir}/go-download-error"
+
+  module_json=''
+  while (( attempt <= max_attempts )); do
+    module_cache="${tmp_dir}/gomodcache-${attempt}"
+    rm -rf "${module_cache}" "${download_error_file}"
+    if module_json="$(GOWORK=off GOMODCACHE="${module_cache}" GOPROXY="${PROXY_URL}" go mod download -json "${MODULE}@${VERSION}" 2>"${download_error_file}")"; then
+      rm -rf "${module_cache}"
+      return 0
+    fi
+    rm -rf "${module_cache}"
+    if (( attempt == max_attempts )); then
+      echo "Go proxy resolution failed after ${max_attempts} attempts: $(tr '\n' ' ' < "${download_error_file}")" >&2
+      return 1
+    fi
+    echo "Retrying Go proxy resolution in ${delay}s (attempt ${attempt}/${max_attempts}): $(tr '\n' ' ' < "${download_error_file}")" >&2
+    sleep "${delay}"
+    delay=$((delay * 2))
+    attempt=$((attempt + 1))
+  done
+}
+
+if ! download_module_with_retry; then
+  echo "Go could not resolve ${MODULE}@${VERSION}" >&2
+  exit 1
+fi
 resolved_sum="$(printf '%s\n' "${module_json}" | sed -n 's/^[[:space:]]*"Sum": "\([^"]*\)".*/\1/p')"
 resolved_gomod_sum="$(printf '%s\n' "${module_json}" | sed -n 's/^[[:space:]]*"GoModSum": "\([^"]*\)".*/\1/p')"
 assert_equals 'Go module checksum' "${EXPECTED_SUM}" "${resolved_sum}"

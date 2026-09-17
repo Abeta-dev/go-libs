@@ -188,3 +188,9 @@ jobs:
           ./scripts/check_version.sh
           ./scripts/check_leaf_imports.sh
 
+      - name: Verify Release Script and Workflow Assertions
+        run: |
+          ./scripts/test_shell_compatibility.sh
+          ./scripts/test_release_workflow.sh
+          ./scripts/test_release_scripts.sh
+
