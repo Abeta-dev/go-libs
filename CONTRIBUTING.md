@@ -12,7 +12,7 @@ This guide provides everything you need to know to get started, run the test sui
 
 `go-libs` follows a strict **Truth-Gate Protocol**: every claim in documentation, every coverage number, and every version reference is programmatically asserted against the actual codebase in CI.
 
-- **Zero Breaking Changes**: We preserve backward compatibility across minor releases.
+- **Zero Breaking Changes in Patch Releases**: We preserve backward compatibility across patch releases in pre-1.0; breaking consolidations occur only in minor releases (v0.X.0).
 - **Hermetic Tests**: Unit tests must remain fully self-contained and runnable locally without requiring external Docker daemons or cloud services.
 - **Maintainer SLA**: We are a small engineering team. We aim to review and respond to first-time contributor pull requests within **5 business days**. Issues are triaged **weekly**.
 
@@ -58,7 +58,7 @@ In addition to standard `go test` and `golangci-lint`, `go-libs` includes two de
 ### B. `./scripts/check_coverage.sh`
 - **What it checks**:
   - Measures statement coverage across all packages.
-  - Asserts global repository statement coverage is `>= 90.0%` (currently **95.0%**).
+  - Asserts global repository statement coverage is `>= 90.0%` (currently **95.8%**).
   - Asserts that every individual package meets a minimum floor of `>= 85.0%`.
   - Asserts that the core authentication/middleware package (`ginmw`) maintains **100.0%** statement coverage.
   - **Zero-Drift README Sync**: Parses the per-package coverage table in `README.md` line-by-line and fails if any number deviates from live toolchain measurements.

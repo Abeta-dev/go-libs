@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>go-libs · Enterprise-Grade Go Microservice Foundations</title>
-  <meta name="description" content="Hardened, framework-agnostic Go microservice primitives with verified 95.0% statement coverage, zero heavy dependencies in core leaves, and zero data races under -race.">
+  <meta name="description" content="Hardened, framework-agnostic Go microservice primitives with verified 95.8% statement coverage, zero heavy dependencies in core leaves, and zero data races under -race.">
   <meta name="theme-color" content="#0b0f19">
 
   <!-- Open Graph -->
   <meta property="og:title" content="go-libs · Enterprise-Grade Go Microservice Foundations">
-  <meta property="og:description" content="31 production-ready Go packages with verified 95.0% statement coverage and zero data races.">
+  <meta property="og:description" content="31 production-ready Go packages with verified 95.8% statement coverage and zero data races.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://umesh0492.github.io/go-libs/">
 
@@ -685,7 +685,7 @@
       </div>
       <h1>Enterprise-Grade Go Microservice Foundations</h1>
       <p class="hero-sub">
-        Unified, zero-business-logic foundation primitives for high-throughput Go backends. Hardened with verified 95.0% statement coverage, zero heavy dependencies in core leaves, and zero data races under <code>-race</code>.
+        Unified, zero-business-logic foundation primitives for high-throughput Go backends. Hardened with verified 95.8% statement coverage, zero heavy dependencies in core leaves, and zero data races under <code>-race</code>.
       </p>
 
       <div class="install-box">
@@ -722,7 +722,7 @@
           <div class="stat-lbl">Hardened Packages</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val">95.0%</div>
+          <div class="stat-val">95.8%</div>
           <div class="stat-lbl">Statement Coverage</div>
         </div>
         <div class="stat-card">
@@ -1263,7 +1263,7 @@ func main() {
         category: "framework",
         coverage: "100.0%",
         desc: "Hardened HTTP request body size enforcement preventing denial-of-service and memory exhaustion.",
-        exports: ["New", "MB", "KB", "LimitBodyDefault", "LimitBodyAuth"]
+        exports: ["New", "MB", "KB", "String"]
       },
       {
         name: "cache",
@@ -1275,14 +1275,14 @@ func main() {
       {
         name: "circuitbreaker",
         category: "resilience",
-        coverage: "90.9%",
+        coverage: "93.3%",
         desc: "Atomic outbound 3-state failure machine (Closed, Open, Half-Open) with consecutive and ratio thresholds.",
         exports: ["ConsecutiveBreaker", "RatioBreaker", "NewConsecutiveBreaker", "NewRatioBreaker", "State"]
       },
       {
         name: "clock",
         category: "resilience",
-        coverage: "93.9%",
+        coverage: "95.2%",
         desc: "Deterministic mockable time abstraction enabling zero-sleep, microsecond-scale unit testing.",
         exports: ["Clock", "RealClock", "FakeClock", "NewReal", "NewFake"]
       },
@@ -1324,7 +1324,7 @@ func main() {
       {
         name: "httpclient",
         category: "http",
-        coverage: "92.0%",
+        coverage: "92.9%",
         desc: "Composed resilient HTTP transport client combining rate limiting, circuit breaker, retry, and telemetry.",
         exports: ["New", "NewRoundTripper", "WithRetry", "WithCircuitBreaker", "WithRateLimiter", "WithTotalTimeout"]
       },
@@ -1338,14 +1338,14 @@ func main() {
       {
         name: "idempotency",
         category: "http",
-        coverage: "100.0%",
+        coverage: "98.8%",
         desc: "Two-phase HTTP request deduplication and response caching with in-memory or PostgreSQL stores.",
         exports: ["Store", "MemoryStore", "NewMemoryStore", "PGStore", "NewPGStore", "Record", "Response"]
       },
       {
         name: "logger",
         category: "primitives",
-        coverage: "93.8%",
+        coverage: "96.0%",
         desc: "Context-aware structured slog logger with dynamic sampling and PII field redaction.",
         exports: ["Default", "WithContext", "FromContext", "NewSamplingHandler", "NewRedactingHandler"]
       },

@@ -74,7 +74,7 @@ go get github.com/umesh0492/go-libs@v0.2.1
 ```
 
 Requirements:
-- Go `1.25.0` or higher
+- Go `1.26.0` or higher
 
 ---
 
