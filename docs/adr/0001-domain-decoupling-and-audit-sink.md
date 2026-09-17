@@ -51,7 +51,7 @@ Historically, shared repositories in distributed microservices suffer from "doma
 ## Consequences
 
 ### Positive
-- **Stable Foundation**: `go-libs` releases (`v0.1.0`) are decoupled from business schema lifecycles.
+- **Stable Foundation**: `go-libs` releases are decoupled from business schema lifecycles.
 - **Clean Dependency Graph**: Consuming microservices can freely import `go-libs` alongside `go-app-kit` without diamond dependency conflicts or circular references.
 - **Audit Flexibility**: Audit logging backends (PostgreSQL partitioned tables, Kafka event streams, S3 archive sinks) can be swapped or modified in `go-app-kit` without recompiling `go-libs`.
 - **Enforced Security Boundaries**: RBAC permissions are evaluated server-side via runtime context hooks (`PermissionProvider`), avoiding baked-in domain assumptions in JWT tokens.

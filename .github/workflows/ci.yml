@@ -110,16 +110,18 @@ jobs:
           go-version: '1.26.x'
           cache: true
 
-      - name: Run Fuzz Targets (5s each)
+      # Go 1.26 can leak the fuzz coordinator's time-budget deadline as a
+      # spurious test failure (go.dev/issue/75804). Bound equivalent work by iterations instead.
+      - name: Run Fuzz Targets (100,000 iterations each)
         run: |
-          go test -fuzz=^FuzzRealIP$ -fuzztime=5s ./ratelimit
-          go test -fuzz=^FuzzJWTExtract$ -fuzztime=5s ./ginmw
-          go test -fuzz=^FuzzErrorChain$ -fuzztime=5s ./apperror
-          go test -fuzz=^FuzzDuration$ -fuzztime=5s ./env
-          go test -fuzz=^FuzzMaskEmail$ -fuzztime=5s ./stringutil
-          go test -fuzz=^FuzzParseTime$ -fuzztime=5s ./timeutil
-          go test -fuzz=^FuzzAddBusinessDays$ -fuzztime=5s ./timeutil
-          go test -fuzz=^FuzzBusinessDays$ -fuzztime=5s ./timeutil
+          go test -fuzz=^FuzzRealIP$ -fuzztime=100000x ./ratelimit
+          go test -fuzz=^FuzzJWTExtract$ -fuzztime=100000x ./ginmw
+          go test -fuzz=^FuzzErrorChain$ -fuzztime=100000x ./apperror
+          go test -fuzz=^FuzzDuration$ -fuzztime=100000x ./env
+          go test -fuzz=^FuzzMaskEmail$ -fuzztime=100000x ./stringutil
+          go test -fuzz=^FuzzParseTime$ -fuzztime=100000x ./timeutil
+          go test -fuzz=^FuzzAddBusinessDays$ -fuzztime=100000x ./timeutil
+          go test -fuzz=^FuzzBusinessDays$ -fuzztime=100000x ./timeutil
 
   security:
     name: Supply Chain & Vulnerability Scanner
@@ -185,4 +187,10 @@ jobs:
         run: |
           ./scripts/check_version.sh
           ./scripts/check_leaf_imports.sh
+
+      - name: Verify Release Script and Workflow Assertions
+        run: |
+          ./scripts/test_shell_compatibility.sh
+          ./scripts/test_release_workflow.sh
+          ./scripts/test_release_scripts.sh
 

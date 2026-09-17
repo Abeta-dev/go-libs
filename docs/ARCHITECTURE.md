@@ -113,9 +113,9 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 | `health` | 3 | Kubernetes-compliant liveness and readiness probes | `Handler`, `New`, `WithChecker` |
 | `httpclient` | 3 | Resilient composed HTTP client pipeline with circuit breaker, rate limit, and retry | `New`, `NewRoundTripper`, `WithRetry`, `WithCircuitBreaker` |
 | `httputil` | 3 | Standard JSON response envelopes and domain error mapping | `OK`, `Created`, `ErrorFromDomain` |
-| `idempotency` | 3 | Two-phase atomic request locking and response replay | `Store`, `MemoryStore`, `Middleware` |
+| `idempotency` | 3 | Two-phase atomic request locking and response replay | `Store`, `MemoryStore`, `PGStore`, `NewPGStore`, `Middleware` |
 | `logger` | 1 | Context-aware structured JSON logging via `log/slog` | `Default`, `WithContext`, `FromContext` |
-| `maputil` | 1 | Generic type-safe map transformations | `Keys`, `Values`, `Merge`, `Filter` |
+| `maputil` | 1 | Generic type-safe map transformations | `Merge`, `Filter` |
 | `metrics` | 1 | Framework-agnostic instrumentation interfaces | `Counter`, `Gauge`, `Histogram` |
 | `pagination` | 3 | Clamped offset pagination and SQL calculations | `Parse`, `Offset`, `Response` |
 | `ratelimit` | 3 | In-memory IP rate limiting (TokenBucket, SlidingWindow) | `NewTokenBucket`, `NewSlidingWindow` |
@@ -126,7 +126,7 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 | `retry` | 2 | Context-aware retry execution with backoff algorithms | `Do`, `Constant`, `ExponentialJitter` |
 | `securityheaders` | 3 | OWASP defensive security headers middleware | `New`, `Default` |
 | `shutdown` | 2 | Coordinated graceful OS signal teardown manager | `Manager`, `New`, `Register`, `Wait` |
-| `sliceutil` | 1 | Generic functional slice transformations | `Map`, `Filter`, `Reduce`, `GroupBy` |
+| `sliceutil` | 1 | Generic slice algorithms | `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`, `First` |
 | `stringutil` | 1 | Sensitive data masking and secure random generators | `MaskEmail`, `MaskPhone`, `RandomAlphanumeric`, `RandomSecureString` |
 | `telemetry` | 3 | OpenTelemetry provider initialization and span helpers | `InitProvider`, `NewTracerProvider`, `StartSpan` |
 | `timeutil` | 1 | UTC normalization and business day calculations | `NowIn`, `FormatIn`, `AddBusinessDays`, `StartOfDay`, `EndOfDay` |
@@ -263,12 +263,12 @@ func main() {
 
 ---
 
-## 7. Go 1.25 Baseline Architecture Justification
+## 7. Go 1.26 Baseline Architecture Justification
 
-`go-libs` pins its minimum supported language toolchain and runtime baseline to **Go 1.25.0**. This decision is rooted in systemic architectural requirements rather than arbitrary version chasing:
+`go-libs` pins its minimum supported language toolchain and runtime baseline to **Go 1.26.0**. This decision is rooted in systemic architectural requirements rather than arbitrary version chasing:
 
-1. **Standard Library `slog` & Context Improvements**: Go 1.25 introduces optimized allocation profiles and enhanced attribute handling in standard library `log/slog`, which `logger`, `ginmw.Logger`, and `recovery` rely on for zero-alloc structured telemetry.
-2. **Runtime Map & Generics Enhancements**: `cache.TypedCache[T]`, `sliceutil`, and `maputil` leverage Go 1.25 compiler optimizations for generic function inlining and Swiss-table runtime map operations, delivering sub-100ns execution without interface boxing.
-3. **Deterministic Testing Infrastructure**: The mockable `clock.Clock` and fuzzing harnesses take advantage of Go 1.25's expanded testing primitives and fuzz corpus scheduler.
-4. **Upstream CVE Mitigation**: Go 1.25 carries critical security patches in standard `crypto/tls`, `net/http`, and `net/url` implementations, establishing a hardened baseline across all consuming microservices.
+1. **Standard Library `slog` & Context Improvements**: Go 1.26 provides optimized allocation profiles and enhanced attribute handling in standard library `log/slog`, which `logger`, `ginmw.Logger`, and `recovery` rely on for zero-alloc structured telemetry.
+2. **Runtime Map & Generics Enhancements**: `cache.TypedCache[T]`, `sliceutil`, and `maputil` rely on the current Go compiler's generic function inlining and Swiss-table runtime map behavior, delivering sub-100ns execution without interface boxing.
+3. **Deterministic Testing Infrastructure**: The mockable `clock.Clock` and fuzzing harnesses take advantage of Go 1.26's expanded testing primitives and fuzz corpus scheduler.
+4. **Upstream CVE Mitigation**: Go 1.26 carries critical security patches in standard `crypto/tls`, `net/http`, and `net/url` implementations, establishing a hardened baseline across all consuming microservices.
 

@@ -10,6 +10,8 @@ GLOBAL_FLOOR=90.0
 PACKAGE_FLOOR=85.0
 GINMW_REQUIRED=100.0
 
+command -v bc >/dev/null || { echo "bc must be available on PATH" >&2; exit 1; }
+
 echo "========================================================"
 echo "🛡️ Running Comprehensive Statement Coverage Gate"
 echo "   - Global Floor:       >= ${GLOBAL_FLOOR}%"
@@ -17,12 +19,15 @@ echo "   - Per-Package Floor:  >= ${PACKAGE_FLOOR}%"
 echo "   - ginmw Gate:         == ${GINMW_REQUIRED}%"
 echo "========================================================"
 
-# List packages excluding loadgen
-PACKAGES=$(go list ./... | grep -v loadgen)
+# List library packages, excluding the root documentation-test package and load generators.
+PACKAGES=$(go list ./... | grep -vE '^github\.com/umesh0492/go-libs$|/loadgen$')
 PKGS_COMMA=$(echo "${PACKAGES}" | tr '\n' ',' | sed 's/,$//')
 
-# Generate merged coverage profile across all packages
-go test -coverprofile=coverage.out ${PACKAGES} >/dev/null 2>&1 || true
+# Generate merged coverage profile across all packages. Never continue with a
+# stale ignored profile when the test command or output write fails.
+rm -f coverage.out
+go test -coverprofile=coverage.out ${PACKAGES}
+test -s coverage.out
 
 # Extract global coverage percentage
 GLOBAL_COV_STR=$(go tool cover -func=coverage.out | grep total | awk '{print $3}')

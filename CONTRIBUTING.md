@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to `go-libs`!
 
-`go-libs` is an open-source, domain-agnostic foundation of Go 1.25+ libraries for building resilient microservices (resilience, concurrency, security, and transport middleware). We welcome contributions ranging from bug fixes and documentation clarifications to performance optimizations and test coverage improvements.
+`go-libs` is an open-source, domain-agnostic foundation of Go 1.26+ libraries for building resilient microservices (resilience, concurrency, security, and transport middleware). We welcome contributions ranging from bug fixes and documentation clarifications to performance optimizations and test coverage improvements.
 
 This guide provides everything you need to know to get started, run the test suite, understand our automated quality gates, and submit a pull request that can be merged smoothly.
 
@@ -12,7 +12,7 @@ This guide provides everything you need to know to get started, run the test sui
 
 `go-libs` follows a strict **Truth-Gate Protocol**: every claim in documentation, every coverage number, and every version reference is programmatically asserted against the actual codebase in CI.
 
-- **Zero Breaking Changes**: We preserve backward compatibility across minor releases.
+- **Zero Breaking Changes in Patch Releases**: We preserve backward compatibility across patch releases in pre-1.0; breaking consolidations occur only in minor releases (v0.X.0).
 - **Hermetic Tests**: Unit tests must remain fully self-contained and runnable locally without requiring external Docker daemons or cloud services.
 - **Maintainer SLA**: We are a small engineering team. We aim to review and respond to first-time contributor pull requests within **5 business days**. Issues are triaged **weekly**.
 
@@ -21,8 +21,8 @@ This guide provides everything you need to know to get started, run the test sui
 ## 2. Development Setup & Prerequisites
 
 ### Prerequisites
-- **Go**: Version `1.25.0` or higher (`go version`)
-- **golangci-lint**: Version `v1.64.0` or higher (`golangci-lint version`)
+- **Go**: Version `1.26.0` (the module toolchain baseline) (`go version`)
+- **golangci-lint**: Version `v2.13.2` (`golangci-lint version`)
 - **make**: Standard GNU Make (`make --version`)
 
 ### Quickstart
@@ -58,7 +58,7 @@ In addition to standard `go test` and `golangci-lint`, `go-libs` includes two de
 ### B. `./scripts/check_coverage.sh`
 - **What it checks**:
   - Measures statement coverage across all packages.
-  - Asserts global repository statement coverage is `>= 90.0%` (currently **95.0%**).
+  - Asserts global repository statement coverage is `>= 90.0%` (currently **95.8%**).
   - Asserts that every individual package meets a minimum floor of `>= 85.0%`.
   - Asserts that the core authentication/middleware package (`ginmw`) maintains **100.0%** statement coverage.
   - **Zero-Drift README Sync**: Parses the per-package coverage table in `README.md` line-by-line and fails if any number deviates from live toolchain measurements.
