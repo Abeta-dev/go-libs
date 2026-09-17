@@ -63,6 +63,31 @@ func (r *statusRecorder) Write(b []byte) (int, error) {
 	return n, err
 }
 
+// sanitizeHeaderForLogging validates and sanitizes untrusted HTTP header values
+// before injecting into log records. Only safe alphanumeric and delimiter characters
+// (a-z, A-Z, 0-9, -, _, ., :, /) up to 128 characters are accepted, preventing log injection
+// and cleartext logging of sensitive header data.
+func sanitizeHeaderForLogging(raw string) string {
+	if len(raw) == 0 {
+		return ""
+	}
+	const maxLen = 128
+	if len(raw) > maxLen {
+		raw = raw[:maxLen]
+	}
+	clean := make([]byte, 0, len(raw))
+	for i := 0; i < len(raw); i++ {
+		b := raw[i]
+		if (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9') ||
+			b == '-' || b == '_' || b == '.' || b == ':' || b == '/' {
+			clean = append(clean, b)
+		} else {
+			return ""
+		}
+	}
+	return string(clean)
+}
+
 // Middleware returns standard net/http middleware that logs every HTTP request and response,
 // recording method, path, status, duration, bytes written, and request ID.
 // It also injects a context-scoped logger into r.Context() containing the request ID.
@@ -82,7 +107,10 @@ func Middleware(opts ...MiddlewareOption) func(http.Handler) http.Handler {
 				baseLogger = FromContext(r.Context())
 			}
 
-			reqID := r.Header.Get(cfg.RequestIDHeader)
+			var reqID string
+			if cfg.RequestIDHeader != "" {
+				reqID = sanitizeHeaderForLogging(r.Header.Get(cfg.RequestIDHeader))
+			}
 			reqLogger := baseLogger
 			if reqID != "" {
 				reqLogger = baseLogger.With(slog.String("request_id", reqID))

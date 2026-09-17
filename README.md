@@ -360,10 +360,10 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |
 | `ginmw` | Unified Gin HTTP middleware chain & helper | **100.0%** |
 | `health` | Parallel dependency health check and Kubernetes probe handler | **100.0%** |
-| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.6%** |
+| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.9%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
 | `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
-| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.2%** |
+| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.5%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |
 | `pagination` | Offset-based request query parser and generic response | **100.0%** |

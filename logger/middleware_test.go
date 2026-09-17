@@ -106,4 +106,53 @@ func TestMiddleware_Levels(t *testing.T) {
 		require.Len(t, capture.records, 1)
 		assert.Equal(t, slog.LevelError, capture.records[0].Level)
 	})
+
+	t.Run("invalid or malicious request id sanitized", func(t *testing.T) {
+		capture := &logCaptureHandler{}
+		mw := logger.Middleware(logger.WithLogger(slog.New(capture)))
+
+		handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		// Header containing injection or invalid characters
+		req := httptest.NewRequest(http.MethodGet, "/test", nil)
+		req.Header.Set("X-Request-ID", "invalid\r\nid\nwith$pecial#chars")
+		handler.ServeHTTP(httptest.NewRecorder(), req)
+
+		require.Len(t, capture.records, 1)
+		foundReqID := false
+		capture.records[0].Attrs(func(a slog.Attr) bool {
+			if a.Key == "request_id" {
+				foundReqID = true
+			}
+			return true
+		})
+		assert.False(t, foundReqID, "invalid header must be discarded and not logged")
+	})
+
+	t.Run("oversized request id truncated and sanitized", func(t *testing.T) {
+		capture := &logCaptureHandler{}
+		mw := logger.Middleware(logger.WithLogger(slog.New(capture)))
+
+		handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		// Header > 128 characters
+		longID := string(bytes.Repeat([]byte("a"), 200))
+		req := httptest.NewRequest(http.MethodGet, "/test", nil)
+		req.Header.Set("X-Request-ID", longID)
+		handler.ServeHTTP(httptest.NewRecorder(), req)
+
+		require.Len(t, capture.records, 1)
+		var recordedID string
+		capture.records[0].Attrs(func(a slog.Attr) bool {
+			if a.Key == "request_id" {
+				recordedID = a.Value.String()
+			}
+			return true
+		})
+		assert.Equal(t, 128, len(recordedID))
+	})
 }
