@@ -98,7 +98,7 @@ fi
 README_CLAIM=$(grep -oE 'Overall Repository Statement Coverage: [0-9]+\.[0-9]+%' README.md | grep -oE '[0-9]+\.[0-9]+%' | head -n1 || true)
 README_TABLE_TOTAL=$(grep -E '^\| \*\*Total Statement Coverage\*\* \|' README.md | grep -oE '[0-9]+\.[0-9]+%' | head -n1 || true)
 
-DYNAMIC_BADGE_URL="https://raw.githubusercontent.com/umesh0492/go-libs/main/.github/badges/coverage.json"
+DYNAMIC_BADGE_URL="https://raw.githubusercontent.com/Abeta-dev/go-libs/main/.github/badges/coverage.json"
 HAS_DYNAMIC_BADGE=$(grep -F "${DYNAMIC_BADGE_URL}" README.md || true)
 
 echo "========================================================"

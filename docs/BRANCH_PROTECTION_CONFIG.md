@@ -34,7 +34,7 @@ To maintain truth-gate integrity and ensure no regression enters production, `ma
 
 ## Public Community Access Model
 
-As a public open-source project, `umesh0492/go-libs` provides:
+As a public open-source project, `Abeta-dev/go-libs` provides:
 
 - **Public Issues**: Enabled and open for all community members to file bug reports, feature requests, and security observations.
 - **GitHub Discussions**: Enabled for architectural questions, ideas, and ecosystem discussion.
@@ -61,7 +61,7 @@ Repository administrators can also apply these settings directly using `curl` an
 
 ```bash
 export GITHUB_TOKEN="ghp_yourAdminTokenHere"
-export REPO_OWNER="umesh0492"
+export REPO_OWNER="Abeta-dev"
 export REPO_NAME="go-libs"
 
 curl -L \
