@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: GitHub Discussions
-    url: https://github.com/umesh0492/go-libs/discussions
+    url: https://github.com/Abeta-dev/go-libs/discussions
     about: Ask questions, share architecture designs, and discuss ideas with the community.
   - name: Security Vulnerability Report
-    url: https://github.com/umesh0492/go-libs/security/advisories/new
+    url: https://github.com/Abeta-dev/go-libs/security/advisories/new
     about: Privately report a security vulnerability.

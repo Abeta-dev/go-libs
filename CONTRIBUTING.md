@@ -58,7 +58,7 @@ In addition to standard `go test` and `golangci-lint`, `go-libs` includes two de
 ### B. `./scripts/check_coverage.sh`
 - **What it checks**:
   - Measures statement coverage across all packages.
-  - Asserts global repository statement coverage is `>= 90.0%` (currently **95.8%**).
+  - Asserts global repository statement coverage is `>= 90.0%` (currently **96.0%**).
   - Asserts that every individual package meets a minimum floor of `>= 85.0%`.
   - Asserts that the core authentication/middleware package (`ginmw`) maintains **100.0%** statement coverage.
   - **Zero-Drift README Sync**: Parses the per-package coverage table in `README.md` line-by-line and fails if any number deviates from live toolchain measurements.

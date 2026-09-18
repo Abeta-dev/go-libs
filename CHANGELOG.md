@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Cryptographic Release Verification & Manifest Provenance**: Integrated `scripts/verify_release.sh` into release workflows, generating cryptographically verified `release-manifest.json` with bounded exponential proxy retry backoff (5 attempts, isolated `GOMODCACHE`), SHA-256 module digests, and read-only cache permission safety.
 - **Downstream Baseline Audit**: Added `scripts/verify_release_baseline.sh` and `docs/RELEASE_BASELINE.md` for historical release verification against Go module proxy and checksum database.
 - **Automated Shell & Release Verification Guards**: Introduced `scripts/test_shell_compatibility.sh`, `scripts/test_release_scripts.sh`, and `scripts/test_release_workflow.sh` ensuring strict Bash 3.2 portability, 90-day manifest artifact retention, and release immutability.
-- **Dynamic Truth-Gate & Coverage Enforcement**: Fully synchronized 95.8% measured statement coverage across all documentation, meta tags, and web portal, enforced by AST-based `docs_truth_test.go` and Go 1.26.0+ toolchain baseline assertions.
+- **Dynamic Truth-Gate & Coverage Enforcement**: Fully synchronized 96.0% measured statement coverage across all documentation, meta tags, and web portal, enforced by AST-based `docs_truth_test.go` and Go 1.26.0+ toolchain baseline assertions.
 
 ### Added
 - logger: Decoupled `Sampler` interface and `WithSampler` functional option for custom log sampling algorithms.
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `httpclient`: Bounded retry buffering using `io.LimitReader`; streams exceeding `DefaultMaxRetryBodySize` are executed as a single attempt without replay buffering.
 - `db`: Streamlined `DBTX` interface to `Exec`, `Query`, and `QueryRow`; batch `CopyFrom` moved to segregated `CopyDBTX` interface.
 - Release Workflow: Configured `.github/workflows/release.yml` to automatically verify immutable release artifacts, attach `release-manifest.json` to GitHub releases, and retain artifacts for 90 days.
-- Documentation: Updated baseline toolchain to Go 1.26.0+ and synchronized overall statement coverage to 95.8%.
+- Documentation: Updated baseline toolchain to Go 1.26.0+ and synchronized overall statement coverage to 96.0%.
 
 ### Fixed
 - Cache Cleanup Permissions: Prepended `chmod -R u+w` before `rm -rf` on temporary module caches and test fixtures, preventing permission errors on read-only Go cache trees.
