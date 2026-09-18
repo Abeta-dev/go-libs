@@ -51,7 +51,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `stringutil` | **Stable** | 100.0% | Masking and cryptographically secure random strings. API frozen. |
 | `timeutil` | **Stable** | 100.0% | UTC/location time arithmetic, business day calculation, and heuristic parsing. |
 | `validation` | **Stable** | 100.0% | Formatter translating validator/v10 errors into client JSON. |
-| `workerpool` | **Stable** | 92.1% | Bounded concurrent worker pool with task queue. Low risk. |
+| `workerpool` | **Stable** | 100.0% | Bounded concurrent worker pool with task queue. Low risk. |
 | `cache` | **Early** | 87.5% | Singleflight cache unified into `TypedCache` with `EvictionPolicy`. API undergoing stabilization. |
 | `clock` | **Early** | 95.2% | Mockable time abstraction with RealClock and advanceable FakeClock. API undergoing stabilization. |
 | `db` | **Early** | 100.0% | pgx connection pool wrapper and transaction runner. Hardened against connection leaks. |

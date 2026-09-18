@@ -5,6 +5,7 @@ package workerpool_test
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -127,18 +128,50 @@ func TestPool_PanicRecovery(t *testing.T) {
 	defer p.StopWait()
 
 	var secondExecuted int32
+	executed := make(chan struct{})
+
 	_ = p.Submit(func() {
 		panic("simulated worker failure")
 	})
 
-	time.Sleep(20 * time.Millisecond)
-
 	_ = p.Submit(func() {
 		atomic.StoreInt32(&secondExecuted, 1)
+		close(executed)
 	})
 
-	time.Sleep(20 * time.Millisecond)
+	select {
+	case <-executed:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timeout waiting for second task execution after worker panic")
+	}
+
 	assert.Equal(t, int32(1), atomic.LoadInt32(&secondExecuted))
+}
+
+func TestPool_WithLogger(t *testing.T) {
+	l := slog.Default()
+	p := workerpool.New(1, 1, workerpool.WithLogger(l), workerpool.WithLogger(nil))
+	defer p.StopWait()
+	assert.NotNil(t, p)
+}
+
+func TestPool_PanicHandlerPanics(t *testing.T) {
+	recovered := make(chan struct{})
+	p := workerpool.New(1, 1, workerpool.WithPanicHandler(func(r any, stack []byte) {
+		defer close(recovered)
+		panic("panic inside handler")
+	}))
+	defer p.StopWait()
+
+	_ = p.Submit(func() {
+		panic("initial panic")
+	})
+
+	select {
+	case <-recovered:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timeout waiting for panicHandler")
+	}
 }
 
 type safeCounter struct {

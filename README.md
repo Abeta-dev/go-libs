@@ -4,9 +4,9 @@ Production Go microservices frequently reimplement identical operational plumbin
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/umesh0492/go-libs.svg)](https://pkg.go.dev/github.com/umesh0492/go-libs)
 [![Code Quality: golangci-lint](https://img.shields.io/badge/code%20quality-golangci--lint-brightgreen?logo=go)](https://golangci-lint.run/)
-[![CI](https://github.com/umesh0492/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/umesh0492/go-libs/actions/workflows/ci.yml)
+[![CI](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/umesh0492/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/umesh0492/go-libs/badge)](https://securityscorecards.dev/viewer/?repo=github.com/umesh0492/go-libs)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Abeta-dev/go-libs/badge)](https://scorecard.dev/viewer/?uri=github.com/Abeta-dev/go-libs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Shared, zero-business-logic Go libraries and middleware for cloud-native microservices.
@@ -344,7 +344,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 Coverage across all 31 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
-> **Overall Repository Statement Coverage: 95.8%** (Zero data races across `-race`)
+> **Overall Repository Statement Coverage: 96.0%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
 > **Quality Standard: Strict per-package floor >= 85.0% enforced by `./scripts/check_coverage.sh`**
 
@@ -380,8 +380,8 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `telemetry` | OpenTelemetry distributed tracing wrapper | **100.0%** |
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |
 | `validation` | Declarative validation error formatter | **100.0%** |
-| `workerpool` | Bounded panic-safe concurrent worker pool with metrics & options | **92.1%** |
-| **Total Statement Coverage** | **Cumulative across all packages** | **95.8%** |
+| `workerpool` | Bounded panic-safe concurrent worker pool with metrics & options | **100.0%** |
+| **Total Statement Coverage** | **Cumulative across all packages** | **96.0%** |
 
 > *Note: The standalone reference microservice (`examples/microservice`) achieves 87.4% integration statement coverage.*
 
