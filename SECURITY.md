@@ -21,13 +21,13 @@ Instead, report vulnerabilities through one of the following confidential channe
 
 ### 1. GitHub Private Vulnerability Reporting (Preferred)
 Submit a confidential advisory directly via GitHub:
-- Navigate to the **Security** tab of `github.com/umesh0492/go-libs`.
+- Navigate to the **Security** tab of `github.com/Abeta-dev/go-libs`.
 - Click **"Report a vulnerability"** to open a private advisory draft.
 - Include a description, affected package(s), minimal reproduction or proof-of-concept (PoC), and potential impact.
 
 ### 2. Direct Security Contact
 If you cannot use GitHub Security Advisories, email the maintainer directly:
-- **Email**: [umesh0492@gmail.com](mailto:umesh0492@gmail.com)
+- **Email**: [security@abeta.dev](mailto:security@abeta.dev)
 - **Subject**: `[SECURITY] go-libs Vulnerability Report: <Package Name>`
 - Please include full reproduction steps and environment details.
 

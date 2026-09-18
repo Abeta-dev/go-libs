@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-DEFAULT_REPO="umesh0492/go-libs"
+DEFAULT_REPO="Abeta-dev/go-libs"
 REPO="${DEFAULT_REPO}"
 DRY_RUN="false"
 PURGE_RUNS="true"
@@ -40,7 +40,7 @@ Authentication:
 
 Examples:
   GITHUB_TOKEN="ghp_xxx" ./scripts/cleanup_github_runs.sh --dry-run
-  ./scripts/cleanup_github_runs.sh --repo umesh0492/go-libs
+  ./scripts/cleanup_github_runs.sh --repo Abeta-dev/go-libs
 USAGE
   exit 0
 }

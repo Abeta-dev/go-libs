@@ -5,7 +5,7 @@ Production Go microservices frequently reimplement identical operational plumbin
 [![Go Reference](https://pkg.go.dev/badge/github.com/umesh0492/go-libs.svg)](https://pkg.go.dev/github.com/umesh0492/go-libs)
 [![Code Quality: golangci-lint](https://img.shields.io/badge/code%20quality-golangci--lint-brightgreen?logo=go)](https://golangci-lint.run/)
 [![CI](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/umesh0492/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Abeta-dev/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Abeta-dev/go-libs/badge)](https://scorecard.dev/viewer/?uri=github.com/Abeta-dev/go-libs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -306,7 +306,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 
 > [!NOTE]
 > **Domain & Application Accelerators**:
-> High-level business and application-layer capabilities (Multi-channel Notifications, PDF Generation with GST Invoice Templates, Transactional Outbox Engine with PostgreSQL DDL, Localized Indian Fintech Helpers, Partitioned Audit Logging, and Streaming Data Export) are maintained in the companion accelerator repository: [**`github.com/umesh0492/go-app-kit`**](https://github.com/umesh0492/go-app-kit).
+> High-level business and application-layer capabilities (Multi-channel Notifications, PDF Generation with GST Invoice Templates, Transactional Outbox Engine with PostgreSQL DDL, Localized Indian Fintech Helpers, Partitioned Audit Logging, and Streaming Data Export) are maintained in the companion accelerator repository: [**`github.com/Abeta-dev/go-app-kit`**](https://github.com/Abeta-dev/go-app-kit).
 
 ---
 
@@ -401,7 +401,7 @@ docker compose -f deploy/docker-compose.observability.yml up --build
 ![Grafana Microservice Golden Signals & Resilience Dashboard](docs/assets/grafana-dashboard-preview.png)
 
 > **Looking for full enterprise cluster-wide observability?**  
-> Check out our companion platform repository: [**cloud-native-observability**](https://github.com/umesh0492/cloud-native-observability) featuring the complete LGTM stack (Loki, Grafana, Tempo, Prometheus) + OpenTelemetry with ArgoCD GitOps and Google SRE SLO alerting!
+> Check out our companion platform repository: [**cloud-native-observability**](https://github.com/Abeta-dev/cloud-native-observability) featuring the complete LGTM stack (Loki, Grafana, Tempo, Prometheus) + OpenTelemetry with ArgoCD GitOps and Google SRE SLO alerting!
 
 ---
 
@@ -443,4 +443,4 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, [SECU
 
 ## License
 
-MIT License. Copyright (c) 2026 umesh0492.
+MIT License. Copyright (c) 2026 Abeta.

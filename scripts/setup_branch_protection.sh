@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # setup_branch_protection.sh
-# Configures GitHub branch protection and repository access for umesh0492/go-libs.
+# Configures GitHub branch protection and repository access for Abeta-dev/go-libs.
 # Enforces CI status checks, PR approvals, admin enforcement, and public community access.
 # ==============================================================================
 
 set -euo pipefail
 
-REPO_OWNER="${REPO_OWNER:-umesh0492}"
+REPO_OWNER="${REPO_OWNER:-Abeta-dev}"
 REPO_NAME="${REPO_NAME:-go-libs}"
 BRANCH="${BRANCH:-main}"
 TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
@@ -129,7 +129,7 @@ PROTECTION_PAYLOAD=$(cat << JSON
     "require_last_push_approval": true
   },
   "restrictions": {
-    "users": ["umesh0492"],
+    "users": ["umesh0492", "Abeta-dev"],
     "teams": [],
     "apps": []
   },
