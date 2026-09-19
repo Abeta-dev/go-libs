@@ -12,8 +12,39 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+  changes:
+    name: Detect Changed Paths
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Detect Changed Paths
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            code:
+              - '**/*.go'
+              - 'go.mod'
+              - 'go.sum'
+              - 'Makefile'
+              - 'scripts/**'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/release.yml'
+              - '.github/workflows/scorecard.yml'
+              - '.github/workflows/codeql.yml'
+              - '.golangci.yml'
+
   lint:
     name: GolangCI-Lint
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -42,6 +73,8 @@ jobs:
 
   test:
     name: Test & Race (${{ matrix.go-version }})
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -81,6 +114,8 @@ jobs:
 
   scale-test:
     name: Scale & Load Tests (-tags=scale)
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -99,6 +134,8 @@ jobs:
 
   fuzz:
     name: Fuzz Testing (PR Corpus Verification)
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -125,6 +162,8 @@ jobs:
 
   security:
     name: Supply Chain & Vulnerability Scanner
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -156,6 +195,8 @@ jobs:
 
   benchmarks:
     name: Benchmark Regression Analysis
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -193,4 +234,71 @@ jobs:
           ./scripts/test_shell_compatibility.sh
           ./scripts/test_release_workflow.sh
           ./scripts/test_release_scripts.sh
+
+  ci-gate:
+    name: CI Quality Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - changes
+      - docs-match-tree
+      - lint
+      - test
+      - scale-test
+      - fuzz
+      - security
+      - benchmarks
+    steps:
+      - name: Evaluate CI Quality Gate
+        run: |
+          echo "========================================================"
+          echo "🏁 Evaluating CI Quality Gate"
+          echo "   Event: ${{ github.event_name }}"
+          echo "   Code changes detected: ${{ needs.changes.outputs.code }}"
+          echo "========================================================"
+
+          if [ "${{ needs.changes.result }}" != "success" ]; then
+            echo "❌ Path detection failed with: ${{ needs.changes.result }}" >&2
+            exit 1
+          fi
+
+          if [ "${{ needs.docs-match-tree.result }}" != "success" ]; then
+            echo "❌ Documentation & Version Gate failed with: ${{ needs.docs-match-tree.result }}" >&2
+            exit 1
+          fi
+
+          SHOULD_VERIFY_CODE="${{ github.event_name == 'push' || needs.changes.outputs.code == 'true' }}"
+          if [ "$SHOULD_VERIFY_CODE" = "true" ]; then
+            echo "🔍 Verifying code test suites..."
+            FAILED=0
+
+            check_job() {
+              local name="$1"
+              local result="$2"
+              if [ "$result" != "success" ]; then
+                echo "❌ $name failed with result: $result" >&2
+                FAILED=1
+              else
+                echo "✅ $name: success"
+              fi
+            }
+
+            check_job "GolangCI-Lint" "${{ needs.lint.result }}"
+            check_job "Test & Race" "${{ needs.test.result }}"
+            check_job "Scale & Load Tests" "${{ needs.scale-test.result }}"
+            check_job "Fuzz Testing" "${{ needs.fuzz.result }}"
+            check_job "Supply Chain Scanner" "${{ needs.security.result }}"
+            check_job "Benchmarks" "${{ needs.benchmarks.result }}"
+
+            if [ "$FAILED" -ne 0 ]; then
+              echo "❌ CI Quality Gate failed due to errors in code test suite." >&2
+              exit 1
+            fi
+          else
+            echo "📄 Docs-only change detected. Heavy test suites (lint, test, race, scale, fuzz, security, benchmarks) safely skipped."
+          fi
+
+          echo "========================================================"
+          echo "✅ All CI Quality Gates successfully satisfied!"
+          echo "========================================================"
 
