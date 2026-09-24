@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-09-24
+
+### Security & Hardening
+- Dependency Updates: Bumped `github.com/gin-gonic/gin` to v1.12.0, `github.com/jackc/pgx/v5` to v5.11.0, `golang.org/x/crypto` to v0.57.0, and `golang.org/x/sync` to v0.23.0 to resolve downstream security advisories including transitive `quic-go` vulnerabilities.
+- OpenSSF Scorecard & CI Pinning: Corrected repository paths and OpenSSF Scorecard configuration for `Abeta-dev/go-libs`, and pinned GitHub Actions across all workflows to immutable commit SHAs.
+
+### Added
+- CI & Quality Gate: Introduced unified CI Quality Gate workflow with intelligent path filtering (`dorny/paths-filter`) to optimize build times and conserve CI minutes.
+- Documentation Portal: Added GitHub Pages deployment workflow deploying the interactive web portal for enterprise library documentation.
+
+### Changed
+- Repository Attribution: Standardized canonical documentation links, code of conduct, and security disclosure policies to `Abeta-dev`.
+
 ## [0.3.0] - 2026-09-17
 
 ### Highlights

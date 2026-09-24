@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing immutable SemVer tag to release (for example v0.3.0 or v0.3.0-rc.1)'
+        description: 'Existing immutable SemVer tag to release (for example v0.3.1 or v0.3.1-rc.1)'
         required: true
         type: string
 
