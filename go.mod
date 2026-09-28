@@ -52,7 +52,7 @@ require (
 )
 
 require (
-	github.com/go-playground/validator/v10 v10.30.4
+	github.com/go-playground/validator/v10 v10.30.5
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/sync v0.23.0
 )
