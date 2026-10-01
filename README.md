@@ -1,6 +1,6 @@
-# go-libs · latest published v0.3.1
+# go-libs · latest published v0.3.2
 
-Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 31 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
+Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 37 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/umesh0492/go-libs.svg)](https://pkg.go.dev/github.com/umesh0492/go-libs)
 [![Code Quality: golangci-lint](https://img.shields.io/badge/code%20quality-golangci--lint-brightgreen?logo=go)](https://golangci-lint.run/)
@@ -14,7 +14,7 @@ Shared, zero-business-logic Go libraries and middleware for cloud-native microse
 > 📖 **Engineering Documentation & Architecture Blueprint**  
 > Complete subsystem guides, module selection flowcharts, architectural rationales, and execution topologies:  
 > - 🏛️ **[System Architecture & Blueprint](docs/ARCHITECTURE.md)** (Topology, Layering Boundaries, Middleware Order)  
-> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.3.1 release ledger, API errata, and evolution)
+> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.3.2 release ledger, API errata, and evolution)
 > - 🏷️ **[Versioning & Stability Matrix](docs/VERSIONING.md)** (Semantic versioning contracts and package tiers)  
 > - ⚡ **[Performance Benchmarks](BENCHMARKS.md)**  
 > - 📝 **[Decisions & Architecture Records](docs/adr/0001-domain-decoupling-and-audit-sink.md)**  
@@ -26,7 +26,7 @@ Each package is independently importable, fully tested with verified statement c
 This repository uses a **Single Module Monorepo** pattern. There is only *one* `go.mod` file at the root of `go-libs`. 
 
 **Why is this the best "BOM" (Bill of Materials) way?**
-By having a single `github.com/umesh0492/go-libs@v0.3.1` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
+By having a single `github.com/umesh0492/go-libs@v0.3.2` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
 
 ### Minimal-Footprint Imports
 
@@ -70,7 +70,7 @@ grep -E 'gin-gonic|jackc/pgx|opentelemetry' go.sum || echo "VERIFIED: Zero heavy
 ## Installation
 
 ```bash
-go get github.com/umesh0492/go-libs@v0.3.1
+go get github.com/umesh0492/go-libs@v0.3.2
 ```
 
 Requirements:
@@ -257,6 +257,8 @@ helm upgrade --install microservice ./deploy/helm/microservice
 | `workerpool` | `/workerpool` | `New(workers, queueSize, opts...)`, `Submit(task) error`, `SubmitContext(ctx, task) error`, `WithMetrics`, `WithPanicHandler` |
 | `cache` | `/cache` | `NewTypedCache[T](opts...)`, `GetOrFetch`, `WithMetrics`, `WithEvictionInterval` — generic singleflight stampede-protected cache |
 | `shutdown` | `/shutdown` | `New(timeout)`, `.Register(name, fn)`, `.Execute(ctx)`, `.Wait()` — concurrent graceful teardown manager |
+| `async` | `/async` | `Go`, `GoCtx`, `Parallel`, `ParallelLimit` — panic-safe goroutines and bounded concurrency orchestration |
+| `fsm` | `/fsm` | `NewMachine`, `ValidateTransition`, `CanTransition` — declarative in-memory finite state machine with O(1) transitions |
 
 ---
 
@@ -272,6 +274,7 @@ helm upgrade --install microservice ./deploy/helm/microservice
 | `stringutil` | `/stringutil` | `OrDefault`, `MaskEmail`, `MaskPhone`, `TrimAndLower`, `Truncate`, `RandomStringFromReader` — safe string operations |
 | `timeutil` | `/timeutil` | `NowIn(loc)`, `FormatIn`, `StartOfDay`, `EndOfDay`, `AddBusinessDays` — parametric time helpers |
 | `cryptoutil` | `/cryptoutil` | `GenerateTempPassword(n)`, `HashPassword(pwd)`, `ComparePassword(hash, pwd)` — secure credential helpers backed by `crypto/rand` (CSPRNG) and `golang.org/x/crypto/bcrypt` (OWASP cost factor 12) |
+| `uuidutil` | `/uuidutil` | `New`, `NewString`, `Parse`, `ParsePtr`, `MustParse`, `IsValid`, `IsNil` — centralized RFC 4122 UUID operations |
 
 ---
 
@@ -288,7 +291,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 | `requestid` | `/requestid` | `Middleware`, `FromContext(ctx)`, `Header` constant — W3C correlation ID propagation |
 | `recovery` | `/recovery` | `Middleware(opts...)` — JSON panic recovery with structured `slog` output |
 | `httputil` | `/httputil` | `OK`, `Created`, `NoContent`, `Error`, `ErrorFromDomain`, `ValidationError` — standardized responses |
-| `pagination` | `/pagination` | `Parse(r)`, `NewResponse`, `NewTypedResponse[T]` — generic query parsing and response formatting |
+| `pagination` | `/pagination` | `Parse(r)`, `NewResponse`, `NewTypedResponse[T]`, `PaginateSlice[T]` — query parsing, response formatting, and generic slice pagination |
 | `health` | `/health` | `New(checks...)`, `LivenessHandler`, `ReadinessHandler`, `.Handler` — parallel HTTP probe service |
 | `idempotency` | `/idempotency` | `NewMemoryStore()`, `NewPGStore(db.DBTX, opts...)`, `Store` — two-phase request deduplication with in-memory or PostgreSQL storage |
 | `validation` | `/validation` | `FormatErrors(err)` — human-readable validator/v10 struct validation error formatting |
@@ -303,6 +306,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 | `rbac` | `/rbac` | `NewEngine()`, `Engine.Match(pattern, action)` — role-based access control engine |
 | `rbaccontext` | `/rbaccontext` | `WithPermissions(ctx, perms)`, `Can(ctx, perm)`, `CanAny(ctx, perms...)` — permission helpers |
 | `telemetry` | `/telemetry` | `NewTracerProvider(opts...)`, `InitProvider(tp)`, `StartSpan(ctx, tracer, span)` — OpenTelemetry distributed tracing |
+| `jwks` | `/jwks` | `GetECPublicKey`, `NewResolver` — thread-safe cached ECDSA P-256 JWKS public key resolver with stale fallback |
 
 > [!NOTE]
 > **Domain & Application Accelerators**:
@@ -316,7 +320,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 | Package | Import suffix | Key exports & Description |
 |---|---|---|
-| `ginmw` | `/ginmw` | `AuthMiddleware`, `GenerateToken`, `GetClaims`, `RateLimit`, `Recovery`, `RequestID`, `SecurityHeaders`, `Idempotency`, `Logger` — unified Gin web framework middleware suite |
+| `ginmw` | `/ginmw` | `AuthMiddleware`, `GenerateToken`, `GetClaims`, `RateLimit`, `Recovery`, `RequestID`, `SecurityHeaders`, `Idempotency`, `Logger`, `RequireTenant`, `RespondSuccess`, `RespondError`, `REDMetrics` — unified Gin web framework middleware suite |
 
 | Function | Purpose |
 |---|---|
@@ -337,6 +341,11 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 | `ginmw.Logger()` | Structured access log (method, path, status, latency) |
 | `ginmw.Telemetry(service)` | OpenTelemetry W3C trace context extraction and span lifecycle |
 | `ginmw.Idempotency(store)` | Two-phase HTTP request deduplication and response caching |
+| `ginmw.RequireTenant(opts...)` | Enforces tenant presence from context, claims, or headers with optional role bypass |
+| `ginmw.RespondSuccess(c, data)` | Unified JSend-compatible 200 JSON response envelope |
+| `ginmw.RespondError(c, status, code, msg)` | Unified JSend-compatible structured error response envelope |
+| `ginmw.REDMetrics()` | Thread-safe lock-free Rate, Errors, Duration metrics middleware |
+| `ginmw.MetricsEndpoint()` | Prometheus text/JSON `/metrics` exposition handler |
 
 ---
 
