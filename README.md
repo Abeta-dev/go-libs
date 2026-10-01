@@ -374,7 +374,7 @@ Coverage across all 35 packages in `go-libs` is measured using Go's official sta
 | `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.9%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
 | `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
-| `jwks` | Thread-safe cached ECDSA P-256 JWKS public key resolver | **89.1%** |
+| `jwks` | Thread-safe cached ECDSA P-256 JWKS public key resolver | **89.7%** |
 | `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.0%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |

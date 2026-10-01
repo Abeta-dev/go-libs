@@ -3,6 +3,7 @@
 package jwks
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"encoding/base64"
@@ -116,7 +117,11 @@ func (r *Resolver) resolveJWKSURL(jwksURL string) (string, error) {
 
 func (r *Resolver) fetchAndCacheKeys(targetURL string) error {
 	//nolint:gosec // G704: targetURL is an operator-configured endpoint for JWKS public keys
-	resp, err := r.httpClient.Get(targetURL)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, targetURL, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create JWKS request: %w", err)
+	}
+	resp, err := r.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to fetch JWKS from %s: %w", targetURL, err)
 	}

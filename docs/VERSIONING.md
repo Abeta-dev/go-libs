@@ -39,7 +39,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `ginmw` | **Stable** | 100.0% | Unified Gin middleware chain; guarded by strict 100% CI gate. |
 | `health` | **Stable** | 100.0% | Parallel dependency checks and Kubernetes HTTP probes. API frozen. |
 | `httputil` | **Stable** | 100.0% | Standardized JSON envelopes and error responders. API frozen. |
-| `jwks` | **Stable** | 89.1% | Thread-safe cached ECDSA P-256 JWKS public key resolver. API frozen. |
+| `jwks` | **Stable** | 89.7% | Thread-safe cached ECDSA P-256 JWKS public key resolver. API frozen. |
 | `maputil` | **Stable** | 100.0% | Generic map helpers (Merge, Filter). API frozen. |
 | `metrics` | **Stable** | *Interfaces* | Framework-agnostic Counter, Gauge, Histogram interfaces. API frozen. |
 | `pagination` | **Stable** | 97.6% | Offset-based request query parser and generic slice pagination. API frozen. |

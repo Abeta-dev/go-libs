@@ -163,6 +163,12 @@ func TestJWKS_ErrorCases(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error when key not found in JWKS")
 	}
+
+	// Invalid URL
+	_, err = resolver.GetECPublicKey("kid-1", "http://[::1]:namedport")
+	if err == nil {
+		t.Fatal("expected error for invalid URL")
+	}
 }
 
 func TestJWKS_PackageLevelHelper(t *testing.T) {
