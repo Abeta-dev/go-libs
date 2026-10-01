@@ -16,6 +16,18 @@ import (
 	"github.com/umesh0492/go-libs/jwks"
 )
 
+func testExtractXY(t *testing.T, pub *ecdsa.PublicKey) (string, string) {
+	t.Helper()
+	ecdhKey, err := pub.ECDH()
+	if err != nil {
+		t.Fatalf("failed to get ECDH key: %v", err)
+	}
+	b := ecdhKey.Bytes()
+	x := base64.RawURLEncoding.EncodeToString(b[1:33])
+	y := base64.RawURLEncoding.EncodeToString(b[33:65])
+	return x, y
+}
+
 func TestJWKS_GetECPublicKey(t *testing.T) {
 	// Generate test ECDSA key
 	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
@@ -23,8 +35,7 @@ func TestJWKS_GetECPublicKey(t *testing.T) {
 		t.Fatalf("failed to generate test ecdsa key: %v", err)
 	}
 
-	xBytes := privKey.PublicKey.X.Bytes()
-	yBytes := privKey.PublicKey.Y.Bytes()
+	xStr, yStr := testExtractXY(t, &privKey.PublicKey)
 
 	mockJWKS := jwks.Set{
 		Keys: []jwks.Key{
@@ -33,8 +44,8 @@ func TestJWKS_GetECPublicKey(t *testing.T) {
 				KTY: "EC",
 				Alg: "ES256",
 				Crv: "P-256",
-				X:   base64.RawURLEncoding.EncodeToString(xBytes),
-				Y:   base64.RawURLEncoding.EncodeToString(yBytes),
+				X:   xStr,
+				Y:   yStr,
 			},
 		},
 	}
@@ -51,8 +62,8 @@ func TestJWKS_GetECPublicKey(t *testing.T) {
 		t.Fatalf("failed to get public key: %v", err)
 	}
 
-	if pubKey.X.Cmp(privKey.PublicKey.X) != 0 || pubKey.Y.Cmp(privKey.PublicKey.Y) != 0 {
-		t.Fatal("retrieved public key coordinates do not match expected")
+	if !pubKey.Equal(&privKey.PublicKey) {
+		t.Fatal("retrieved public key does not match expected")
 	}
 
 	// Verify caching (second call doesn't error even if server is closed)
@@ -61,13 +72,14 @@ func TestJWKS_GetECPublicKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected cached key, got error: %v", err)
 	}
-	if cachedKey.X.Cmp(pubKey.X) != 0 {
-		t.Fatal("cached key coordinates mismatch")
+	if !cachedKey.Equal(pubKey) {
+		t.Fatal("cached key mismatch")
 	}
 }
 
 func TestJWKS_EnvFallbacks(t *testing.T) {
 	privKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	xStr, yStr := testExtractXY(t, &privKey.PublicKey)
 	mockJWKS := jwks.Set{
 		Keys: []jwks.Key{
 			{
@@ -75,8 +87,8 @@ func TestJWKS_EnvFallbacks(t *testing.T) {
 				KTY: "EC",
 				Alg: "ES256",
 				Crv: "P-256",
-				X:   base64.RawURLEncoding.EncodeToString(privKey.PublicKey.X.Bytes()),
-				Y:   base64.RawURLEncoding.EncodeToString(privKey.PublicKey.Y.Bytes()),
+				X:   xStr,
+				Y:   yStr,
 			},
 		},
 	}
@@ -155,6 +167,7 @@ func TestJWKS_ErrorCases(t *testing.T) {
 
 func TestJWKS_PackageLevelHelper(t *testing.T) {
 	privKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	xStr, yStr := testExtractXY(t, &privKey.PublicKey)
 	mockJWKS := jwks.Set{
 		Keys: []jwks.Key{
 			{
@@ -162,8 +175,8 @@ func TestJWKS_PackageLevelHelper(t *testing.T) {
 				KTY: "EC",
 				Alg: "ES256",
 				Crv: "P-256",
-				X:   base64.RawURLEncoding.EncodeToString(privKey.PublicKey.X.Bytes()),
-				Y:   base64.RawURLEncoding.EncodeToString(privKey.PublicKey.Y.Bytes()),
+				X:   xStr,
+				Y:   yStr,
 			},
 		},
 	}

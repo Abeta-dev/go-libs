@@ -55,12 +55,7 @@ func NewResolver() *Resolver {
 
 // GetECPublicKey retrieves or caches the ECDSA P-256 public key for the specified key ID (kid).
 func (r *Resolver) GetECPublicKey(kid, jwksURL string) (*ecdsa.PublicKey, error) {
-	r.mu.RLock()
-	key, exists := r.cache[kid]
-	cachedTime := r.lastFetch
-	r.mu.RUnlock()
-
-	if exists && time.Since(cachedTime) < r.cacheTTL {
+	if key := r.getCachedKey(kid); key != nil {
 		return key, nil
 	}
 
@@ -68,56 +63,21 @@ func (r *Resolver) GetECPublicKey(kid, jwksURL string) (*ecdsa.PublicKey, error)
 	defer r.mu.Unlock()
 
 	// Double check under write lock
-	if key, exists = r.cache[kid]; exists && time.Since(r.lastFetch) < r.cacheTTL {
+	if key, exists := r.cache[kid]; exists && time.Since(r.lastFetch) < r.cacheTTL {
 		return key, nil
 	}
 
-	if jwksURL == "" {
-		jwksURL = r.defaultJWKSURL
-	}
-	if jwksURL == "" {
-		if envURL := os.Getenv("AUTH_JWKS_URL"); envURL != "" {
-			jwksURL = strings.TrimSpace(envURL)
-		} else if envBase := os.Getenv("AUTH_ISSUER_URL"); envBase != "" {
-			jwksURL = fmt.Sprintf("%s/.well-known/jwks.json", strings.TrimSuffix(strings.TrimSpace(envBase), "/"))
-		} else {
-			return nil, fmt.Errorf("failed to fetch JWKS: no jwksURL provided and AUTH_JWKS_URL/AUTH_ISSUER_URL not set")
-		}
-	}
-
-	resp, err := r.httpClient.Get(jwksURL)
+	targetURL, err := r.resolveJWKSURL(jwksURL)
 	if err != nil {
-		if key != nil {
-			return key, nil // Fallback to stale cached key if network is temporarily unreachable
+		return nil, err
+	}
+
+	if err := r.fetchAndCacheKeys(targetURL); err != nil {
+		if cachedKey := r.cache[kid]; cachedKey != nil {
+			return cachedKey, nil // Fallback to stale cached key if network is temporarily unreachable
 		}
-		return nil, fmt.Errorf("failed to fetch JWKS from %s: %w", jwksURL, err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to fetch JWKS: received HTTP %d from %s", resp.StatusCode, jwksURL)
-	}
-
-	var set Set
-	if err := json.NewDecoder(resp.Body).Decode(&set); err != nil {
-		return nil, fmt.Errorf("failed to decode JWKS payload: %w", err)
-	}
-
-	for _, k := range set.Keys {
-		if k.KTY == "EC" && k.Crv == "P-256" {
-			xBytes, errX := base64.RawURLEncoding.DecodeString(k.X)
-			yBytes, errY := base64.RawURLEncoding.DecodeString(k.Y)
-			if errX == nil && errY == nil {
-				pubKey := &ecdsa.PublicKey{
-					Curve: elliptic.P256(),
-					X:     new(big.Int).SetBytes(xBytes),
-					Y:     new(big.Int).SetBytes(yBytes),
-				}
-				r.cache[k.KID] = pubKey
-			}
-		}
-	}
-	r.lastFetch = time.Now()
 
 	if found, ok := r.cache[kid]; ok {
 		return found, nil
@@ -127,6 +87,73 @@ func (r *Resolver) GetECPublicKey(kid, jwksURL string) (*ecdsa.PublicKey, error)
 		return k, nil
 	}
 	return nil, fmt.Errorf("public key with kid '%s' not found in JWKS", kid)
+}
+
+func (r *Resolver) getCachedKey(kid string) *ecdsa.PublicKey {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if key, exists := r.cache[kid]; exists && time.Since(r.lastFetch) < r.cacheTTL {
+		return key
+	}
+	return nil
+}
+
+func (r *Resolver) resolveJWKSURL(jwksURL string) (string, error) {
+	if jwksURL != "" {
+		return jwksURL, nil
+	}
+	if r.defaultJWKSURL != "" {
+		return r.defaultJWKSURL, nil
+	}
+	if envURL := os.Getenv("AUTH_JWKS_URL"); envURL != "" {
+		return strings.TrimSpace(envURL), nil
+	}
+	if envBase := os.Getenv("AUTH_ISSUER_URL"); envBase != "" {
+		return fmt.Sprintf("%s/.well-known/jwks.json", strings.TrimSuffix(strings.TrimSpace(envBase), "/")), nil
+	}
+	return "", fmt.Errorf("failed to fetch JWKS: no jwksURL provided and AUTH_JWKS_URL/AUTH_ISSUER_URL not set")
+}
+
+func (r *Resolver) fetchAndCacheKeys(targetURL string) error {
+	//nolint:gosec // G704: targetURL is an operator-configured endpoint for JWKS public keys
+	resp, err := r.httpClient.Get(targetURL)
+	if err != nil {
+		return fmt.Errorf("failed to fetch JWKS from %s: %w", targetURL, err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to fetch JWKS: received HTTP %d from %s", resp.StatusCode, targetURL)
+	}
+
+	var set Set
+	if err := json.NewDecoder(resp.Body).Decode(&set); err != nil {
+		return fmt.Errorf("failed to decode JWKS payload: %w", err)
+	}
+
+	for _, k := range set.Keys {
+		if k.KTY == "EC" && k.Crv == "P-256" {
+			if pubKey := parseECP256Key(k); pubKey != nil {
+				r.cache[k.KID] = pubKey
+			}
+		}
+	}
+	r.lastFetch = time.Now()
+	return nil
+}
+
+func parseECP256Key(k Key) *ecdsa.PublicKey {
+	xBytes, errX := base64.RawURLEncoding.DecodeString(k.X)
+	yBytes, errY := base64.RawURLEncoding.DecodeString(k.Y)
+	if errX != nil || errY != nil {
+		return nil
+	}
+	//nolint:staticcheck // SA1019: JWKS standard defines EC public keys via raw big-endian coordinates
+	return &ecdsa.PublicKey{
+		Curve: elliptic.P256(),
+		X:     new(big.Int).SetBytes(xBytes),
+		Y:     new(big.Int).SetBytes(yBytes),
+	}
 }
 
 // GetECPublicKey fetches from the DefaultResolver.

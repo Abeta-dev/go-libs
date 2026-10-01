@@ -22,7 +22,7 @@ type MetricsTracker struct {
 	Status4xx      atomic.Uint64
 	Status5xx      atomic.Uint64
 	ActiveRequests atomic.Int64
-	DurationSumMs  atomic.Uint64
+	DurationSumMs  atomic.Int64
 }
 
 // DefaultMetrics is the package-level default metrics tracker.
@@ -43,7 +43,7 @@ func REDMetrics(tracker ...*MetricsTracker) gin.HandlerFunc {
 		defer func() {
 			t.ActiveRequests.Add(-1)
 			duration := time.Since(start).Milliseconds()
-			t.DurationSumMs.Add(uint64(duration))
+			t.DurationSumMs.Add(duration)
 
 			status := c.Writer.Status()
 			switch {
