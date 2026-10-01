@@ -1,6 +1,6 @@
 # go-libs · latest published v0.3.2
 
-Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 37 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
+Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 35 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/umesh0492/go-libs.svg)](https://pkg.go.dev/github.com/umesh0492/go-libs)
 [![Code Quality: golangci-lint](https://img.shields.io/badge/code%20quality-golangci--lint-brightgreen?logo=go)](https://golangci-lint.run/)
@@ -56,7 +56,7 @@ func main() {
 EOF
 
 # 3. Resolve dependencies
-go get github.com/umesh0492/go-libs@v0.3.1
+go get github.com/umesh0492/go-libs@v0.3.2
 go mod tidy
 
 # 4. Prove no heavy frameworks exist in go.sum (exits 0 with zero output if clean)
@@ -351,7 +351,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 ## 📊 Verified Statement Coverage Status
 
-Coverage across all 31 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
+Coverage across all 35 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
 > **Overall Repository Statement Coverage: 96.0%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
@@ -360,6 +360,7 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | Package | Purpose | Statement Coverage |
 |---|---|---|
 | `apperror` | Canonical structured application error codes and helpers | **100.0%** |
+| `async` | Panic-safe goroutines and bounded concurrency orchestration | **95.7%** |
 | `bodylimit` | Gin middleware to cap HTTP request body sizes | **100.0%** |
 | `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **87.5%** |
 | `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **93.3%** |
@@ -367,15 +368,17 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `cryptoutil` | Secure password hashing (`golang.org/x/crypto/bcrypt`) and CSPRNG password generation (`crypto/rand`) | **100.0%** |
 | `db` | Database Pool & Querier | **100.0%** |
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |
+| `fsm` | Declarative in-memory finite state machine with O(1) state transitions | **100.0%** |
 | `ginmw` | Unified Gin HTTP middleware chain & helper | **100.0%** |
 | `health` | Parallel dependency health check and Kubernetes probe handler | **100.0%** |
 | `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.9%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
 | `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
+| `jwks` | Thread-safe cached ECDSA P-256 JWKS public key resolver | **88.6%** |
 | `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.0%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |
-| `pagination` | Offset-based request query parser and generic response | **100.0%** |
+| `pagination` | Offset-based request query parser and generic slice pagination | **97.6%** |
 | `ratelimit` | IP rate limiters (TokenBucket, SlidingWindow) with CIDR proxy parsing | **100.0%** |
 | `rbac` | Role-Based Access Control logic engine | **100.0%** |
 | `rbaccontext` | Context-based permission lookup helpers | **100.0%** |
@@ -388,6 +391,7 @@ Coverage across all 31 packages in `go-libs` is measured using Go's official sta
 | `stringutil` | Sensitive info masking and text helpers | **100.0%** |
 | `telemetry` | OpenTelemetry distributed tracing wrapper | **100.0%** |
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |
+| `uuidutil` | Centralized RFC 4122 UUID operations and validation | **92.3%** |
 | `validation` | Declarative validation error formatter | **100.0%** |
 | `workerpool` | Bounded panic-safe concurrent worker pool with metrics & options | **100.0%** |
 | **Total Statement Coverage** | **Cumulative across all packages** | **96.0%** |
@@ -446,7 +450,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, [SECU
 
 ### 📦 Repository Provenance & Release Record
 
-`go-libs` is available from the Go module proxy at the latest verified published version, `v0.3.1`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
+`go-libs` is available from the Go module proxy at the latest verified published version, `v0.3.2`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
 
 ---
 

@@ -25,21 +25,24 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 - **Early**: Production-ready implementation that has undergone recent surface consolidation or is subject to ergonomic refinements based on community feedback.
 - **Experimental / Deprecated**: Transitional APIs that may be superseded by standard CNCF/Go patterns or scheduled for deprecation.
 
-### Complete Inventory (31 Packages: 23 Stable, 8 Early, 0 Deprecated)
+### Complete Inventory (35 Packages: 27 Stable, 8 Early, 0 Deprecated)
 
 | Package | Maturity Tier | Measured Coverage | API Status & Production Risk |
 | :--- | :--- | :--- | :--- |
 | `apperror` | **Stable** | 100.0% | Canonical domain error types and JSON encoders. API frozen. |
+| `async` | **Stable** | 95.7% | Panic-safe goroutines and bounded concurrency orchestration. API frozen. |
 | `bodylimit` | **Stable** | 100.0% | Request body cap Gin middleware. Complete and stable. |
 | `circuitbreaker` | **Stable** | 93.3% | Consecutive-failure and failure-ratio state machines. Low risk. |
 | `cryptoutil` | **Stable** | 100.0% | Bcrypt password hashing and CSPRNG token generators. API frozen. |
 | `env` | **Stable** | 100.0% | Zero-dependency typed environment variable parser. API frozen. |
+| `fsm` | **Stable** | 100.0% | Declarative in-memory finite state machine with O(1) state transitions. API frozen. |
 | `ginmw` | **Stable** | 100.0% | Unified Gin middleware chain; guarded by strict 100% CI gate. |
 | `health` | **Stable** | 100.0% | Parallel dependency checks and Kubernetes HTTP probes. API frozen. |
 | `httputil` | **Stable** | 100.0% | Standardized JSON envelopes and error responders. API frozen. |
+| `jwks` | **Stable** | 88.6% | Thread-safe cached ECDSA P-256 JWKS public key resolver. API frozen. |
 | `maputil` | **Stable** | 100.0% | Generic map helpers (Merge, Filter). API frozen. |
 | `metrics` | **Stable** | *Interfaces* | Framework-agnostic Counter, Gauge, Histogram interfaces. API frozen. |
-| `pagination` | **Stable** | 100.0% | Offset and page query parsing and envelopes. API frozen. |
+| `pagination` | **Stable** | 97.6% | Offset-based request query parser and generic slice pagination. API frozen. |
 | `rbac` | **Stable** | 100.0% | Role-based access control engine with wildcard matching. Low risk. |
 | `rbaccontext` | **Stable** | 100.0% | Context permission attachment and evaluation helpers. Low risk. |
 | `recovery` | **Stable** | 100.0% | Panic recovery middleware with structured logging. Low risk. |
@@ -50,6 +53,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `sliceutil` | **Stable** | 100.0% | Generic slice algorithms (Reduce, GroupBy, Chunk, Unique, Flatten, First). API frozen. |
 | `stringutil` | **Stable** | 100.0% | Masking and cryptographically secure random strings. API frozen. |
 | `timeutil` | **Stable** | 100.0% | UTC/location time arithmetic, business day calculation, and heuristic parsing. |
+| `uuidutil` | **Stable** | 92.3% | Centralized RFC 4122 UUID operations and validation. API frozen. |
 | `validation` | **Stable** | 100.0% | Formatter translating validator/v10 errors into client JSON. |
 | `workerpool` | **Stable** | 100.0% | Bounded concurrent worker pool with task queue. Low risk. |
 | `cache` | **Early** | 87.5% | Singleflight cache unified into `TypedCache` with `EvictionPolicy`. API undergoing stabilization. |

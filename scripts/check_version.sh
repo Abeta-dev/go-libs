@@ -59,7 +59,7 @@ echo "========================================================"
 echo "📦 Verifying Package Inventory & Count Synchronization"
 echo "========================================================"
 
-EXPECTED_PKG_COUNT=31
+EXPECTED_PKG_COUNT=35
 MEASURED_PKGS=$(go list ./... | grep -vE '^github\.com/umesh0492/go-libs$|/(loadgen|tests?)$' | wc -l | tr -d ' ')
 README_PKG_COUNT=$(grep -oE '[0-9]+ packages' README.md | awk '{print $1}' | head -n1 || true)
 TABLE_PKG_COUNT=$(sed -n '/| Package | Purpose | Statement Coverage |/,/| \*\*Total Statement Coverage\*\*/p' README.md | grep -E '^\| `[a-zA-Z0-9_/]+` \|' | wc -l | tr -d ' ')
