@@ -97,11 +97,12 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 
 ---
 
-## 4. Master Module Directory (31 Packages)
+## 4. Master Module Directory (35 Packages)
 
 | Package | Layer | Primary Responsibility | Key Types / Constructors |
 |---|:---:|---|---|
 | `apperror` | 1 | Canonical error codes and structured error wrapping | `Error`, `Code`, `New`, `Wrap` |
+| `async` | 2 | Panic-safe goroutines and bounded concurrency orchestration | `Go`, `WaitAll`, `WithTimeout` |
 | `bodylimit` | 3 | HTTP request body size bounding | `New`, `MB`, `KB` |
 | `cache` | 2 | Typed cache with singleflight and eviction policies | `TypedCache`, `NewTypedCache`, `WithEvictionPolicy` |
 | `circuitbreaker` | 2 | 3-state failure machine for outbound dependencies | `ConsecutiveBreaker`, `RatioBreaker`, `NewConsecutiveBreaker` |
@@ -109,11 +110,13 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 | `cryptoutil` | 1 | Bcrypt hashing (cost 12) and CSPRNG string generation | `HashPassword`, `GenerateTempPassword` |
 | `db` | 3 | PostgreSQL pgxpool lifecycle and DBTX querier abstraction | `Connect`, `DBTX`, `WithMaxConns` |
 | `env` | 1 | Zero-dependency typed environment variable retrieval | `String`, `Int`, `Bool`, `MustString` |
+| `fsm` | 2 | Declarative in-memory finite state machine with O(1) state transitions | `Machine`, `New`, `Transition`, `Can` |
 | `ginmw` | 4 | Complete Gin-native middleware pipeline and token utilities | `RequestID`, `Telemetry`, `AuthMiddleware`, `RBAC` |
 | `health` | 3 | Kubernetes-compliant liveness and readiness probes | `Handler`, `New`, `WithChecker` |
 | `httpclient` | 3 | Resilient composed HTTP client pipeline with circuit breaker, rate limit, and retry | `New`, `NewRoundTripper`, `WithRetry`, `WithCircuitBreaker` |
 | `httputil` | 3 | Standard JSON response envelopes and domain error mapping | `OK`, `Created`, `ErrorFromDomain` |
 | `idempotency` | 3 | Two-phase atomic request locking and response replay | `Store`, `MemoryStore`, `PGStore`, `NewPGStore`, `Middleware` |
+| `jwks` | 3 | Thread-safe cached ECDSA P-256 JWKS public key resolver | `KeySet`, `New`, `Fetch`, `Key` |
 | `logger` | 1 | Context-aware structured JSON logging via `log/slog` | `Default`, `WithContext`, `FromContext` |
 | `maputil` | 1 | Generic type-safe map transformations | `Merge`, `Filter` |
 | `metrics` | 1 | Framework-agnostic instrumentation interfaces | `Counter`, `Gauge`, `Histogram` |
@@ -130,6 +133,7 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 | `stringutil` | 1 | Sensitive data masking and secure random generators | `MaskEmail`, `MaskPhone`, `RandomAlphanumeric`, `RandomSecureString` |
 | `telemetry` | 3 | OpenTelemetry provider initialization and span helpers | `InitProvider`, `NewTracerProvider`, `StartSpan` |
 | `timeutil` | 1 | UTC normalization and business day calculations | `NowIn`, `FormatIn`, `AddBusinessDays`, `StartOfDay`, `EndOfDay` |
+| `uuidutil` | 1 | Centralized RFC 4122 UUID operations and validation | `New`, `Parse`, `IsValid`, `Nil` |
 | `validation` | 3 | Format `validator/v10` errors into clean client JSON | `FormatErrors`, `FieldError` |
 | `workerpool` | 2 | Bounded, panic-safe background worker pool | `Pool`, `New`, `Submit`, `SubmitContext` |
 

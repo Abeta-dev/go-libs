@@ -101,6 +101,9 @@ linters:
       - gocritic
       - revive
       path: examples/.*
+    - linters:
+      - staticcheck
+      text: "SA1019:.*(PublicKey)\\.(X|Y)"
     paths:
     - third_party$
     - builtin$
