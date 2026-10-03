@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2026-10-01
+
+### Added
+- **`async`**: Concurrency orchestration package with panic-safe `Go`, context-aware `GoCtx`, fan-out `Parallel` with first-error cancellation, and bounded `ParallelLimit` using semaphores for worker quota protection.
+- **`fsm`**: Declarative in-memory Finite State Machine with $O(1)$ compiled transition table lookups, `CanTransition`, and structured `ValidateTransition` errors.
+- **`uuidutil`**: Centralized RFC 4122 UUID manipulation helpers (`New`, `NewString`, `ParsePtr`, `MustParse`, `IsValid`, `IsNil`).
+- **`pagination`**: Added `PaginateSlice[T any]` and `PageMeta` in `slice.go` for bounds-safe generic slice slicing preventing out-of-bounds slice indexing.
+- **`jwks`**: Thread-safe in-memory cached ECDSA P-256 JWKS public key resolver with 2-hour TTL and network-interruption stale fallback.
+- **`ginmw`**:
+  - `RequireTenant` middleware with flexible source extraction (Gin context, claims, `x-tenant-id` header, or query parameters) and role-based bypass (`WithBypassRoles`).
+  - Standardized JSON response helpers (`RespondSuccess`, `RespondCreated`, `RespondError`, `RespondErrorWithDetail`) implementing JSend-compatible `Envelope[T any]`.
+  - Lock-free, low-latency RED metrics middleware (`REDMetrics`) and Prometheus text/JSON `/metrics` endpoint handler (`MetricsEndpoint`).
+
 ## [0.3.1] - 2026-09-24
 
 ### Security & Hardening
