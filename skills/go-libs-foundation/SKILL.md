@@ -1,6 +1,6 @@
 ---
 name: go-libs-foundation
-description: Foundational Go utilities and domain error handling using github.com/Abeta-dev/go-libs (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, dates, and UUIDv7/v4.
+description: Foundational Go utilities and domain error handling using github.com/Abeta-dev/go-libs (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and UUIDs.
 ---
 
 # `go-libs-foundation` Subskill (`v0.3.2`)
@@ -16,28 +16,31 @@ Packages covered:
 
 ## 1. Domain Error Taxonomy (`apperror`)
 
-Never return raw database or internal errors (`pgx.ErrNoRows`, SQL syntax errors) directly to HTTP clients. Wrap them into typed `apperror.Error` constructors so `httputil.WriteError` and `ginmw` map them deterministically to HTTP status codes:
+Never return raw database or internal errors (`pgx.ErrNoRows`, SQL syntax errors) directly to HTTP clients. Construct typed `*apperror.Error` instances so `httputil.ErrorFromDomain` and `ginmw.ErrorHandler` map them deterministically to HTTP status codes:
 
-| Constructor | HTTP Status | Typical Use |
+| Constructor | Error Code | Typical Use |
 | :--- | :--- | :--- |
-| `apperror.BadRequest(code, msg)` | `400 Bad Request` | Malformed input or business rule violation |
-| `apperror.Unauthorized(code, msg)` | `401 Unauthorized` | Missing or expired JWT |
-| `apperror.Forbidden(code, msg)` | `403 Forbidden` | RBAC permission denied |
-| `apperror.NotFound(code, msg)` | `404 Not Found` | Entity lookup miss |
-| `apperror.Conflict(code, msg)` | `409 Conflict` | Duplicate idempotency key or state transition conflict |
-| `apperror.RateLimited(code, msg)` | `429 Too Many Requests` | Rate limit exceeded |
-| `apperror.Internal(code, msg, cause)` | `500 Internal Server Error` | Unexpected infrastructure failure (cause logged, never leaked to client) |
+| `apperror.BadRequest(msg)` | `CodeBadRequest` (`400`) | Malformed input or business rule violation |
+| `apperror.Unauthorized(msg)` | `CodeUnauthorized` (`401`) | Missing or expired JWT |
+| `apperror.Forbidden(msg)` | `CodeForbidden` (`403`) | RBAC permission denied |
+| `apperror.NotFound(msg)` | `CodeNotFound` (`404`) | Entity lookup miss |
+| `apperror.Conflict(msg)` | `CodeConflict` (`409`) | Duplicate idempotency key or state conflict |
+| `apperror.Internal(msg, cause)` | `CodeInternal` (`500`) | Unexpected infrastructure failure (cause wrapped, never leaked) |
+
+Inspect error codes using `apperror.Is(err, apperror.CodeNotFound)` and `apperror.CodeOf(err)`.
 
 ## 2. Typed Environment Configuration (`env`)
 
-Fail fast at process startup (`main.go`) using `env.MustGetString`, `env.MustGetDuration`, or `env.GetInt("PORT", 8080)` instead of scattered `os.Getenv` calls inside business packages.
+Fail fast at process startup (`main.go`) using `env.MustString("DATABASE_URL")`, `env.MustInt("WORKERS")`, `env.String("PORT", "8080")`, `env.Int("MAX_CONNS", 25)`, `env.Bool("DEBUG", false)`, and `env.Duration("TIMEOUT", 5*time.Second)`.
 
-## 3. Time-Ordered Primary Keys (`uuidutil`)
+## 3. Generic Slice & Map Operations (`sliceutil`, `maputil`)
 
-Prefer **UUIDv7** (`uuidutil.NewV7()`) over random UUIDv4 for PostgreSQL B-tree primary keys (`orders.id`, `outbox_events.id`, `audit_events.id`) to preserve insert locality and eliminate index page fragmentation.
+- **`sliceutil`**: `sliceutil.Chunk(items, 500)`, `sliceutil.GroupBy(items, keyFn)`, `sliceutil.Unique(items)`, `sliceutil.Flatten(nested)`, `sliceutil.Reduce(items, init, fn)`, and `sliceutil.First(items, pred)`.
+  - *(Note: For simple slice mapping/filtering or map keys/values, use standard library `slices`/`maps` packages; do not reference removed `sliceutil` or `maputil` helpers).*
+- **`maputil`**: `maputil.Merge(m1, m2)` and `maputil.Filter(m, pred)`.
 
-## 4. Generic Collection & String Helpers (`sliceutil`, `maputil`, `stringutil`, `timeutil`)
+## 4. String Masking, Time & UUID Helpers (`stringutil`, `timeutil`, `uuidutil`)
 
-- `sliceutil.Chunk(items, 500)` for batching bulk SQL inserts or API calls.
-- `sliceutil.IndexBy(items, keyFn)` and `sliceutil.GroupBy(items, keyFn)` for `O(n)` in-memory joins without nested loops.
-- `stringutil.Mask(val, visiblePrefix, visibleSuffix)` for safe logging of identifiers (for Aadhaar/PAN/GSTIN masking, prefer `go-fintech-india`).
+- **`stringutil`**: `stringutil.MaskEmail(email)`, `stringutil.MaskPhone(phone)`, `stringutil.RandomAlphanumeric(n)`, `stringutil.RandomSecureString(n)`.
+- **`timeutil`**: `timeutil.AddBusinessDays(t, days)`, `timeutil.BusinessDays(start, end)`, `timeutil.StartOfDay(t)`, `timeutil.EndOfDay(t)`, `timeutil.NowIn(tz)`.
+- **`uuidutil`**: `uuidutil.New()`, `uuidutil.Parse(s)`, `uuidutil.IsValid(s)`, `uuidutil.Nil`.

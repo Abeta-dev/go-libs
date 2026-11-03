@@ -1,6 +1,6 @@
 ---
 name: go-libs-data-security
-description: Database transactions, RBAC authorization, JWKS/JWT verification, AES-GCM/HMAC cryptography, structured logging, and OpenTelemetry bootstrap using github.com/Abeta-dev/go-libs (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger).
+description: Database pools, RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/Abeta-dev/go-libs (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger).
 ---
 
 # `go-libs-data-security` Subskill (`v0.3.2`)
@@ -14,32 +14,27 @@ Packages covered:
 - `github.com/Abeta-dev/go-libs/telemetry`
 - `github.com/Abeta-dev/go-libs/logger`
 
-## 1. PostgreSQL Pool & Transactional Boundaries (`db`)
+## 1. PostgreSQL Pool & `DBTX` Abstraction (`db`)
 
-Use `db.WithTx` to guarantee automatic rollback on error or panic and commit on `nil` return:
+Connect using `db.Connect(ctx, dsn, db.WithMaxConns(25))` and accept `db.DBTX` in repositories so methods run transparently against either `*pgxpool.Pool` or an active `pgx.Tx` transaction:
 
 ```go
-err := db.WithTx(ctx, pool, func(ctx context.Context, tx pgx.Tx) error {
-	if err := orderRepo.InsertTx(ctx, tx, order); err != nil {
-		return err
-	}
-	// Pair with go-app-kit/outbox.InsertTx or go-app-kit/audit.RecordTx here
-	return nil
-})
+pool, err := db.Connect(ctx, dsn, db.WithMaxConns(25))
+querier := db.GetQuerier(ctx, pool) // Returns context-bound pgx.Tx if active, else pool
 ```
 
-## 2. JWKS Verification & Context-Propagated RBAC (`jwks`, `rbac`, `rbaccontext`)
+## 2. JWKS Verification & Dynamic RBAC (`jwks`, `rbac`, `rbaccontext`)
 
-1. Validate incoming Bearer tokens against a cached remote JWKS endpoint using `jwks.Validator`.
-2. Store the verified subject and roles in `context.Context` via `rbaccontext.WithPrincipal(ctx, principal)`.
-3. Enforce fine-grained permissions (`invoices:approve`, `payouts:create`) at the route or service layer using `rbac.Enforcer`.
+1. Resolve and cache remote ECDSA P-256 JWKS public keys using `jwks.New(jwksURL)`.
+2. Evaluate wildcard permissions (`orders:*`, `invoices:approve`) using `rbac.NewEngine()` or `rbac.HasPermission(granted, required)`.
+3. Attach and verify request permissions in handlers via `rbaccontext.WithPermissions(ctx, perms)` and `rbaccontext.Can(ctx, "invoices:approve")`.
 
-## 3. Authenticated Encryption & HMAC (`cryptoutil`)
+## 3. Password Hashing & CSPRNG Generation (`cryptoutil`)
 
-- Use `cryptoutil.EncryptAESGCM(key32, plaintext)` and `cryptoutil.DecryptAESGCM(key32, ciphertext)` for encrypting sensitive PII/tokens at rest (automatically generates a unique 12-byte nonce per encryption).
-- Use `cryptoutil.ComputeHMACSHA256` and constant-time `cryptoutil.VerifyHMACSHA256` (`hmac.Equal`) for webhook signatures and signed tokens.
+- Use `cryptoutil.HashPassword(plain)` (bcrypt cost 12) and `cryptoutil.ComparePassword(hash, plain)` / `cryptoutil.IsCorrectPassword(hash, plain)`.
+- Generate cryptographically secure temporary passwords using `cryptoutil.GenerateTempPassword(length)`.
 
-## 4. OpenTelemetry & Structured Logging (`telemetry`, `logger`)
+## 4. OpenTelemetry & Context-Aware `slog` Logging (`telemetry`, `logger`)
 
-- Bootstrap OTel once in `main.go` via `telemetry.Init(ctx, telemetry.Config{...})` and register its `Shutdown` function with `shutdown.Manager`.
-- Use `logger.FromContext(ctx)` so every log entry automatically carries `trace_id`, `span_id`, and `request_id` for Loki-to-Tempo correlation in `cloud-native-observability`.
+- Initialize OpenTelemetry tracing in `main.go` via `telemetry.NewTracerProvider(telemetry.WithServiceName("..."))` and create child spans with `telemetry.StartSpan(ctx, "operation")`.
+- Use `logger.FromContext(ctx)` paired with `logger.NewRedactingHandler` and `logger.NewSamplingHandler` so logs automatically redact sensitive keys and include request correlation attributes.

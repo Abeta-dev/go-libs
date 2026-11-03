@@ -276,3 +276,15 @@ func main() {
 3. **Deterministic Testing Infrastructure**: The mockable `clock.Clock` and fuzzing harnesses take advantage of Go 1.26's expanded testing primitives and fuzz corpus scheduler.
 4. **Upstream CVE Mitigation**: Go 1.26 carries critical security patches in standard `crypto/tls`, `net/http`, and `net/url` implementations, establishing a hardened baseline across all consuming microservices.
 
+---
+
+## 8. AI Agent Skills & Context Routing (`AGENTS.md` + `skills/`)
+
+To prevent LLM context bloat across all 35 packages, `go-libs` ships progressive-disclosure Agent Skills (`SKILL.md`) routed via the root [`AGENTS.md`](../AGENTS.md):
+- [`skills/go-libs/SKILL.md`](../skills/go-libs/SKILL.md) — Umbrella 35-package router and truth-gate guide
+- [`skills/go-libs-resilience/SKILL.md`](../skills/go-libs-resilience/SKILL.md) — Layer 2 resilience, caching, concurrency, and deterministic time
+- [`skills/go-libs-http-gin/SKILL.md`](../skills/go-libs-http-gin/SKILL.md) — Layer 3 & 4 Gin middleware pipeline, HTTP client/utilities, idempotency, and pagination
+- [`skills/go-libs-data-security/SKILL.md`](../skills/go-libs-data-security/SKILL.md) — PostgreSQL `db.DBTX`, JWKS, dynamic RBAC, bcrypt `cryptoutil`, `logger`, and `telemetry`
+- [`skills/go-libs-foundation/SKILL.md`](../skills/go-libs-foundation/SKILL.md) — Layer 1 `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, and `uuidutil`
+
+

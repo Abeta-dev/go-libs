@@ -70,11 +70,13 @@ func TestDocumentationDoesNotClaimRemovedUtilityAPIs(t *testing.T) {
 	}
 	for _, path := range []string{
 		"README.md",
+		"AGENTS.md",
 		"CHANGELOG.md",
 		"BENCHMARKS.md",
 		"CONTRIBUTING.md",
 		"TESTING_PARAMETERS.md",
 		"docs",
+		"skills",
 		"maputil",
 		"sliceutil",
 	} {

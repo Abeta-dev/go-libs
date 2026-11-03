@@ -19,60 +19,40 @@ Packages covered:
 
 ## 1. Layered Outbound Call Hardening (`circuitbreaker` + `retry`)
 
-Always wrap **retry outside** or **circuit breaker inside** each attempt so a tripped breaker fails fast without burning retry budgets, or use `retry.Permanent(err)` when `circuitbreaker.ErrCircuitOpen` is returned:
+Wrap outbound calls with `circuitbreaker.NewConsecutiveBreaker` (or `NewRatioBreaker`) and `retry.Do` / `retry.DoWithResult` with `retry.ExponentialJitter`:
 
 ```go
-cb := circuitbreaker.New(circuitbreaker.Config{
-	Name:             "bank-payout-api",
-	FailureThreshold: 5,
-	ResetTimeout:     30 * time.Second,
-	HalfOpenMaxCalls: 2,
-})
+breaker := circuitbreaker.NewConsecutiveBreaker(5, 30*time.Second)
 
-resp, err := retry.DoWithData(ctx, retry.Config{
-	MaxAttempts: 3,
-	BaseDelay:   100 * time.Millisecond,
-	MaxDelay:    2 * time.Second,
-}, func(ctx context.Context) (*PayoutResponse, error) {
-	var out *PayoutResponse
-	err := cb.Execute(func() error {
-		var callErr error
-		out, callErr = client.SendPayout(ctx, req)
-		return callErr
+err := retry.Do(ctx, func(ctx context.Context) error {
+	return breaker.Execute(ctx, func() error {
+		return client.SendPayout(ctx, req)
 	})
-	if errors.Is(err, circuitbreaker.ErrCircuitOpen) {
-		return nil, retry.Permanent(err) // Fail fast when breaker is open
-	}
-	return out, err
-})
+}, retry.WithBackoff(retry.ExponentialJitter(100*time.Millisecond, 2*time.Second)), retry.WithMaxAttempts(3))
 ```
 
 ## 2. Stampede-Safe Caching (`cache`)
 
-Use `GetOrLoad` to coalesce concurrent cache misses via singleflight:
+Use `cache.NewTypedCache[T]` with `GetOrFetch` to coalesce concurrent cache misses via singleflight across SampledLRU, LRU, LFU, FIFO, or TTL eviction policies:
 
 ```go
-memCache := cache.NewMemory[string, TenantConfig](cache.MemoryConfig{
-	MaxEntries: 10_000,
-	DefaultTTL: 5 * time.Minute,
-})
+memCache := cache.NewTypedCache[TenantConfig](
+	cache.WithCapacity(5000),
+	cache.WithEvictionPolicy(cache.EvictionLRU),
+	cache.WithTTL(5 * time.Minute),
+)
 
-cfg, err := memCache.GetOrLoad(ctx, tenantID, func(ctx context.Context) (TenantConfig, error) {
+cfg, err := memCache.GetOrFetch(ctx, tenantID, func(ctx context.Context) (TenantConfig, error) {
 	return repo.FetchTenantConfig(ctx, tenantID)
 })
 ```
 
 ## 3. Bounded Concurrency (`workerpool` & `async`)
 
-- Use `workerpool.New[T, R]` when processing large slices or streams with fixed goroutine concurrency and panic safety.
-- Use `async.Parallel(ctx, fn1, fn2, ...)` when fanning out a small fixed set of heterogeneous calls in a single request handler.
+- Prohibit naked `go func()` in production paths. Use `workerpool.New(workers, queueSize)` with `Submit` / `SubmitContext` and `Stop()` for panic-isolated background execution.
+- Use `async.Go`, `async.WaitAll`, and `async.WithTimeout` when fanning out bounded concurrent tasks inside a request.
 
-## 4.Deterministic Time & Graceful Shutdown (`clock` & `shutdown`)
+## 4. Deterministic Time & Graceful Shutdown (`clock` & `shutdown`)
 
-- Inject `clock.Clock` (`clock.RealClock{}` in production, `clock.NewMockClock(t0)` in unit tests) into services that compute TTLs, SLA deadlines, or backoff windows.
-- Register cleanup hooks (`http.Server.Shutdown`, worker pool drain, OTel flush, DB pool close) with `shutdown.Manager` so resources close in deterministic order on `SIGTERM`.
-
-## Guardrails
-
-- Never retry non-idempotent mutations unless guarded by an idempotency key (`go-libs/idempotency`).
-- Always respect `ctx.Done()` inside `retry` and `workerpool` task functions.
+- Inject `clock.Clock` (`clock.NewReal()` in production, `clock.NewFake(t0)` in unit tests) into caches, circuit breakers, and rate limiters for deterministic testing without `time.Sleep`.
+- Trap `SIGINT`/`SIGTERM` with `shutdown.New(15 * time.Second)` and `Register` cleanup hooks (`srv.Shutdown`, `poolWorker.Stop`, `dbPool.Close`, `memCache.Close`) followed by `mgr.Wait()`.

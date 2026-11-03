@@ -24,41 +24,41 @@ Module: `github.com/Abeta-dev/go-libs` (`v0.3.2`, `Go 1.26.0`)
 
 ## Complete 35-Package Inventory
 
-1. `apperror` — Structured domain errors with HTTP/gRPC status mapping (`Code`, `Message`, `Details`, `Unwrap`).
-2. `async` — Generic `Future[T]`, `Parallel`, and `Race` helpers with panic recovery and context cancellation.
-3. `bodylimit` — `net/http` request body byte-limit middleware (`http.MaxBytesReader`).
-4. `cache` — Generic `Cache[K, V]` interface with sharded in-memory LRU/TTL and Redis (`go-redis/v9`) backends, plus `GetOrLoad` stampede protection (`singleflight`).
-5. `circuitbreaker` — Three-state (`Closed`, `Open`, `HalfOpen`) circuit breaker with configurable failure thresholds and state-change callbacks.
-6. `clock` — `Clock` interface (`RealClock`, `MockClock`) for deterministic time testing.
-7. `cryptoutil` — AES-256-GCM authenticated encryption, HMAC-SHA256 signing/verification, and CSPRNG token generation.
-8. `db` — PostgreSQL `pgxpool.Pool` lifecycle management, health check, and `WithTx` transactional helper.
-9. `env` — Typed environment variable loaders (`GetString`, `GetInt`, `GetBool`, `GetDuration`, `MustGet*`).
-10. `fsm` — Generic table-driven finite state machine (`FSM[S, E]`) with guard predicates and transition hooks.
-11. `ginmw` — 22 composable Gin middleware helpers (request ID, structured logging, recovery, CORS, security headers, body limit, timeout, rate limit, idempotency, RBAC, JWT/JWKS, compression, canonical log line, deprecation, circuit breaker, etc.).
-12. `health` — Kubernetes liveness (`/healthz`) and readiness (`/readyz`) HTTP handlers with concurrent dependency probes.
-13. `httpclient` — Resilient `http.Client` wrapper with automatic retry, circuit breaker, per-attempt timeout, and OpenTelemetry trace propagation.
-14. `httputil` — Standardized JSON response envelopes (`WriteJSON`, `WriteError`, `DecodeJSON` with strict unknown-field rejection).
-15. `idempotency` — HTTP idempotency-key middleware and store (`InMemoryStore`, Redis) preventing duplicate mutations.
-16. `jwks` — Caching JWKS keyfetcher and RS256/ES256 JWT validator with background key rotation refresh.
-17. `logger` — Structured `slog` wrapper with context-aware trace/span/request-ID injection and PII redaction.
-18. `maputil` — Generic map transformations (`Keys`, `Values`, `Merge`, `Filter`, `MapKeys`, `MapValues`, `Invert`).
-19. `metrics` — Prometheus/OpenTelemetry counter, histogram, and gauge registration helpers.
-20. `pagination` — Cursor-based (opaque base64 keyset) and offset/limit pagination parsers and response envelopes.
-21. `ratelimit` — Token-bucket and sliding-window rate limiters (in-memory and Redis Lua script) with `net/http` middleware.
-22. `rbac` — Role-Based Access Control policy evaluator with wildcard permissions (`resource:action`, `*`).
-23. `rbaccontext` — Context propagation helpers for authenticated principal roles and permissions.
-24. `recovery` — Panic-recovery `net/http` middleware with stack-trace logging and structured `500` response.
-25. `requestid` — `X-Request-ID` generation (UUIDv4/ULID) and context propagation middleware.
-26. `retry` — Context-aware exponential backoff with full jitter (`Do`, `DoWithData[T]`, `RetryableError`).
-27. `securityheaders` — OWASP recommended HTTP response headers (`Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Content-Security-Policy`).
-28. `shutdown` — Graceful shutdown coordinator executing registered hooks in priority/LIFO order on `SIGINT`/`SIGTERM`.
-29. `sliceutil` — Generic slice operations (`Map`, `Filter`, `Reduce`, `Chunk`, `Unique`, `GroupBy`, `IndexBy`, `Compact`).
-30. `stringutil` — Safe string truncation, case conversion (`ToSnakeCase`, `ToCamelCase`, `ToKebabCase`), masking, and slugification.
-31. `telemetry` — OpenTelemetry SDK bootstrap (`TracerProvider`, `MeterProvider`, OTLP gRPC/HTTP exporters, W3C propagator).
-32. `timeutil` — Business-day arithmetic, start/end of day/month/quarter helpers, and ISO-8601 duration parsing.
-33. `uuidutil` — UUIDv4 and time-ordered UUIDv7 generation, validation, and nil-check utilities.
-34. `validation` — Composable struct/field validation accumulator returning `apperror.ValidationError` details.
-35. `workerpool` — Bounded concurrency worker pool (`Pool[T, R]`) with backpressure, panic isolation, and graceful drain.
+1. `apperror` — Canonical error codes and structured domain errors (`Error`, `Code`, `New`, `Wrap`, `BadRequest`, `Unauthorized`, `Forbidden`, `NotFound`, `Conflict`, `Internal`).
+2. `async` — Panic-safe goroutines and bounded concurrency orchestration (`Go`, `WaitAll`, `WithTimeout`).
+3. `bodylimit` — `net/http` request body byte-limit middleware (`New`, `MB`, `KB`).
+4. `cache` — Generic singleflight stampede-protected multi-policy cache (`TypedCache[T]`, `NewTypedCache`, `NewMemoryCache`, `WithEvictionPolicy` supporting SampledLRU, LRU, LFU, FIFO, TTL).
+5. `circuitbreaker` — Outbound 3-state (`Closed`, `Open`, `HalfOpen`) failure machine (`ConsecutiveBreaker`, `RatioBreaker`, `NewConsecutiveBreaker`, `NewRatioBreaker`).
+6. `clock` — Deterministic mockable time abstraction (`Clock`, `RealClock`, `FakeClock`, `NewReal`, `NewFake`).
+7. `cryptoutil` — Bcrypt password hashing (cost 12) and CSPRNG password generation (`HashPassword`, `ComparePassword`, `IsCorrectPassword`, `GenerateTempPassword`).
+8. `db` — PostgreSQL `pgxpool` lifecycle management and `DBTX` querier abstraction (`Connect`, `DBTX`, `WithMaxConns`).
+9. `env` — Zero-dependency typed environment variable parsers (`String`, `Int`, `Bool`, `Duration`, `MustString`, `MustInt`).
+10. `fsm` — Declarative in-memory finite state machine with O(1) state transitions (`Machine`, `New`, `Transition`, `Can`).
+11. `ginmw` — Unified Gin middleware pipeline (`RequestID`, `LimitBodyDefault`, `LimitBodyAuth`, `CORS`, `Logger`, `Telemetry`, `GlobalRateLimit`, `AuthRateLimit`, `AuthMiddleware`, `RBAC`, `RequirePermission`, `Idempotency`, `ErrorHandler`).
+12. `health` — Parallel dependency health check and Kubernetes probe handler (`Handler`, `New`, `WithChecker`, `LivenessHandler`, `ReadinessHandler`).
+13. `httpclient` — Resilient composed HTTP client (`New`, `NewRoundTripper`, `WithRetry`, `WithCircuitBreaker`, `WithRateLimiter`, `WithPerAttemptTimeout`).
+14. `httputil` — Standardized JSON response envelopes and domain error mapping (`OK`, `Created`, `NoContent`, `Error`, `ErrorFromDomain`).
+15. `idempotency` — Two-phase atomic HTTP request deduplication (`Store`, `MemoryStore`, `PGStore`, `NewMemoryStore`, `NewPGStore`, `Middleware`).
+16. `jwks` — Thread-safe cached ECDSA P-256 JWKS public key resolver (`KeySet`, `New`, `Fetch`, `Key`).
+17. `logger` — Request-context aware structured `slog` logging with sampling and sensitive field redaction (`Default`, `WithContext`, `FromContext`, `NewRedactingHandler`, `NewSamplingHandler`).
+18. `maputil` — Generic type-safe map transformations (`Merge`, `Filter`).
+19. `metrics` — Framework-agnostic `Counter`, `Gauge`, and `Histogram` interfaces with atomic/noop implementations.
+20. `pagination` — Clamped offset and cursor pagination parsers and response envelopes (`Parse`, `Offset`, `Response`, `ParseCursor`, `EncodeCursor`, `DecodeCursor`).
+21. `ratelimit` — IP rate limiters (`TokenBucketLimiter`, `SlidingWindowLimiter`, `NewTokenBucket`, `NewSlidingWindow`, `NewPGRateLimiter`) with CIDR proxy parsing.
+22. `rbac` — Multi-segment wildcard Role-Based Access Control evaluator (`Engine`, `NewEngine`, `Match`, `HasPermission`, `HasAnyPermission`, `HasAllPermissions`).
+23. `rbaccontext` — Context-bound permission lookup helpers (`WithPermissions`, `Permissions`, `Can`, `CanAny`, `CanAll`).
+24. `recovery` — Panic-to-JSON-500 middleware with structured logging (`Middleware`, `WithLogger`).
+25. `requestid` — Correlation ID generator and context propagator (`Middleware`, `FromContext`, `GetRequestID`).
+26. `retry` — Context-aware backoff and retry execution algorithms (`Do`, `DoWithResult`, `Constant`, `ExponentialJitter`).
+27. `securityheaders` — OWASP defensive security headers middleware (`New`, `Default`).
+28. `shutdown` — Coordinated graceful OS signal teardown manager (`Manager`, `New`, `Register`, `Wait`).
+29. `sliceutil` — Generic slice algorithms (`Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`, `First`).
+30. `stringutil` — Sensitive info masking and CSPRNG string helpers (`MaskEmail`, `MaskPhone`, `RandomAlphanumeric`, `RandomSecureString`).
+31. `telemetry` — OpenTelemetry distributed tracing provider and span helpers (`InitProvider`, `NewTracerProvider`, `StartSpan`).
+32. `timeutil` — UTC normalization, RFC parsing, business days, and day boundaries (`NowIn`, `FormatIn`, `AddBusinessDays`, `BusinessDays`, `StartOfDay`, `EndOfDay`).
+33. `uuidutil` — Centralized RFC 4122 UUID operations and validation (`New`, `Parse`, `IsValid`, `Nil`).
+34. `validation` — Declarative `validator/v10` error formatter (`FormatErrors`, `FieldError`).
+35. `workerpool` — Bounded panic-safe concurrent worker pool (`Pool`, `New`, `Submit`, `SubmitContext`, `Stop`).
 
 ## Truth Gates (`./scripts/check_version.sh`)
 
