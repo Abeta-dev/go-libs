@@ -3,7 +3,7 @@ name: go-libs-data-security
 description: Database pools, RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/Abeta-dev/go-libs (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger).
 ---
 
-# `go-libs-data-security` Subskill (`v0.3.2`)
+# `go-libs-data-security` Subskill (`v0.3.3`)
 
 Packages covered:
 - `github.com/Abeta-dev/go-libs/db`

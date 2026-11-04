@@ -1,11 +1,11 @@
 ---
 name: go-libs
-description: Umbrella router and integration guide for github.com/Abeta-dev/go-libs (v0.3.2, 35 Go packages). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
+description: Umbrella router and integration guide for github.com/Abeta-dev/go-libs (v0.3.3, 35 Go packages). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
 ---
 
-# `go-libs` Umbrella Skill (`v0.3.2`)
+# `go-libs` Umbrella Skill (`v0.3.3`)
 
-Module: `github.com/Abeta-dev/go-libs` (`v0.3.2`, `Go 1.26.0`)
+Module: `github.com/Abeta-dev/go-libs` (`v0.3.3`, `Go 1.26.0`)
 
 ## When to Use
 
@@ -63,4 +63,4 @@ Module: `github.com/Abeta-dev/go-libs` (`v0.3.2`, `Go 1.26.0`)
 ## Truth Gates (`./scripts/check_version.sh`)
 
 - `EXPECTED_PKG_COUNT=35` must match the number of top-level Go package directories.
-- All versioned install commands and references in docs must match `@v0.3.2`.
+- All versioned install commands and references in docs must match `@v0.3.3`.

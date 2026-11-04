@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2026-11-05
+
+### Security & Hardening
+- Dependency Updates: Upgraded `golang.org/x/net` to `v0.60.0` (remediating HTTP/2 vulnerabilities `GO-2026-6617`, `GO-2026-6612`, `GO-2026-6611`, `GO-2026-6610`, and `GO-2026-6603`), `golang.org/x/crypto` to `v0.58.0`, `golang.org/x/sync` to `v0.24.0`, `go.opentelemetry.io/otel` and `go.opentelemetry.io/otel/trace` to `v1.47.0`, `github.com/go-playground/validator/v10` to `v10.30.5`, and `github.com/gabriel-vasile/mimetype` to latest unretracted version.
+
+### Documentation
+- AI Agent Skills & Context Routing: Added portable multi-model `AGENTS.md` router and 5 modular Agent Skills (`skills/go-libs`, `skills/go-libs-resilience`, `skills/go-libs-http-gin`, `skills/go-libs-data-security`, `skills/go-libs-foundation`), plus `docs_truth_test.go` coverage across `AGENTS.md` and `skills/`.
+
 ## [0.3.2] - 2026-10-01
 
 ### Added
