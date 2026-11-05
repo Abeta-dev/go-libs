@@ -28,7 +28,7 @@ The `httputil` package provides standardized JSON serialization, status code res
 ```go
 import (
     "net/http"
-    "github.com/umesh0492/go-libs/httputil"
+    "github.com/Abeta-dev/go-libs/httputil"
 )
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {

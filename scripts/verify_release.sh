@@ -5,7 +5,7 @@ set -euo pipefail
 # Unlike verify_release_baseline.sh, this is intentionally tag-parameterized and
 # is safe to invoke from every future release workflow.
 
-readonly MODULE='github.com/umesh0492/go-libs'
+readonly MODULE='github.com/Abeta-dev/go-libs'
 readonly DEFAULT_REMOTE='origin'
 readonly DEFAULT_PROXY='https://proxy.golang.org'
 readonly DEFAULT_MANIFEST='release-manifest.json'

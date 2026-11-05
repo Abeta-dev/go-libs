@@ -62,7 +62,7 @@ type Cache[T any] interface {
 import (
     "context"
     "time"
-    "github.com/umesh0492/go-libs/cache"
+    "github.com/Abeta-dev/go-libs/cache"
 )
 
 // LRU cache with capacity 1,000 items

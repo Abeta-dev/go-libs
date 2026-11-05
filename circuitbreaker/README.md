@@ -59,7 +59,7 @@ import (
     "context"
     "errors"
     "time"
-    "github.com/umesh0492/go-libs/circuitbreaker"
+    "github.com/Abeta-dev/go-libs/circuitbreaker"
 )
 
 // Trip if error rate >= 50% over a 10s window (min 10 requests), cooling down for 30s

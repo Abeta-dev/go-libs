@@ -5,8 +5,8 @@ package httpclient
 import (
 	"net/http"
 
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/metrics"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/metrics"
 )
 
 // New creates an *http.Client configured with the resilient RoundTripper middleware stack.

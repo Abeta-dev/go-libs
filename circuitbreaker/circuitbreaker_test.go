@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/circuitbreaker"
 )
 
 func TestCircuitBreaker(t *testing.T) {

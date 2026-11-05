@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/umesh0492/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/clock"
 )
 
 // SlidingWindowLimiter implements the Sliding Window Counter algorithm (Cloudflare approximation).

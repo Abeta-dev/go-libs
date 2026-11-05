@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/httputil"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/httputil"
 )
 
 func TestCORS_AllowedOrigins(t *testing.T) {

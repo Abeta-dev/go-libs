@@ -8,9 +8,9 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/Abeta-dev/go-libs/idempotency"
+	"github.com/Abeta-dev/go-libs/logger"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/idempotency"
-	"github.com/umesh0492/go-libs/logger"
 )
 
 // responseBuffer is a custom gin.ResponseWriter that captures the response body and status.

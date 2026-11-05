@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Abeta-dev/go-libs/workerpool"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/workerpool"
 )
 
 func TestPool_DefaultOptions(t *testing.T) {

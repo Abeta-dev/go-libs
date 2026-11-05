@@ -9,9 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Abeta-dev/go-libs/db"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/db"
 )
 
 func TestConnect_EmptyURL(t *testing.T) {
@@ -128,4 +130,85 @@ func TestGetQuerier(t *testing.T) {
 	ctx := context.WithValue(context.Background(), db.ConnKey, conn)
 	querierWithConn := db.GetQuerier(ctx, pool)
 	assert.Nil(t, querierWithConn)
+}
+
+type fakeTx struct {
+	pgx.Tx
+	committed  bool
+	rolledBack bool
+	commitErr  error
+}
+
+func (f *fakeTx) Commit(ctx context.Context) error {
+	f.committed = true
+	return f.commitErr
+}
+
+func (f *fakeTx) Rollback(ctx context.Context) error {
+	f.rolledBack = true
+	return nil
+}
+
+func (f *fakeTx) Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error) {
+	return pgconn.CommandTag{}, nil
+}
+
+type fakeBeginner struct {
+	tx       *fakeTx
+	beginErr error
+}
+
+func (b *fakeBeginner) Begin(ctx context.Context) (pgx.Tx, error) {
+	if b.beginErr != nil {
+		return nil, b.beginErr
+	}
+	return b.tx, nil
+}
+
+func TestWithTx(t *testing.T) {
+	ctx := context.Background()
+
+	// 1. Nil pool or nil fn
+	assert.Error(t, db.WithTx(ctx, nil, func(ctx context.Context, tx pgx.Tx) error { return nil }))
+	assert.Error(t, db.WithTx(ctx, &fakeBeginner{tx: &fakeTx{}}, nil))
+
+	// 2. Begin error
+	assert.Error(t, db.WithTx(ctx, &fakeBeginner{beginErr: errors.New("begin fail")}, func(ctx context.Context, tx pgx.Tx) error {
+		return nil
+	}))
+
+	// 3. Successful commit & GetQuerier returns injected tx
+	tx1 := &fakeTx{}
+	err := db.WithTx(ctx, &fakeBeginner{tx: tx1}, func(txCtx context.Context, tx pgx.Tx) error {
+		assert.Equal(t, tx1, db.GetQuerier(txCtx, nil))
+		return nil
+	})
+	assert.NoError(t, err)
+	assert.True(t, tx1.committed)
+	assert.False(t, tx1.rolledBack)
+
+	// 4. Callback error triggers Rollback
+	tx2 := &fakeTx{}
+	err = db.WithTx(ctx, &fakeBeginner{tx: tx2}, func(txCtx context.Context, tx pgx.Tx) error {
+		return errors.New("business error")
+	})
+	assert.Error(t, err)
+	assert.False(t, tx2.committed)
+	assert.True(t, tx2.rolledBack)
+
+	// 5. Commit error
+	tx3 := &fakeTx{commitErr: errors.New("commit fail")}
+	err = db.WithTx(ctx, &fakeBeginner{tx: tx3}, func(txCtx context.Context, tx pgx.Tx) error {
+		return nil
+	})
+	assert.Error(t, err)
+
+	// 6. Panic inside callback rolls back and re-panics
+	tx4 := &fakeTx{}
+	assert.Panics(t, func() {
+		_ = db.WithTx(ctx, &fakeBeginner{tx: tx4}, func(txCtx context.Context, tx pgx.Tx) error {
+			panic("boom")
+		})
+	})
+	assert.True(t, tx4.rolledBack)
 }

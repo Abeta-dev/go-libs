@@ -33,6 +33,8 @@ jobs:
               - '**/*.go'
               - 'go.mod'
               - 'go.sum'
+              - 'examples/microservice/go.mod'
+              - 'examples/microservice/go.sum'
               - 'Makefile'
               - 'scripts/**'
               - '.github/workflows/ci.yml'
@@ -159,6 +161,7 @@ jobs:
           go test -fuzz=^FuzzParseTime$ -fuzztime=100000x ./timeutil
           go test -fuzz=^FuzzAddBusinessDays$ -fuzztime=100000x ./timeutil
           go test -fuzz=^FuzzBusinessDays$ -fuzztime=100000x ./timeutil
+          go test -fuzz=^FuzzDecodeCursor$ -fuzztime=100000x ./pagination
 
   security:
     name: Supply Chain & Vulnerability Scanner

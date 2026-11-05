@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
+	"github.com/Abeta-dev/go-libs/clock"
 )
 
 func TestConsecutiveBreaker_WithFakeClock_DeterministicReset(t *testing.T) {

@@ -27,7 +27,7 @@ The `health` package provides standardized liveness and readiness probe handlers
 ```go
 import (
     "github.com/gin-gonic/gin"
-    "github.com/umesh0492/go-libs/health"
+    "github.com/Abeta-dev/go-libs/health"
 )
 
 r := gin.New()

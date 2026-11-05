@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-`go-libs` provides security updates for the current release series (currently v0.3.3):
+`go-libs` provides security updates for the current release series (currently v0.4.0):
 
 | Version Series | Status             | Security Updates |
 | -------------- | ------------------ | ---------------- |

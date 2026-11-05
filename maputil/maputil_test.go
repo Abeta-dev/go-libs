@@ -5,8 +5,8 @@ package maputil_test
 import (
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/maputil"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/maputil"
 )
 
 func TestMerge(t *testing.T) {

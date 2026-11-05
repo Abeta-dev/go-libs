@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/Abeta-dev/go-libs/ginmw"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/ginmw"
 )
 
 func ExampleRequestID() {

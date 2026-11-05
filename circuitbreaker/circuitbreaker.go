@@ -7,8 +7,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/metrics"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/metrics"
 )
 
 // ErrCircuitOpen is returned when an execution request is rejected because the circuit is open.

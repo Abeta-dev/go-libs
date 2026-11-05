@@ -28,6 +28,12 @@ LEAF_PACKAGES=(
   "timeutil"
   "maputil"
   "clock"
+  "async"
+  "bodylimit"
+  "fsm"
+  "metrics"
+  "rbaccontext"
+  "securityheaders"
 )
 
 FORBIDDEN_PATTERN='github.com/gin-gonic/gin|github.com/jackc/pgx|go.opentelemetry.io/otel\b'
@@ -55,12 +61,12 @@ for pkg in "${LEAF_PACKAGES[@]}"; do
 package main
 
 import (
-	_ "github.com/umesh0492/go-libs/${pkg}"
+	_ "github.com/Abeta-dev/go-libs/${pkg}"
 )
 
 func main() {}
 EOF
-    go mod edit -replace "github.com/umesh0492/go-libs=${ROOT_DIR}" >/dev/null 2>&1
+    go mod edit -replace "github.com/Abeta-dev/go-libs=${ROOT_DIR}" >/dev/null 2>&1
     if ! TIDY_ERR=$(go mod tidy 2>&1); then
       echo "❌ Error: 'go mod tidy' failed for '${pkg}': ${TIDY_ERR}"
       exit 1

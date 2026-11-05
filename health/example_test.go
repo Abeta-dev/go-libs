@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/umesh0492/go-libs/health"
+	"github.com/Abeta-dev/go-libs/health"
 )
 
 func ExampleNew() {

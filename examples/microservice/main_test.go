@@ -15,15 +15,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/httpclient"
+	"github.com/Abeta-dev/go-libs/logger"
+	"github.com/Abeta-dev/go-libs/pagination"
+	"github.com/Abeta-dev/go-libs/retry"
+	"github.com/Abeta-dev/go-libs/timeutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/httpclient"
-	"github.com/umesh0492/go-libs/logger"
-	"github.com/umesh0492/go-libs/pagination"
-	"github.com/umesh0492/go-libs/retry"
-	"github.com/umesh0492/go-libs/timeutil"
 )
 
 func TestReferenceMicroservice(t *testing.T) {
@@ -216,6 +216,28 @@ func TestReferenceMicroservice(t *testing.T) {
 		badRec := httptest.NewRecorder()
 		app.Router.ServeHTTP(badRec, badReq)
 		assert.Equal(t, http.StatusBadRequest, badRec.Code)
+	})
+
+	t.Run("Order FSM Transition and RED Metrics", func(t *testing.T) {
+		validBody := bytes.NewBufferString(`{"from_state":"PENDING","to_state":"PAID","action":"pay"}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/orders/transition", validBody)
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		app.Router.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		invalidBody := bytes.NewBufferString(`{"from_state":"PENDING","to_state":"DELIVERED","action":"deliver"}`)
+		badReq := httptest.NewRequest(http.MethodPost, "/api/v1/orders/transition", invalidBody)
+		badReq.Header.Set("Content-Type", "application/json")
+		badRec := httptest.NewRecorder()
+		app.Router.ServeHTTP(badRec, badReq)
+		assert.Equal(t, http.StatusConflict, badRec.Code)
+
+		redReq := httptest.NewRequest(http.MethodGet, "/metrics/red", nil)
+		redRec := httptest.NewRecorder()
+		app.Router.ServeHTTP(redRec, redReq)
+		assert.Equal(t, http.StatusOK, redRec.Code)
+		assert.Contains(t, redRec.Body.String(), "http_requests_total")
 	})
 
 	t.Run("Observability Metrics Endpoint JSON", func(t *testing.T) {

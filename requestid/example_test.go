@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/umesh0492/go-libs/requestid"
+	"github.com/Abeta-dev/go-libs/requestid"
 )
 
 func ExampleMiddleware() {

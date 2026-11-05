@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/umesh0492/go-libs/shutdown"
+	"github.com/Abeta-dev/go-libs/shutdown"
 )
 
 func ExampleManager() {

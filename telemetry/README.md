@@ -24,7 +24,7 @@ The `telemetry` package provides OpenTelemetry (OTel) instrumentation for distri
 ### 1. Initialize Global Tracer Provider (`main.go`)
 ```go
 import (
-    "github.com/umesh0492/go-libs/telemetry"
+    "github.com/Abeta-dev/go-libs/telemetry"
     "go.opentelemetry.io/otel/trace/noop"
 )
 
@@ -38,7 +38,7 @@ func main() {
 ### 2. Attach Middleware to Router (`router.go`)
 ```go
 import (
-    "github.com/umesh0492/go-libs/ginmw"
+    "github.com/Abeta-dev/go-libs/ginmw"
 )
 
 r := gin.New()
@@ -47,7 +47,7 @@ r.Use(ginmw.Telemetry("order-service"))
 
 ### 3. Trace Downstream Custom Spans
 ```go
-import "github.com/umesh0492/go-libs/telemetry"
+import "github.com/Abeta-dev/go-libs/telemetry"
 
 func processOrder(ctx context.Context, orderID string) {
     ctx, span := telemetry.StartSpan(ctx, "order-service", "calculate_tax")

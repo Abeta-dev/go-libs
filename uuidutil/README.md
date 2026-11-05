@@ -5,10 +5,11 @@ Package `uuidutil` provides domain-agnostic UUID generation, parsing, pointer tr
 ## Usage
 
 ```go
-import "github.com/umesh0492/go-libs/uuidutil"
+import "github.com/Abeta-dev/go-libs/uuidutil"
 
 id := uuidutil.New()
 str := uuidutil.NewString()
+v7 := uuidutil.NewV7String() // Time-ordered UUIDv7 for B-Tree primary keys
 
 ptr, err := uuidutil.ParsePtr(optionalIDString)
 if uuidutil.IsValid(str) {

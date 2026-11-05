@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/umesh0492/go-libs/env"
+	"github.com/Abeta-dev/go-libs/env"
 )
 
 func ExampleString() {

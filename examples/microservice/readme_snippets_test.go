@@ -12,17 +12,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/umesh0492/go-libs/apperror"
-	"github.com/umesh0492/go-libs/cache"
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/env"
-	"github.com/umesh0492/go-libs/httpclient"
-	"github.com/umesh0492/go-libs/logger"
-	"github.com/umesh0492/go-libs/ratelimit"
-	"github.com/umesh0492/go-libs/retry"
-	"github.com/umesh0492/go-libs/timeutil"
-	"github.com/umesh0492/go-libs/workerpool"
+	"github.com/Abeta-dev/go-libs/apperror"
+	"github.com/Abeta-dev/go-libs/cache"
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/env"
+	"github.com/Abeta-dev/go-libs/httpclient"
+	"github.com/Abeta-dev/go-libs/logger"
+	"github.com/Abeta-dev/go-libs/ratelimit"
+	"github.com/Abeta-dev/go-libs/retry"
+	"github.com/Abeta-dev/go-libs/timeutil"
+	"github.com/Abeta-dev/go-libs/workerpool"
 )
 
 type UserProfile struct {

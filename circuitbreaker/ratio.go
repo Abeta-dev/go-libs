@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/metrics"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/metrics"
 )
 
 type reqRecord struct {

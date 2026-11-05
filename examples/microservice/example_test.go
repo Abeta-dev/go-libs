@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	microservice "github.com/umesh0492/go-libs/examples/microservice"
+	microservice "github.com/Abeta-dev/go-libs/examples/microservice"
 )
 
 func ExampleNewApp() {

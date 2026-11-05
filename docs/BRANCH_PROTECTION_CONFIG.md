@@ -1,6 +1,6 @@
 # Branch Protection & Community Configuration for `main`
 
-This document details the branch protection rules, community access policies, and automated configuration for the `main` branch of `github.com/umesh0492/go-libs`.
+This document details the branch protection rules, community access policies, and automated configuration for the `main` branch of `github.com/Abeta-dev/go-libs`.
 
 ---
 

@@ -10,9 +10,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/ginmw"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/ginmw"
 )
 
 func TestLogger_StructuredLoggingAndRequestID(t *testing.T) {

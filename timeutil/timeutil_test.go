@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Abeta-dev/go-libs/timeutil"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/timeutil"
 )
 
 func TestNowIn(t *testing.T) {

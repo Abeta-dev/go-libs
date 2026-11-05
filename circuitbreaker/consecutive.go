@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/metrics"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/metrics"
 )
 
 // ConsecutiveBreaker implements a circuit breaker that trips after a configured number

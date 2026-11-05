@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/umesh0492/go-libs/circuitbreaker"
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
 )
 
 func BenchmarkCircuitBreaker_Execute_Closed(b *testing.B) {

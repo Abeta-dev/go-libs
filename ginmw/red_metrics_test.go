@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/ginmw"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/ginmw"
 )
 
 func TestREDMetrics_Tracking(t *testing.T) {

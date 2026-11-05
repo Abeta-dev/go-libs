@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/stringutil"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/stringutil"
 )
 
 type errorReader struct{}

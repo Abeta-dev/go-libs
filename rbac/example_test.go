@@ -5,7 +5,7 @@ package rbac_test
 import (
 	"fmt"
 
-	"github.com/umesh0492/go-libs/rbac"
+	"github.com/Abeta-dev/go-libs/rbac"
 )
 
 func ExampleEngine() {

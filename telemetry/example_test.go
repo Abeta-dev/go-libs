@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/umesh0492/go-libs/telemetry"
+	"github.com/Abeta-dev/go-libs/telemetry"
 )
 
 func ExampleStartSpan() {

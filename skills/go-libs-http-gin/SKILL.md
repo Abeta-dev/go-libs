@@ -3,20 +3,20 @@ name: go-libs-http-gin
 description: HTTP server/client and Gin middleware patterns using github.com/Abeta-dev/go-libs (ginmw, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation). Use when building REST APIs, middleware chains, or resilient HTTP clients.
 ---
 
-# `go-libs-http-gin` Subskill (`v0.3.3`)
+# `go-libs-http-gin` Subskill (`v0.4.0`)
 
 Packages covered:
-- `github.com/umesh0492/go-libs/ginmw`
-- `github.com/umesh0492/go-libs/httpclient`
-- `github.com/umesh0492/go-libs/httputil`
-- `github.com/umesh0492/go-libs/pagination`
-- `github.com/umesh0492/go-libs/idempotency`
-- `github.com/umesh0492/go-libs/health`
-- `github.com/umesh0492/go-libs/requestid`
-- `github.com/umesh0492/go-libs/recovery`
-- `github.com/umesh0492/go-libs/securityheaders`
-- `github.com/umesh0492/go-libs/bodylimit`
-- `github.com/umesh0492/go-libs/validation`
+- `github.com/Abeta-dev/go-libs/ginmw`
+- `github.com/Abeta-dev/go-libs/httpclient`
+- `github.com/Abeta-dev/go-libs/httputil`
+- `github.com/Abeta-dev/go-libs/pagination`
+- `github.com/Abeta-dev/go-libs/idempotency`
+- `github.com/Abeta-dev/go-libs/health`
+- `github.com/Abeta-dev/go-libs/requestid`
+- `github.com/Abeta-dev/go-libs/recovery`
+- `github.com/Abeta-dev/go-libs/securityheaders`
+- `github.com/Abeta-dev/go-libs/bodylimit`
+- `github.com/Abeta-dev/go-libs/validation`
 
 ## 1. Canonical Gin Middleware Topology (`ginmw`)
 
@@ -31,12 +31,13 @@ r := gin.New()
 r.Use(
 	ginmw.RequestID(),                                // 1. Inject/propagate X-Request-ID
 	ginmw.LimitBodyDefault(),                         // 2. Cap payload size (2MB default, LimitBodyAuth 4KB)
-	ginmw.CORS([]string{"https://app.example.com"}),  // 3. Handle OPTIONS preflight early
-	recovery.Middleware(recovery.WithLogger(log)),    // 4. Catch panics and return safe 500 JSON
-	ginmw.Logger(),                                   // 5. Structured request completion logging
+	ginmw.CORS([]string{"https://app.example.com"}),  // 3. Handle OPTIONS preflight early ("*" supported)
+	ginmw.Recovery(log),                              // 4. Catch panics and return safe 500 JSON
+	ginmw.Logger(),                                   // 5. Structured request completion logging + context enrichment
 	ginmw.Telemetry("order-service"),                 // 6. Root OpenTelemetry span & W3C propagation
-	ginmw.GlobalRateLimit(),                          // 7. TokenBucket / SlidingWindow IP rate limit
-	ginmw.AuthMiddleware(jwtSecret),                  // 8. Validate Bearer JWT claims
+	ginmw.REDMetrics("order_service"),                // 6b. Prometheus RED metrics (pair with ginmw.MetricsEndpoint())
+	ginmw.GlobalRateLimit(),                          // 7. TokenBucket / SlidingWindow IP rate limit (aborts on 429)
+	ginmw.AuthMiddleware(),                           // 8. Validate Bearer JWT claims (via InitJWT)
 	ginmw.RBAC(permissionProvider),                   // 9. Resolve permissions into rbaccontext
 	ginmw.Idempotency(idemStore),                     // 10. Two-phase lock on mutating endpoints
 )
@@ -58,6 +59,6 @@ r.Use(
 h := health.New(health.WithChecker("db", func(ctx context.Context) error {
 	return pool.Ping(ctx)
 }))
-r.GET("/healthz", gin.WrapH(h.LivenessHandler()))
-r.GET("/readyz", gin.WrapH(h.ReadinessHandler()))
+r.GET("/healthz", gin.WrapF(health.LivenessHandler))
+r.GET("/readyz", gin.WrapF(h.Handler))
 ```

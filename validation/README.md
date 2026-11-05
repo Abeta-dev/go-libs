@@ -36,7 +36,7 @@ import (
     "net/http"
     "github.com/gin-gonic/gin"
     "github.com/go-playground/validator/v10"
-    "github.com/umesh0492/go-libs/validation"
+    "github.com/Abeta-dev/go-libs/validation"
 )
 
 var validate = validator.New()

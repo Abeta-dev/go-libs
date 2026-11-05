@@ -11,9 +11,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/recovery"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/recovery"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"

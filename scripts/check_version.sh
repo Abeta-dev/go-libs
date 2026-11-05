@@ -17,8 +17,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${ROOT_DIR}"
 
-README_GET_VER=$(grep -E 'go get github.com/umesh0492/go-libs@v' README.md | head -n1 | sed -E 's/.*go-libs@v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?).*/\1/')
-CURRENT_TAG="${GIT_TAG:-$(git describe --tags --exact-match 2>/dev/null || true)}"
+README_GET_VER=$(grep -E 'go get github.com/Abeta-dev/go-libs@v' README.md | head -n1 | sed -E 's/.*go-libs@v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?).*/\1/')
+CURRENT_TAG="${GIT_TAG:-}"
+if [ -z "${CURRENT_TAG}" ] && [ -z "$(git status --porcelain 2>/dev/null || true)" ]; then
+  CURRENT_TAG="$(git describe --tags --exact-match 2>/dev/null || true)"
+fi
 LATEST_CHANGELOG_VER=$(sed -n -E 's/^## \[([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?)\].*/\1/p' CHANGELOG.md | head -n1)
 
 printf '%s\n' '========================================================'
@@ -60,7 +63,7 @@ echo "📦 Verifying Package Inventory & Count Synchronization"
 echo "========================================================"
 
 EXPECTED_PKG_COUNT=35
-MEASURED_PKGS=$(go list ./... | grep -vE '^github\.com/umesh0492/go-libs$|/(loadgen|tests?)$' | wc -l | tr -d ' ')
+MEASURED_PKGS=$(go list ./... | grep -vE '^github\.com/Abeta-dev/go-libs$|/(loadgen|tests?)$' | wc -l | tr -d ' ')
 README_PKG_COUNT=$(grep -oE '[0-9]+ packages' README.md | awk '{print $1}' | head -n1 || true)
 TABLE_PKG_COUNT=$(sed -n '/| Package | Purpose | Statement Coverage |/,/| \*\*Total Statement Coverage\*\*/p' README.md | grep -E '^\| `[a-zA-Z0-9_/]+` \|' | wc -l | tr -d ' ')
 

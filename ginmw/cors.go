@@ -12,7 +12,7 @@ import (
 func isOriginAllowed(origin string, allowedOrigins []string) bool {
 	for _, o := range allowedOrigins {
 		trimmed := strings.TrimSpace(o)
-		if trimmed == origin {
+		if trimmed == "*" || trimmed == origin {
 			return true
 		}
 		// Wildcard suffix: "*.example.com"
@@ -27,7 +27,7 @@ func isOriginAllowed(origin string, allowedOrigins []string) bool {
 }
 
 // CORS returns a gin middleware that handles cross-origin requests.
-// allowedOrigins may contain exact origins or wildcard-prefix entries like "*.example.com".
+// allowedOrigins may contain "*", exact origins, or wildcard-prefix entries like "*.example.com".
 func CORS(allowedOrigins []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.GetHeader("Origin")
@@ -35,11 +35,12 @@ func CORS(allowedOrigins []string) gin.HandlerFunc {
 		if origin != "" && isOriginAllowed(origin, allowedOrigins) {
 			// Reflect the exact requesting origin — never set a mismatched value
 			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Vary", "Origin")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Header("Access-Control-Expose-Headers", "Content-Disposition, Content-Type, Content-Length")
 		}
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		c.Header("Access-Control-Allow-Credentials", "true")
-		c.Header("Access-Control-Expose-Headers", "Content-Disposition, Content-Type, Content-Length")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)

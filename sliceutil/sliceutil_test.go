@@ -5,8 +5,8 @@ package sliceutil_test
 import (
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/sliceutil"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/sliceutil"
 )
 
 func TestReduce(t *testing.T) {

@@ -5,7 +5,7 @@ package workerpool_test
 import (
 	"testing"
 
-	"github.com/umesh0492/go-libs/workerpool"
+	"github.com/Abeta-dev/go-libs/workerpool"
 )
 
 func BenchmarkWorkerPool_Submit(b *testing.B) {

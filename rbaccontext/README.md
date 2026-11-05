@@ -25,7 +25,7 @@ The `rbaccontext` package provides context-key helpers that store and evaluate p
 ## API
 
 ```go
-import "github.com/umesh0492/go-libs/rbaccontext"
+import "github.com/Abeta-dev/go-libs/rbaccontext"
 
 // Injected by ginmw.RBAC — you never call this directly in service code
 ctx = rbaccontext.WithPermissions(ctx, []string{"orders:create", "orders:read", "documents:view"})

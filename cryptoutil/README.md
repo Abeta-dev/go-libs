@@ -25,7 +25,7 @@ The `cryptoutil` package provides audited cryptographic helpers for secure passw
 ## API
 
 ```go
-import "github.com/umesh0492/go-libs/cryptoutil"
+import "github.com/Abeta-dev/go-libs/cryptoutil"
 
 // Generate a cryptographically random temporary password of the given length
 // Uses crypto/rand with a safe 70-character charset (excludes ambiguous 0, O, I, l).

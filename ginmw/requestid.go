@@ -7,8 +7,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/Abeta-dev/go-libs/requestid"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/requestid"
 )
 
 // RequestID injects a unique X-Request-ID into every request context and response.
@@ -21,6 +21,9 @@ func RequestID() gin.HandlerFunc {
 
 		wrapper.ServeHTTP(c.Writer, c.Request)
 
+		if id := requestid.FromContext(newCtx); id != "" {
+			c.Set("request_id", id)
+		}
 		c.Request = c.Request.WithContext(newCtx)
 		c.Next()
 	}

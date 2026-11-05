@@ -1,6 +1,6 @@
 # Branch Protection & Community Access Policy
 
-To maintain production stability, zero-regression guarantees, and security compliance for `github.com/umesh0492/go-libs`, the `main` branch is protected by automated GitHub branch protection rules, paired with open community access policies.
+To maintain production stability, zero-regression guarantees, and security compliance for `github.com/Abeta-dev/go-libs`, the `main` branch is protected by automated GitHub branch protection rules, paired with open community access policies.
 
 ---
 

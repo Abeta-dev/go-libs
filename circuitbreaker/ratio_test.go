@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/circuitbreaker"
 )
 
 func TestRatioBreaker_HalfOpenProbeThrottling(t *testing.T) {

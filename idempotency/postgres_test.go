@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Abeta-dev/go-libs/idempotency"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/idempotency"
 )
 
 type mockRow struct {
@@ -426,4 +426,66 @@ func TestPGStore_ErrorBranches(t *testing.T) {
 
 	err = store.Delete(ctx, "k")
 	assert.Error(t, err)
+}
+
+func TestPGStore_Lock_ConcurrentDeleteRetryAndInvalidHeadersJSON(t *testing.T) {
+	ctx := context.Background()
+	now := time.Now()
+	statusCode := 200
+
+	// 1. Concurrent delete (pgx.ErrNoRows on SELECT triggers recursive Lock retry)
+	execCalls := 0
+	mockRetry := &mockDBTX{
+		execFunc: func(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error) {
+			execCalls++
+			if execCalls == 1 {
+				return pgconn.NewCommandTag("INSERT 0"), nil
+			}
+			return pgconn.NewCommandTag("INSERT 1"), nil
+		},
+		queryRowFunc: func(ctx context.Context, sql string, args ...any) pgx.Row {
+			return &mockRow{
+				scanFunc: func(dest ...any) error {
+					return pgx.ErrNoRows
+				},
+			}
+		},
+	}
+
+	storeRetry, err := idempotency.NewPGStore(mockRetry)
+	require.NoError(t, err)
+	exists, rec, err := storeRetry.Lock(ctx, "concurrent-del-key")
+	require.NoError(t, err)
+	assert.False(t, exists)
+	assert.Nil(t, rec)
+	assert.Equal(t, 2, execCalls)
+
+	// 2. Corrupted headers JSON in DB falls back to empty header map cleanly
+	mockCorruptHeaders := &mockDBTX{
+		execFunc: func(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error) {
+			return pgconn.NewCommandTag("INSERT 0"), nil
+		},
+		queryRowFunc: func(ctx context.Context, sql string, args ...any) pgx.Row {
+			return &mockRow{
+				scanFunc: func(dest ...any) error {
+					*dest[0].(*string) = string(idempotency.StatusCompleted)
+					*dest[1].(**int) = &statusCode
+					*dest[2].(*[]byte) = []byte("{invalid-json")
+					*dest[3].(*[]byte) = []byte("ok")
+					*dest[4].(*time.Time) = now.Add(time.Hour)
+					*dest[5].(*time.Time) = now.Add(time.Hour)
+					return nil
+				},
+			}
+		},
+	}
+
+	storeCorrupt, err := idempotency.NewPGStore(mockCorruptHeaders)
+	require.NoError(t, err)
+	exists, rec, err = storeCorrupt.Lock(ctx, "corrupt-hdr-key")
+	require.NoError(t, err)
+	assert.True(t, exists)
+	require.NotNil(t, rec)
+	require.NotNil(t, rec.Response)
+	assert.Empty(t, rec.Response.Headers)
 }

@@ -6,9 +6,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/Abeta-dev/go-libs/cryptoutil"
+	"github.com/Abeta-dev/go-libs/stringutil"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/cryptoutil"
-	"github.com/umesh0492/go-libs/stringutil"
 	"golang.org/x/crypto/bcrypt"
 )
 

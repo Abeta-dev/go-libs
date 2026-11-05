@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/ratelimit"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/ratelimit"
 )
 
 func TestTokenBucket_WithFakeClock_Replenishment(t *testing.T) {

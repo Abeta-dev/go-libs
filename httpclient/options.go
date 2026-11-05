@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/metrics"
-	"github.com/umesh0492/go-libs/retry"
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
+	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/Abeta-dev/go-libs/metrics"
+	"github.com/Abeta-dev/go-libs/retry"
 	"go.opentelemetry.io/otel/trace"
 )
 

@@ -13,8 +13,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/retry"
+	"github.com/Abeta-dev/go-libs/circuitbreaker"
+	"github.com/Abeta-dev/go-libs/retry"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -267,12 +267,8 @@ func computeRetryWait(cfg retry.Config, attempt int) time.Duration {
 	case retry.ExponentialJitter:
 		mult := math.Pow(2, float64(expAttempt))
 		maxWait := float64(cfg.InitialWait) * mult
-		if maxWait <= 0 {
-			wait = 0
-		} else {
-			//nolint:gosec // G404: pseudo-random jitter is appropriate for network retry backoff
-			wait = time.Duration(rand.Float64() * maxWait)
-		}
+		//nolint:gosec // G404: pseudo-random jitter is appropriate for network retry backoff
+		wait = time.Duration(rand.Float64() * maxWait)
 	case retry.Constant:
 		wait = cfg.InitialWait
 	default:
