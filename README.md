@@ -1,4 +1,4 @@
-# go-libs · latest published v0.3.2
+# go-libs · latest published v0.3.3
 
 Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 35 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
@@ -14,7 +14,7 @@ Shared, zero-business-logic Go libraries and middleware for cloud-native microse
 > 📖 **Engineering Documentation & Architecture Blueprint**  
 > Complete subsystem guides, module selection flowcharts, architectural rationales, and execution topologies:  
 > - 🏛️ **[System Architecture & Blueprint](docs/ARCHITECTURE.md)** (Topology, Layering Boundaries, Middleware Order)  
-> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.3.2 release ledger, API errata, and evolution)
+> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.3.3 release ledger, API errata, and evolution)
 > - 🏷️ **[Versioning & Stability Matrix](docs/VERSIONING.md)** (Semantic versioning contracts and package tiers)  
 > - ⚡ **[Performance Benchmarks](BENCHMARKS.md)**  
 > - 📝 **[Decisions & Architecture Records](docs/adr/0001-domain-decoupling-and-audit-sink.md)**  
@@ -26,7 +26,7 @@ Each package is independently importable, fully tested with verified statement c
 This repository uses a **Single Module Monorepo** pattern. There is only *one* `go.mod` file at the root of `go-libs`. 
 
 **Why is this the best "BOM" (Bill of Materials) way?**
-By having a single `github.com/umesh0492/go-libs@v0.3.2` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
+By having a single `github.com/umesh0492/go-libs@v0.3.3` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
 
 ### Minimal-Footprint Imports
 
@@ -56,7 +56,7 @@ func main() {
 EOF
 
 # 3. Resolve dependencies
-go get github.com/umesh0492/go-libs@v0.3.2
+go get github.com/umesh0492/go-libs@v0.3.3
 go mod tidy
 
 # 4. Prove no heavy frameworks exist in go.sum (exits 0 with zero output if clean)
@@ -70,7 +70,7 @@ grep -E 'gin-gonic|jackc/pgx|opentelemetry' go.sum || echo "VERIFIED: Zero heavy
 ## Installation
 
 ```bash
-go get github.com/umesh0492/go-libs@v0.3.2
+go get github.com/umesh0492/go-libs@v0.3.3
 ```
 
 Requirements:
@@ -418,6 +418,20 @@ docker compose -f deploy/docker-compose.observability.yml up --build
 
 ---
 
+## 🤖 AI Agent Skills & Multi-Model Context Routing
+
+`go-libs` includes vendor-neutral **Agent Skills (`SKILL.md`)** and a root **[`AGENTS.md`](AGENTS.md)** router for any LLM coding agent (Antigravity, Gemini CLI, Claude Code, OpenAI Codex, Cursor, Windsurf):
+
+| Skill | Path | Covered Packages |
+| :--- | :--- | :--- |
+| **`go-libs` (Umbrella)** | [`skills/go-libs/SKILL.md`](skills/go-libs/SKILL.md) | Full 35-package catalog router, architectural invariants, and truth gates |
+| **`go-libs-resilience`** | [`skills/go-libs-resilience/SKILL.md`](skills/go-libs-resilience/SKILL.md) | `retry`, `circuitbreaker`, `ratelimit`, `workerpool`, `cache`, `async`, `shutdown`, `fsm`, `clock`, `metrics` |
+| **`go-libs-http-gin`** | [`skills/go-libs-http-gin/SKILL.md`](skills/go-libs-http-gin/SKILL.md) | `ginmw`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation` |
+| **`go-libs-data-security`** | [`skills/go-libs-data-security/SKILL.md`](skills/go-libs-data-security/SKILL.md) | `db`, `rbac`, `rbaccontext`, `jwks`, `cryptoutil`, `telemetry`, `logger` |
+| **`go-libs-foundation`** | [`skills/go-libs-foundation/SKILL.md`](skills/go-libs-foundation/SKILL.md) | `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, `uuidutil` |
+
+---
+
 ## Contributing & Development
 
 ```bash
@@ -450,7 +464,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, [SECU
 
 ### 📦 Repository Provenance & Release Record
 
-`go-libs` is available from the Go module proxy at the latest verified published version, `v0.3.2`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
+`go-libs` is available from the Go module proxy at the latest verified published version, `v0.3.3`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
 
 ---
 
