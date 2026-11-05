@@ -6,13 +6,13 @@ description: Foundational Go utilities and domain error handling using github.co
 # `go-libs-foundation` Subskill (`v0.3.3`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/apperror`
-- `github.com/Abeta-dev/go-libs/env`
-- `github.com/Abeta-dev/go-libs/sliceutil`
-- `github.com/Abeta-dev/go-libs/maputil`
-- `github.com/Abeta-dev/go-libs/stringutil`
-- `github.com/Abeta-dev/go-libs/timeutil`
-- `github.com/Abeta-dev/go-libs/uuidutil`
+- `github.com/umesh0492/go-libs/apperror`
+- `github.com/umesh0492/go-libs/env`
+- `github.com/umesh0492/go-libs/sliceutil`
+- `github.com/umesh0492/go-libs/maputil`
+- `github.com/umesh0492/go-libs/stringutil`
+- `github.com/umesh0492/go-libs/timeutil`
+- `github.com/umesh0492/go-libs/uuidutil`
 
 ## 1. Domain Error Taxonomy (`apperror`)
 

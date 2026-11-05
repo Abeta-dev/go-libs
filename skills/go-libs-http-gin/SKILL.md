@@ -6,17 +6,17 @@ description: HTTP server/client and Gin middleware patterns using github.com/Abe
 # `go-libs-http-gin` Subskill (`v0.3.3`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/ginmw`
-- `github.com/Abeta-dev/go-libs/httpclient`
-- `github.com/Abeta-dev/go-libs/httputil`
-- `github.com/Abeta-dev/go-libs/pagination`
-- `github.com/Abeta-dev/go-libs/idempotency`
-- `github.com/Abeta-dev/go-libs/health`
-- `github.com/Abeta-dev/go-libs/requestid`
-- `github.com/Abeta-dev/go-libs/recovery`
-- `github.com/Abeta-dev/go-libs/securityheaders`
-- `github.com/Abeta-dev/go-libs/bodylimit`
-- `github.com/Abeta-dev/go-libs/validation`
+- `github.com/umesh0492/go-libs/ginmw`
+- `github.com/umesh0492/go-libs/httpclient`
+- `github.com/umesh0492/go-libs/httputil`
+- `github.com/umesh0492/go-libs/pagination`
+- `github.com/umesh0492/go-libs/idempotency`
+- `github.com/umesh0492/go-libs/health`
+- `github.com/umesh0492/go-libs/requestid`
+- `github.com/umesh0492/go-libs/recovery`
+- `github.com/umesh0492/go-libs/securityheaders`
+- `github.com/umesh0492/go-libs/bodylimit`
+- `github.com/umesh0492/go-libs/validation`
 
 ## 1. Canonical Gin Middleware Topology (`ginmw`)
 

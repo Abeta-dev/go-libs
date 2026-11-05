@@ -6,13 +6,13 @@ description: Database pools, RBAC authorization, JWKS public key resolution, bcr
 # `go-libs-data-security` Subskill (`v0.3.3`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/db`
-- `github.com/Abeta-dev/go-libs/rbac`
-- `github.com/Abeta-dev/go-libs/rbaccontext`
-- `github.com/Abeta-dev/go-libs/jwks`
-- `github.com/Abeta-dev/go-libs/cryptoutil`
-- `github.com/Abeta-dev/go-libs/telemetry`
-- `github.com/Abeta-dev/go-libs/logger`
+- `github.com/umesh0492/go-libs/db`
+- `github.com/umesh0492/go-libs/rbac`
+- `github.com/umesh0492/go-libs/rbaccontext`
+- `github.com/umesh0492/go-libs/jwks`
+- `github.com/umesh0492/go-libs/cryptoutil`
+- `github.com/umesh0492/go-libs/telemetry`
+- `github.com/umesh0492/go-libs/logger`
 
 ## 1. PostgreSQL Pool & `DBTX` Abstraction (`db`)
 

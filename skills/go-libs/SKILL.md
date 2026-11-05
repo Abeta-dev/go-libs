@@ -5,7 +5,7 @@ description: Umbrella router and integration guide for github.com/Abeta-dev/go-l
 
 # `go-libs` Umbrella Skill (`v0.3.3`)
 
-Module: `github.com/Abeta-dev/go-libs` (`v0.3.3`, `Go 1.26.0`)
+Module (`go.mod` import path): `github.com/umesh0492/go-libs` (GitHub repo: `github.com/Abeta-dev/go-libs`) (`v0.3.3`, `Go 1.26.0`)
 
 ## When to Use
 

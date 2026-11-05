@@ -6,16 +6,16 @@ description: Resilience, concurrency, caching, and lifecycle patterns using gith
 # `go-libs-resilience` Subskill (`v0.3.3`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/retry`
-- `github.com/Abeta-dev/go-libs/circuitbreaker`
-- `github.com/Abeta-dev/go-libs/ratelimit`
-- `github.com/Abeta-dev/go-libs/workerpool`
-- `github.com/Abeta-dev/go-libs/cache`
-- `github.com/Abeta-dev/go-libs/async`
-- `github.com/Abeta-dev/go-libs/shutdown`
-- `github.com/Abeta-dev/go-libs/fsm`
-- `github.com/Abeta-dev/go-libs/clock`
-- `github.com/Abeta-dev/go-libs/metrics`
+- `github.com/umesh0492/go-libs/retry`
+- `github.com/umesh0492/go-libs/circuitbreaker`
+- `github.com/umesh0492/go-libs/ratelimit`
+- `github.com/umesh0492/go-libs/workerpool`
+- `github.com/umesh0492/go-libs/cache`
+- `github.com/umesh0492/go-libs/async`
+- `github.com/umesh0492/go-libs/shutdown`
+- `github.com/umesh0492/go-libs/fsm`
+- `github.com/umesh0492/go-libs/clock`
+- `github.com/umesh0492/go-libs/metrics`
 
 ## 1. Layered Outbound Call Hardening (`circuitbreaker` + `retry`)
 
