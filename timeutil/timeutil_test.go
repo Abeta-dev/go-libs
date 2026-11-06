@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/timeutil"
+	"github.com/abeta-dev/go-libs/timeutil"
 	"github.com/stretchr/testify/assert"
 )
 

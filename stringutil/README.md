@@ -25,7 +25,7 @@ The `stringutil` package provides domain-agnostic string manipulation helpers, U
 ## API
 
 ```go
-import "github.com/Abeta-dev/go-libs/stringutil"
+import "github.com/abeta-dev/go-libs/stringutil"
 
 // Fallback: returns s if non-empty, otherwise defaultVal
 name := stringutil.OrDefault(user.DisplayName, "Unknown User")

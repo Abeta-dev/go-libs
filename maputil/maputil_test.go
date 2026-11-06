@@ -5,7 +5,7 @@ package maputil_test
 import (
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/maputil"
+	"github.com/abeta-dev/go-libs/maputil"
 	"github.com/stretchr/testify/assert"
 )
 

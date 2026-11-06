@@ -5,7 +5,7 @@ package maputil_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/maputil"
+	"github.com/abeta-dev/go-libs/maputil"
 )
 
 func ExampleMerge() {

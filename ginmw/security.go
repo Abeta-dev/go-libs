@@ -4,7 +4,7 @@
 package ginmw
 
 import (
-	"github.com/Abeta-dev/go-libs/securityheaders"
+	"github.com/abeta-dev/go-libs/securityheaders"
 	"github.com/gin-gonic/gin"
 )
 

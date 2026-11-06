@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/clock"
 )
 
 func TestRealClock(t *testing.T) {

@@ -1,4 +1,4 @@
-module github.com/Abeta-dev/go-libs
+module github.com/abeta-dev/go-libs
 
 go 1.26.0
 

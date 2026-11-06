@@ -5,7 +5,7 @@ package metrics_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/metrics"
+	"github.com/abeta-dev/go-libs/metrics"
 )
 
 // testCounter is a simple in-memory counter for illustrating how to implement

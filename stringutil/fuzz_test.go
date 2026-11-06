@@ -6,7 +6,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/Abeta-dev/go-libs/stringutil"
+	"github.com/abeta-dev/go-libs/stringutil"
 )
 
 func FuzzMaskEmail(f *testing.F) {

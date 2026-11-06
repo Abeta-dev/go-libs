@@ -61,24 +61,24 @@ flowchart TD
 
 | Module | Package | Role in Reference Microservice |
 |---|---|---|
-| **Resilient HTTP Client** | `github.com/Abeta-dev/go-libs/httpclient` | Outbound HTTP client composing circuit breaking, retries with backoff, and timeouts (`httpclient.New`) |
-| **Log Masking** | `github.com/Abeta-dev/go-libs/logger` | Automatically masks sensitive keys (`password`, `token`, `secret`, `authorization`) via `logger.NewRedactingHandler` |
-| **Time Utilities** | `github.com/Abeta-dev/go-libs/timeutil` | Date arithmetic and business day quote expiration calculation (`timeutil.AddBusinessDays`) |
-| **Clock Abstraction** | `github.com/Abeta-dev/go-libs/clock` | Pluggable time source (`clock.Clock`) with real (`clock.NewReal`) and deterministic simulated (`clock.NewFake`) backends |
-| **Circuit Breaker** | `github.com/Abeta-dev/go-libs/circuitbreaker` | Fails fast when downstream services experience consecutive errors (`circuitbreaker.NewConsecutiveBreaker`) |
-| **Retry with Jitter** | `github.com/Abeta-dev/go-libs/retry` | Exponential backoff with full jitter for transient failure recovery (`retry.DoWithResult`) |
-| **Typed Cache** | `github.com/Abeta-dev/go-libs/cache` | In-memory cache with sampled LRU eviction and atomic hit/miss metrics (`cache.NewTypedCache`) |
-| **Bounded Worker Pool** | `github.com/Abeta-dev/go-libs/workerpool` | Concurrent task dispatch with bounded queue and panic safety (`workerpool.New`) |
-| **Graceful Shutdown** | `github.com/Abeta-dev/go-libs/shutdown` | Coordinated shutdown hooks for HTTP server, worker pool, and caches (`shutdown.New`) |
-| **Health Probes** | `github.com/Abeta-dev/go-libs/health` | Kubernetes liveness, readiness, and component health status checkers (`health.New`) |
-| **HTTP Middleware** | `github.com/Abeta-dev/go-libs/ginmw` | Canonical 12-stage Gin pipeline: RequestID, SecurityHeaders, CORS, RateLimit, Telemetry, Idempotency, REDMetrics |
-| **Type-safe Env** | `github.com/Abeta-dev/go-libs/env` | Environment configuration parsing with fallback defaults (`env.String`, `env.Duration`) |
-| **Domain AppErrors** | `github.com/Abeta-dev/go-libs/apperror` | Structured domain errors with canonical HTTP status mapping (`apperror.NotFound`, `apperror.BadRequest`) |
-| **Pagination** | `github.com/Abeta-dev/go-libs/pagination` | Type-safe query parsing and paginated response envelope generation (`pagination.Parse`) |
-| **Slice & Map Utilities** | `github.com/Abeta-dev/go-libs/sliceutil` | Batching, grouping, and algorithmic slice/map partitioning (`sliceutil.Chunk`, `maputil.Merge`) |
-| **HTTP Utilities** | `github.com/Abeta-dev/go-libs/httputil` | Standardized JSON envelopes for API responses and errors (`httputil.OK`, `httputil.Error`) |
-| **Panic Recovery** | `github.com/Abeta-dev/go-libs/recovery` | HTTP middleware intercepting uncaught panics and logging stack traces (`recovery.Middleware`) |
-| **FSM, Async & UUIDv7** | `github.com/Abeta-dev/go-libs/fsm` | Declarative order state transitions (`fsm.NewMachine`), fan-out (`async.Parallel`), and UUIDv7 (`uuidutil.NewV7String`) |
+| **Resilient HTTP Client** | `github.com/abeta-dev/go-libs/httpclient` | Outbound HTTP client composing circuit breaking, retries with backoff, and timeouts (`httpclient.New`) |
+| **Log Masking** | `github.com/abeta-dev/go-libs/logger` | Automatically masks sensitive keys (`password`, `token`, `secret`, `authorization`) via `logger.NewRedactingHandler` |
+| **Time Utilities** | `github.com/abeta-dev/go-libs/timeutil` | Date arithmetic and business day quote expiration calculation (`timeutil.AddBusinessDays`) |
+| **Clock Abstraction** | `github.com/abeta-dev/go-libs/clock` | Pluggable time source (`clock.Clock`) with real (`clock.NewReal`) and deterministic simulated (`clock.NewFake`) backends |
+| **Circuit Breaker** | `github.com/abeta-dev/go-libs/circuitbreaker` | Fails fast when downstream services experience consecutive errors (`circuitbreaker.NewConsecutiveBreaker`) |
+| **Retry with Jitter** | `github.com/abeta-dev/go-libs/retry` | Exponential backoff with full jitter for transient failure recovery (`retry.DoWithResult`) |
+| **Typed Cache** | `github.com/abeta-dev/go-libs/cache` | In-memory cache with sampled LRU eviction and atomic hit/miss metrics (`cache.NewTypedCache`) |
+| **Bounded Worker Pool** | `github.com/abeta-dev/go-libs/workerpool` | Concurrent task dispatch with bounded queue and panic safety (`workerpool.New`) |
+| **Graceful Shutdown** | `github.com/abeta-dev/go-libs/shutdown` | Coordinated shutdown hooks for HTTP server, worker pool, and caches (`shutdown.New`) |
+| **Health Probes** | `github.com/abeta-dev/go-libs/health` | Kubernetes liveness, readiness, and component health status checkers (`health.New`) |
+| **HTTP Middleware** | `github.com/abeta-dev/go-libs/ginmw` | Canonical 12-stage Gin pipeline: RequestID, SecurityHeaders, CORS, RateLimit, Telemetry, Idempotency, REDMetrics |
+| **Type-safe Env** | `github.com/abeta-dev/go-libs/env` | Environment configuration parsing with fallback defaults (`env.String`, `env.Duration`) |
+| **Domain AppErrors** | `github.com/abeta-dev/go-libs/apperror` | Structured domain errors with canonical HTTP status mapping (`apperror.NotFound`, `apperror.BadRequest`) |
+| **Pagination** | `github.com/abeta-dev/go-libs/pagination` | Type-safe query parsing and paginated response envelope generation (`pagination.Parse`) |
+| **Slice & Map Utilities** | `github.com/abeta-dev/go-libs/sliceutil` | Batching, grouping, and algorithmic slice/map partitioning (`sliceutil.Chunk`, `maputil.Merge`) |
+| **HTTP Utilities** | `github.com/abeta-dev/go-libs/httputil` | Standardized JSON envelopes for API responses and errors (`httputil.OK`, `httputil.Error`) |
+| **Panic Recovery** | `github.com/abeta-dev/go-libs/recovery` | HTTP middleware intercepting uncaught panics and logging stack traces (`recovery.Middleware`) |
+| **FSM, Async & UUIDv7** | `github.com/abeta-dev/go-libs/fsm` | Declarative order state transitions (`fsm.NewMachine`), fan-out (`async.Parallel`), and UUIDv7 (`uuidutil.NewV7String`) |
 
 ---
 

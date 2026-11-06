@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/env"
+	"github.com/abeta-dev/go-libs/env"
 	"github.com/stretchr/testify/assert"
 )
 

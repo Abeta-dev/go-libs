@@ -1,18 +1,18 @@
 ---
 name: go-libs-data-security
-description: Database pools, RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/Abeta-dev/go-libs (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger).
+description: Database pools, RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/abeta-dev/go-libs (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger).
 ---
 
 # `go-libs-data-security` Subskill (`v0.4.0`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/db`
-- `github.com/Abeta-dev/go-libs/rbac`
-- `github.com/Abeta-dev/go-libs/rbaccontext`
-- `github.com/Abeta-dev/go-libs/jwks`
-- `github.com/Abeta-dev/go-libs/cryptoutil`
-- `github.com/Abeta-dev/go-libs/telemetry`
-- `github.com/Abeta-dev/go-libs/logger`
+- `github.com/abeta-dev/go-libs/db`
+- `github.com/abeta-dev/go-libs/rbac`
+- `github.com/abeta-dev/go-libs/rbaccontext`
+- `github.com/abeta-dev/go-libs/jwks`
+- `github.com/abeta-dev/go-libs/cryptoutil`
+- `github.com/abeta-dev/go-libs/telemetry`
+- `github.com/abeta-dev/go-libs/logger`
 
 ## 1. PostgreSQL Pool, `DBTX` Abstraction & Transactions (`db`)
 

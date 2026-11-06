@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Abeta-dev/go-libs/ginmw"
-	"github.com/Abeta-dev/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/ratelimit"
 )
 
 func init() { gin.SetMode(gin.TestMode) }

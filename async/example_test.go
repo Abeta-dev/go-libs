@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/Abeta-dev/go-libs/async"
+	"github.com/abeta-dev/go-libs/async"
 )
 
 func ExampleParallel() {

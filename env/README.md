@@ -36,7 +36,7 @@ package main
 
 import (
     "time"
-    "github.com/Abeta-dev/go-libs/env"
+    "github.com/abeta-dev/go-libs/env"
 )
 
 type Config struct {

@@ -5,7 +5,7 @@ package metrics_test
 import (
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/metrics"
+	"github.com/abeta-dev/go-libs/metrics"
 )
 
 // Verify interface satisfaction at compile time.

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Abeta-dev/go-libs/requestid"
+	"github.com/abeta-dev/go-libs/requestid"
 )
 
 func TestMiddleware_GeneratesIDWhenAbsent(t *testing.T) {

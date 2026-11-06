@@ -10,9 +10,9 @@ package main
 import (
 	"time"
 
-	"github.com/Abeta-dev/go-libs/circuitbreaker"
-	"github.com/Abeta-dev/go-libs/httpclient"
-	"github.com/Abeta-dev/go-libs/retry"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/httpclient"
+	"github.com/abeta-dev/go-libs/retry"
 )
 
 func main() {

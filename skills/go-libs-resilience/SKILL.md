@@ -1,21 +1,21 @@
 ---
 name: go-libs-resilience
-description: Resilience, concurrency, caching, and lifecycle patterns using github.com/Abeta-dev/go-libs (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics). Use when hardening external calls, background workers, caches, or state machines.
+description: Resilience, concurrency, caching, and lifecycle patterns using github.com/abeta-dev/go-libs (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics). Use when hardening external calls, background workers, caches, or state machines.
 ---
 
 # `go-libs-resilience` Subskill (`v0.4.0`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/retry`
-- `github.com/Abeta-dev/go-libs/circuitbreaker`
-- `github.com/Abeta-dev/go-libs/ratelimit`
-- `github.com/Abeta-dev/go-libs/workerpool`
-- `github.com/Abeta-dev/go-libs/cache`
-- `github.com/Abeta-dev/go-libs/async`
-- `github.com/Abeta-dev/go-libs/shutdown`
-- `github.com/Abeta-dev/go-libs/fsm`
-- `github.com/Abeta-dev/go-libs/clock`
-- `github.com/Abeta-dev/go-libs/metrics`
+- `github.com/abeta-dev/go-libs/retry`
+- `github.com/abeta-dev/go-libs/circuitbreaker`
+- `github.com/abeta-dev/go-libs/ratelimit`
+- `github.com/abeta-dev/go-libs/workerpool`
+- `github.com/abeta-dev/go-libs/cache`
+- `github.com/abeta-dev/go-libs/async`
+- `github.com/abeta-dev/go-libs/shutdown`
+- `github.com/abeta-dev/go-libs/fsm`
+- `github.com/abeta-dev/go-libs/clock`
+- `github.com/abeta-dev/go-libs/metrics`
 
 ## 1. Layered Outbound Call Hardening (`circuitbreaker` + `retry`)
 

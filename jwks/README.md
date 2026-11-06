@@ -5,7 +5,7 @@ Package `jwks` provides an in-memory cached JSON Web Key Set (JWKS) resolver for
 ## Usage
 
 ```go
-import "github.com/Abeta-dev/go-libs/jwks"
+import "github.com/abeta-dev/go-libs/jwks"
 
 // Retrieve ECDSA P-256 public key by KID
 pubKey, err := jwks.GetECPublicKey("my-kid", "https://auth.example.com/.well-known/jwks.json")

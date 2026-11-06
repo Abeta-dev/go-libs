@@ -10,7 +10,7 @@ import (
 	"runtime/debug"
 	"sync"
 
-	"github.com/Abeta-dev/go-libs/metrics"
+	"github.com/abeta-dev/go-libs/metrics"
 )
 
 // ErrPoolClosed is returned when submitting tasks to a closed pool.

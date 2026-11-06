@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/Abeta-dev/go-libs/securityheaders"
+	"github.com/abeta-dev/go-libs/securityheaders"
 )
 
 func ExampleDefault() {

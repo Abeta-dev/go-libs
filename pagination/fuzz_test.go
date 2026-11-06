@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/pagination"
+	"github.com/abeta-dev/go-libs/pagination"
 )
 
 func FuzzParse(f *testing.F) {

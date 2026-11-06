@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/httputil"
+	"github.com/abeta-dev/go-libs/httputil"
 	"github.com/stretchr/testify/assert"
 )
 

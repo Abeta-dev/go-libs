@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/idempotency"
+	"github.com/abeta-dev/go-libs/idempotency"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"

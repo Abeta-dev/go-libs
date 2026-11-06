@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/cache"
 	"github.com/stretchr/testify/assert"
 )
 

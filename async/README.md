@@ -11,7 +11,7 @@ Package `async` provides panic-safe concurrency primitives, asynchronous gorouti
 ## Usage
 
 ```go
-import "github.com/Abeta-dev/go-libs/async"
+import "github.com/abeta-dev/go-libs/async"
 
 // Fan-out concurrent queries
 err := async.Parallel(ctx,

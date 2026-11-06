@@ -5,7 +5,7 @@ package stringutil_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/stringutil"
+	"github.com/abeta-dev/go-libs/stringutil"
 )
 
 func ExampleOrDefault() {

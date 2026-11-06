@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/clock"
-	"github.com/Abeta-dev/go-libs/metrics"
+	"github.com/abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/metrics"
 )
 
 // ── Metrics & Options ─────────────────────────────────────────────────────────

@@ -27,7 +27,7 @@ The `requestid` package provides HTTP middleware for request correlation tracing
 ```go
 import (
     "github.com/gin-gonic/gin"
-    "github.com/Abeta-dev/go-libs/requestid"
+    "github.com/abeta-dev/go-libs/requestid"
 )
 
 func main() {

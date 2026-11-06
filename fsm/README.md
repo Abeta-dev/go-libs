@@ -5,7 +5,7 @@ Package `fsm` provides a lightweight, declarative, in-memory Finite State Machin
 ## Usage
 
 ```go
-import "github.com/Abeta-dev/go-libs/fsm"
+import "github.com/abeta-dev/go-libs/fsm"
 
 machine := fsm.NewMachine([]fsm.Transition{
     {From: "DRAFT", To: "PENDING", Action: "SUBMIT"},

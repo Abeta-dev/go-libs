@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/workerpool"
+	"github.com/abeta-dev/go-libs/workerpool"
 	"github.com/stretchr/testify/assert"
 )
 

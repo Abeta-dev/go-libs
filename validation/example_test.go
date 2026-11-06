@@ -5,7 +5,7 @@ package validation_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/validation"
+	"github.com/abeta-dev/go-libs/validation"
 	"github.com/go-playground/validator/v10"
 )
 

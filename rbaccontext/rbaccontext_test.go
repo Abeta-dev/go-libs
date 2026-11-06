@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Abeta-dev/go-libs/rbaccontext"
+	"github.com/abeta-dev/go-libs/rbaccontext"
 )
 
 func TestCan_FalseWhenNoPermissionsLoaded(t *testing.T) {

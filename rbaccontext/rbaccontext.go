@@ -6,7 +6,7 @@ package rbaccontext
 import (
 	"context"
 
-	"github.com/Abeta-dev/go-libs/rbac"
+	"github.com/abeta-dev/go-libs/rbac"
 )
 
 type contextKey struct{}

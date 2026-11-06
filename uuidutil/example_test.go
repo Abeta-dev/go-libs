@@ -5,7 +5,7 @@ package uuidutil_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/uuidutil"
+	"github.com/abeta-dev/go-libs/uuidutil"
 )
 
 func ExampleParse() {

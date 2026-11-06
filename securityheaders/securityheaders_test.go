@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Abeta-dev/go-libs/securityheaders"
+	"github.com/abeta-dev/go-libs/securityheaders"
 )
 
 func roundTrip(mw func(http.Handler) http.Handler) *httptest.ResponseRecorder {

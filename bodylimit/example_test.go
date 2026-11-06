@@ -5,7 +5,7 @@ package bodylimit_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/bodylimit"
+	"github.com/abeta-dev/go-libs/bodylimit"
 )
 
 func ExampleString() {

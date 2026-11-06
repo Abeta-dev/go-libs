@@ -2,11 +2,11 @@
 
 Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 35 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/Abeta-dev/go-libs.svg)](https://pkg.go.dev/github.com/Abeta-dev/go-libs)
+[![Go Reference](https://pkg.go.dev/badge/github.com/abeta-dev/go-libs.svg)](https://pkg.go.dev/github.com/abeta-dev/go-libs)
 [![Code Quality: golangci-lint](https://img.shields.io/badge/code%20quality-golangci--lint-brightgreen?logo=go)](https://golangci-lint.run/)
-[![CI](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Abeta-dev/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Abeta-dev/go-libs/badge)](https://scorecard.dev/viewer/?uri=github.com/Abeta-dev/go-libs)
+[![CI](https://github.com/abeta-dev/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/abeta-dev/go-libs/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/abeta-dev/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/abeta-dev/go-libs/badge)](https://scorecard.dev/viewer/?uri=github.com/abeta-dev/go-libs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Shared, zero-business-logic Go libraries and middleware for cloud-native microservices.
@@ -26,7 +26,7 @@ Each package is independently importable, fully tested with verified statement c
 This repository uses a **Single Module Monorepo** pattern. There is only *one* `go.mod` file at the root of `go-libs`. 
 
 **Why is this the best "BOM" (Bill of Materials) way?**
-By having a single `github.com/Abeta-dev/go-libs@v0.4.0` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
+By having a single `github.com/abeta-dev/go-libs@v0.4.0` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
 
 ### Minimal-Footprint Imports
 
@@ -46,7 +46,7 @@ package main
 import (
 	"fmt"
 	"time"
-	"github.com/Abeta-dev/go-libs/shutdown"
+	"github.com/abeta-dev/go-libs/shutdown"
 )
 
 func main() {
@@ -56,7 +56,7 @@ func main() {
 EOF
 
 # 3. Resolve dependencies
-go get github.com/Abeta-dev/go-libs@v0.4.0
+go get github.com/abeta-dev/go-libs@v0.4.0
 go mod tidy
 
 # 4. Prove no heavy frameworks exist in go.sum (exits 0 with zero output if clean)
@@ -70,7 +70,7 @@ grep -E 'gin-gonic|jackc/pgx|opentelemetry' go.sum || echo "VERIFIED: Zero heavy
 ## Installation
 
 ```bash
-go get github.com/Abeta-dev/go-libs@v0.4.0
+go get github.com/abeta-dev/go-libs@v0.4.0
 ```
 
 Requirements:
@@ -87,7 +87,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/retry"
+	"github.com/abeta-dev/go-libs/retry"
 )
 
 cfg := retry.Config{
@@ -109,7 +109,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
 )
 
 // Trips open after 3 consecutive failures; re-tests after 500ms
@@ -127,7 +127,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/ratelimit"
 )
 
 // Standalone in-memory rate limiter (100 req / minute)
@@ -147,7 +147,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/cache"
 )
 
 c := cache.NewTypedCache[UserProfile](
@@ -165,7 +165,7 @@ profile, err := c.GetOrFetch(ctx, "user:123", 5*time.Minute, func(ctx context.Co
 Fixed-size worker pools with task buffering, metric collection, and graceful drain-and-stop:
 ```go
 import (
-	"github.com/Abeta-dev/go-libs/workerpool"
+	"github.com/abeta-dev/go-libs/workerpool"
 )
 
 // 4 concurrent workers, queue buffer of 100 tasks
@@ -183,7 +183,7 @@ Safe environment parsing with sensible fallbacks and zero external reflection de
 import (
 	"time"
 
-	"github.com/Abeta-dev/go-libs/env"
+	"github.com/abeta-dev/go-libs/env"
 )
 
 port := env.Int("PORT", 8080)
@@ -196,7 +196,7 @@ appName := env.String("APP_NAME", "order-service")
 Canonical typed error codes mapping cleanly to HTTP status codes with `errors.Is` support:
 ```go
 import (
-	"github.com/Abeta-dev/go-libs/apperror"
+	"github.com/abeta-dev/go-libs/apperror"
 )
 
 func FindUser(id string) (*User, error) {
@@ -310,7 +310,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 
 > [!NOTE]
 > **Domain & Application Accelerators**:
-> High-level business and application-layer capabilities (Multi-channel Notifications, PDF Generation with GST Invoice Templates, Transactional Outbox Engine with PostgreSQL DDL, Localized Indian Fintech Helpers, Partitioned Audit Logging, and Streaming Data Export) are maintained in the companion accelerator repository: [**`github.com/Abeta-dev/go-app-kit`**](https://github.com/Abeta-dev/go-app-kit).
+> High-level business and application-layer capabilities (Multi-channel Notifications, PDF Generation with GST Invoice Templates, Transactional Outbox Engine with PostgreSQL DDL, Localized Indian Fintech Helpers, Partitioned Audit Logging, and Streaming Data Export) are maintained in the companion accelerator repository: [**`github.com/abeta-dev/go-app-kit`**](https://github.com/abeta-dev/go-app-kit).
 
 ---
 
@@ -414,7 +414,7 @@ docker compose -f deploy/docker-compose.observability.yml up --build
 ![Grafana Microservice Golden Signals & Resilience Dashboard](docs/assets/grafana-dashboard-preview.png)
 
 > **Looking for full enterprise cluster-wide observability?**  
-> Check out our companion platform repository: [**cloud-native-observability**](https://github.com/Abeta-dev/cloud-native-observability) featuring the complete LGTM stack (Loki, Grafana, Tempo, Prometheus) + OpenTelemetry with ArgoCD GitOps and Google SRE SLO alerting!
+> Check out our companion platform repository: [**cloud-native-observability**](https://github.com/abeta-dev/cloud-native-observability) featuring the complete LGTM stack (Loki, Grafana, Tempo, Prometheus) + OpenTelemetry with ArgoCD GitOps and Google SRE SLO alerting!
 
 ---
 

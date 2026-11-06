@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/circuitbreaker"
-	"github.com/Abeta-dev/go-libs/clock"
-	"github.com/Abeta-dev/go-libs/httpclient"
-	"github.com/Abeta-dev/go-libs/ratelimit"
-	"github.com/Abeta-dev/go-libs/retry"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/httpclient"
+	"github.com/abeta-dev/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/retry"
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
 )

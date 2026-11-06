@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http/httptest"
 
-	"github.com/Abeta-dev/go-libs/pagination"
+	"github.com/abeta-dev/go-libs/pagination"
 )
 
 func ExampleParse() {

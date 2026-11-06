@@ -39,7 +39,7 @@ package main
 
 import (
     "fmt"
-    "github.com/Abeta-dev/go-libs/sliceutil"
+    "github.com/abeta-dev/go-libs/sliceutil"
 )
 
 type User struct {

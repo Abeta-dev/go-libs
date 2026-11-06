@@ -13,7 +13,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/jwks"
+	"github.com/abeta-dev/go-libs/jwks"
 )
 
 func testExtractXY(t *testing.T, pub *ecdsa.PublicKey) (string, string) {

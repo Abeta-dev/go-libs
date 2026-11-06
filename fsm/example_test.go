@@ -5,7 +5,7 @@ package fsm_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/fsm"
+	"github.com/abeta-dev/go-libs/fsm"
 )
 
 func ExampleNewMachine() {

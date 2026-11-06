@@ -5,7 +5,7 @@ package fsm_test
 import (
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/fsm"
+	"github.com/abeta-dev/go-libs/fsm"
 )
 
 func TestFSM_ValidTransitions(t *testing.T) {

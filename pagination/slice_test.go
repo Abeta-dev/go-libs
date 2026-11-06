@@ -5,7 +5,7 @@ package pagination_test
 import (
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/pagination"
+	"github.com/abeta-dev/go-libs/pagination"
 )
 
 func TestPaginateSlice(t *testing.T) {

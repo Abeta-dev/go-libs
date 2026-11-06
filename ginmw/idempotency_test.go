@@ -9,8 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/ginmw"
-	"github.com/Abeta-dev/go-libs/idempotency"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/idempotency"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )

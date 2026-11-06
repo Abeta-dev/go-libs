@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/validation"
+	"github.com/abeta-dev/go-libs/validation"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 )

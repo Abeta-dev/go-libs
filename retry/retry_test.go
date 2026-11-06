@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/retry"
+	"github.com/abeta-dev/go-libs/retry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

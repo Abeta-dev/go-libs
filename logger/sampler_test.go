@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/clock"
-	"github.com/Abeta-dev/go-libs/logger"
+	"github.com/abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

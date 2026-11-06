@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/cache"
-	"github.com/Abeta-dev/go-libs/circuitbreaker"
-	"github.com/Abeta-dev/go-libs/ginmw"
-	"github.com/Abeta-dev/go-libs/workerpool"
+	"github.com/abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/workerpool"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

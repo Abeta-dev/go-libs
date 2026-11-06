@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/metrics"
+	"github.com/abeta-dev/go-libs/metrics"
 	"github.com/stretchr/testify/assert"
 )
 

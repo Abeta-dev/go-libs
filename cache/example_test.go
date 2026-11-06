@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/cache"
 )
 
 func ExampleTypedCache() {

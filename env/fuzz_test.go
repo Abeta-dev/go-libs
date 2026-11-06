@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/env"
+	"github.com/abeta-dev/go-libs/env"
 )
 
 func FuzzDuration(f *testing.F) {

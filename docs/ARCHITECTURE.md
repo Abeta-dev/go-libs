@@ -1,6 +1,6 @@
 # System Architecture & Technical Blueprint
 
-This document defines the architectural topology, layering boundaries, middleware pipeline ordering, and systemic engineering contracts for `github.com/Abeta-dev/go-libs`.
+This document defines the architectural topology, layering boundaries, middleware pipeline ordering, and systemic engineering contracts for `github.com/abeta-dev/go-libs`.
 
 ---
 
@@ -170,19 +170,19 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/Abeta-dev/go-libs/cache"
-	"github.com/Abeta-dev/go-libs/circuitbreaker"
-	"github.com/Abeta-dev/go-libs/db"
-	"github.com/Abeta-dev/go-libs/env"
-	"github.com/Abeta-dev/go-libs/ginmw"
-	"github.com/Abeta-dev/go-libs/health"
-	"github.com/Abeta-dev/go-libs/httputil"
-	"github.com/Abeta-dev/go-libs/idempotency"
-	"github.com/Abeta-dev/go-libs/logger"
-	"github.com/Abeta-dev/go-libs/recovery"
-	"github.com/Abeta-dev/go-libs/shutdown"
-	"github.com/Abeta-dev/go-libs/telemetry"
-	"github.com/Abeta-dev/go-libs/workerpool"
+	"github.com/abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/db"
+	"github.com/abeta-dev/go-libs/env"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/health"
+	"github.com/abeta-dev/go-libs/httputil"
+	"github.com/abeta-dev/go-libs/idempotency"
+	"github.com/abeta-dev/go-libs/logger"
+	"github.com/abeta-dev/go-libs/recovery"
+	"github.com/abeta-dev/go-libs/shutdown"
+	"github.com/abeta-dev/go-libs/telemetry"
+	"github.com/abeta-dev/go-libs/workerpool"
 )
 
 func main() {

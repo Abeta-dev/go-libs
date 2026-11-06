@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/stringutil"
+	"github.com/abeta-dev/go-libs/stringutil"
 	"github.com/stretchr/testify/assert"
 )
 

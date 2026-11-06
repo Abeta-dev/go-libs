@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/retry"
+	"github.com/abeta-dev/go-libs/retry"
 )
 
 func BenchmarkRetry_SuccessImmediate(b *testing.B) {

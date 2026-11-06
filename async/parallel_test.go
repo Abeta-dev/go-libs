@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/async"
+	"github.com/abeta-dev/go-libs/async"
 )
 
 func TestParallel_Success(t *testing.T) {

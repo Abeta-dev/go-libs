@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/idempotency"
+	"github.com/abeta-dev/go-libs/idempotency"
 )
 
 func ExampleMemoryStore() {

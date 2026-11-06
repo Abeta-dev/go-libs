@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/logger"
-	"github.com/Abeta-dev/go-libs/requestid"
+	"github.com/abeta-dev/go-libs/logger"
+	"github.com/abeta-dev/go-libs/requestid"
 	"github.com/gin-gonic/gin"
 )
 

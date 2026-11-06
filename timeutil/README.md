@@ -16,7 +16,7 @@ The `timeutil` package provides domain-agnostic time helpers for location normal
 ## API
 
 ```go
-import "github.com/Abeta-dev/go-libs/timeutil"
+import "github.com/abeta-dev/go-libs/timeutil"
 
 // Current time in a given location
 loc, _ := time.LoadLocation("UTC")

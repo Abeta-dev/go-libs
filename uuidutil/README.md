@@ -5,7 +5,7 @@ Package `uuidutil` provides domain-agnostic UUID generation, parsing, pointer tr
 ## Usage
 
 ```go
-import "github.com/Abeta-dev/go-libs/uuidutil"
+import "github.com/abeta-dev/go-libs/uuidutil"
 
 id := uuidutil.New()
 str := uuidutil.NewString()

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/uuidutil"
+	"github.com/abeta-dev/go-libs/uuidutil"
 	"github.com/google/uuid"
 )
 

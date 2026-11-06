@@ -27,7 +27,7 @@ package main
 
 import (
     "fmt"
-    "github.com/Abeta-dev/go-libs/rbac"
+    "github.com/abeta-dev/go-libs/rbac"
 )
 
 func main() {

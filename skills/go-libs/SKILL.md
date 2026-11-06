@@ -1,15 +1,15 @@
 ---
 name: go-libs
-description: Umbrella router and integration guide for github.com/Abeta-dev/go-libs (v0.4.0, 35 Go packages). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
+description: Umbrella router and integration guide for github.com/abeta-dev/go-libs (v0.4.0, 35 Go packages). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
 ---
 
 # `go-libs` Umbrella Skill (`v0.4.0`)
 
-Module (`go.mod` import path): `github.com/Abeta-dev/go-libs` (`v0.4.0`, `Go 1.26.0`)
+Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`v0.4.0`, `Go 1.26.0`)
 
 ## When to Use
 
-- Choosing which of the **35 packages** in `github.com/Abeta-dev/go-libs` solves a backend engineering requirement
+- Choosing which of the **35 packages** in `github.com/abeta-dev/go-libs` solves a backend engineering requirement
 - Wiring a production HTTP/Gin service with structured logging, OpenTelemetry, resilience, and RBAC
 - Maintaining or contributing to `go-libs` and passing `./scripts/check_version.sh`
 

@@ -17,7 +17,7 @@ chmod +x "${fixture_dir}/tagged-checkout/scripts/check_version.sh"
 cd "${fixture_dir}/tagged-checkout"
 # The fixture has its own refs. This does not move, delete, or recreate tags in
 # the source checkout, including the known conflicting local v0.2.1 tag.
-TARGET_TAG="v$(grep -E 'go get github.com/Abeta-dev/go-libs@v' "${ROOT_DIR}/README.md" | head -n1 | sed -E 's/.*go-libs@v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?).*/\1/')"
+TARGET_TAG="v$(grep -E 'go get github.com/abeta-dev/go-libs@v' "${ROOT_DIR}/README.md" | head -n1 | sed -E 's/.*go-libs@v([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?).*/\1/')"
 git tag -d "${TARGET_TAG}" >/dev/null 2>&1 || true
 git -c user.name='go-libs release fixture' \
   -c user.email='release-fixture@invalid.example' \

@@ -29,7 +29,7 @@ import (
     "context"
     "os"
     "time"
-    "github.com/Abeta-dev/go-libs/db"
+    "github.com/abeta-dev/go-libs/db"
 )
 
 // Initialize with production pool limits matching container resources:

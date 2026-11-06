@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/ratelimit"
 	"github.com/jackc/pgx/v5"
 )
 

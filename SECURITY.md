@@ -21,7 +21,7 @@ Instead, report vulnerabilities through one of the following confidential channe
 
 ### 1. GitHub Private Vulnerability Reporting (Preferred)
 Submit a confidential advisory directly via GitHub:
-- Navigate to the **Security** tab of `github.com/Abeta-dev/go-libs`.
+- Navigate to the **Security** tab of `github.com/abeta-dev/go-libs`.
 - Click **"Report a vulnerability"** to open a private advisory draft.
 - Include a description, affected package(s), minimal reproduction or proof-of-concept (PoC), and potential impact.
 

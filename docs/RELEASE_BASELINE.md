@@ -17,7 +17,7 @@ This document records the release facts used to normalize the dependency baselin
 | Checksum database module hash | `h1:9Fzm2GZMkd+rnFAFOd5MURnOorqM98O4H/zcVUb6uoY=` |
 | Checksum database `go.mod` hash | `h1:R7gQaadUNwpnavd5P96ThNbhYyUUKyVbfKCR/mu29/o=` |
 
-`go mod download -json github.com/umesh0492/go-libs@v0.2.1` is the independent module-resolution check. `scripts/verify_release_baseline.sh` revalidates this historical remote-tag, proxy, and checksum-database evidence. It is an audit only and is deliberately not a recurring release-workflow gate. `scripts/verify_release.sh <tag>` validates the actual immutable tag being released and emits `release-manifest.json`. The recorded published release notes are in the immutable artifact at [`v0.2.1`](https://github.com/Abeta-dev/go-libs/releases/tag/v0.2.1), rather than this checkout's unreleased changelog section.
+`go mod download -json github.com/umesh0492/go-libs@v0.2.1` is the independent module-resolution check. `scripts/verify_release_baseline.sh` revalidates this historical remote-tag, proxy, and checksum-database evidence. It is an audit only and is deliberately not a recurring release-workflow gate. `scripts/verify_release.sh <tag>` validates the actual immutable tag being released and emits `release-manifest.json`. The recorded published release notes are in the immutable artifact at [`v0.2.1`](https://github.com/abeta-dev/go-libs/releases/tag/v0.2.1), rather than this checkout's unreleased changelog section.
 
 ## Checkout status
 

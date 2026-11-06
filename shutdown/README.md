@@ -26,7 +26,7 @@ The `shutdown` package manages graceful termination on `SIGINT`/`SIGTERM` OS sig
 
 ```go
 import (
-    "github.com/Abeta-dev/go-libs/shutdown"
+    "github.com/abeta-dev/go-libs/shutdown"
     "time"
 )
 

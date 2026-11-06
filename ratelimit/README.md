@@ -37,7 +37,7 @@ The `ratelimit` package provides in-memory, thread-safe rate limiting with **Tok
 ```go
 import (
     "time"
-    "github.com/Abeta-dev/go-libs/ratelimit"
+    "github.com/abeta-dev/go-libs/ratelimit"
 )
 
 // Choose the algorithm that fits your workload:
@@ -80,7 +80,7 @@ r.POST("/login", ratelimit.NewAuth(), authHandler)
 
 ### 4. Gin Web Framework (`ginmw`)
 ```go
-import "github.com/Abeta-dev/go-libs/ginmw"
+import "github.com/abeta-dev/go-libs/ginmw"
 
 // Attach any algorithm to Gin:
 limiter := ratelimit.NewTokenBucket(50, 100*time.Millisecond)

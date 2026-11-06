@@ -41,7 +41,7 @@ package service
 import (
     "context"
     "fmt"
-    "github.com/Abeta-dev/go-libs/apperror"
+    "github.com/abeta-dev/go-libs/apperror"
 )
 
 func (s *OrderService) CancelOrder(ctx context.Context, orderID string) error {

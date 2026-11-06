@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/cache"
-	"github.com/Abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/clock"
 )
 
 func TestTypedCache_WithFakeClock_TTLExpiration_AllPolicies(t *testing.T) {

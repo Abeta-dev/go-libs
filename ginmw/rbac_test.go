@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Abeta-dev/go-libs/ginmw"
-	"github.com/Abeta-dev/go-libs/rbaccontext"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/rbaccontext"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

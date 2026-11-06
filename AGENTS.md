@@ -1,4 +1,4 @@
-# AGENTS.md — `go-libs` (`github.com/Abeta-dev/go-libs`)
+# AGENTS.md — `go-libs` (`github.com/abeta-dev/go-libs`)
 
 This repository provides **35 focused, production-hardened Go packages** (`v0.4.0`, `Go 1.26.0`) covering HTTP & Gin middleware, resilience & concurrency, data/caching/observability, security & RBAC, and foundational type-safe utilities.
 

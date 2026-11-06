@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/Abeta-dev/go-libs/db"
+	"github.com/abeta-dev/go-libs/db"
 	"github.com/jackc/pgx/v5"
 )
 

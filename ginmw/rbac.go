@@ -5,7 +5,7 @@ package ginmw
 import (
 	"context"
 
-	"github.com/Abeta-dev/go-libs/rbaccontext"
+	"github.com/abeta-dev/go-libs/rbaccontext"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

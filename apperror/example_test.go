@@ -5,7 +5,7 @@ package apperror_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/apperror"
+	"github.com/abeta-dev/go-libs/apperror"
 )
 
 func ExampleNotFound() {

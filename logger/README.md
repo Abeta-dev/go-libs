@@ -32,7 +32,7 @@ import (
     "context"
     "net/http"
     "github.com/gin-gonic/gin"
-    "github.com/Abeta-dev/go-libs/logger"
+    "github.com/abeta-dev/go-libs/logger"
 )
 
 func OrderHandler(c *gin.Context) {

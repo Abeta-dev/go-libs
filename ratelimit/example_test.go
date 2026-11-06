@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/Abeta-dev/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/ratelimit"
 )
 
 func ExampleNewGlobal() {

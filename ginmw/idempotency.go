@@ -8,8 +8,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/Abeta-dev/go-libs/idempotency"
-	"github.com/Abeta-dev/go-libs/logger"
+	"github.com/abeta-dev/go-libs/idempotency"
+	"github.com/abeta-dev/go-libs/logger"
 	"github.com/gin-gonic/gin"
 )
 

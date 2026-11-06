@@ -1,6 +1,6 @@
 # Versioning Policy & Package Maturity Matrix
 
-This document outlines the versioning guarantees, breaking change communication policy, package maturity lifecycle, and path to `v1.0.0` for `github.com/Abeta-dev/go-libs`.
+This document outlines the versioning guarantees, breaking change communication policy, package maturity lifecycle, and path to `v1.0.0` for `github.com/abeta-dev/go-libs`.
 
 ---
 

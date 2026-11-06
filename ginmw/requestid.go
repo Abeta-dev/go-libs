@@ -7,7 +7,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Abeta-dev/go-libs/requestid"
+	"github.com/abeta-dev/go-libs/requestid"
 	"github.com/gin-gonic/gin"
 )
 

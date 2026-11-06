@@ -1,18 +1,18 @@
 ---
 name: go-libs-foundation
-description: Foundational Go utilities and domain error handling using github.com/Abeta-dev/go-libs (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and UUIDs.
+description: Foundational Go utilities and domain error handling using github.com/abeta-dev/go-libs (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and UUIDs.
 ---
 
 # `go-libs-foundation` Subskill (`v0.4.0`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/apperror`
-- `github.com/Abeta-dev/go-libs/env`
-- `github.com/Abeta-dev/go-libs/sliceutil`
-- `github.com/Abeta-dev/go-libs/maputil`
-- `github.com/Abeta-dev/go-libs/stringutil`
-- `github.com/Abeta-dev/go-libs/timeutil`
-- `github.com/Abeta-dev/go-libs/uuidutil`
+- `github.com/abeta-dev/go-libs/apperror`
+- `github.com/abeta-dev/go-libs/env`
+- `github.com/abeta-dev/go-libs/sliceutil`
+- `github.com/abeta-dev/go-libs/maputil`
+- `github.com/abeta-dev/go-libs/stringutil`
+- `github.com/abeta-dev/go-libs/timeutil`
+- `github.com/abeta-dev/go-libs/uuidutil`
 
 ## 1. Domain Error Taxonomy (`apperror`)
 

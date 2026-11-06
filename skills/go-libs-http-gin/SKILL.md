@@ -1,22 +1,22 @@
 ---
 name: go-libs-http-gin
-description: HTTP server/client and Gin middleware patterns using github.com/Abeta-dev/go-libs (ginmw, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation). Use when building REST APIs, middleware chains, or resilient HTTP clients.
+description: HTTP server/client and Gin middleware patterns using github.com/abeta-dev/go-libs (ginmw, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation). Use when building REST APIs, middleware chains, or resilient HTTP clients.
 ---
 
 # `go-libs-http-gin` Subskill (`v0.4.0`)
 
 Packages covered:
-- `github.com/Abeta-dev/go-libs/ginmw`
-- `github.com/Abeta-dev/go-libs/httpclient`
-- `github.com/Abeta-dev/go-libs/httputil`
-- `github.com/Abeta-dev/go-libs/pagination`
-- `github.com/Abeta-dev/go-libs/idempotency`
-- `github.com/Abeta-dev/go-libs/health`
-- `github.com/Abeta-dev/go-libs/requestid`
-- `github.com/Abeta-dev/go-libs/recovery`
-- `github.com/Abeta-dev/go-libs/securityheaders`
-- `github.com/Abeta-dev/go-libs/bodylimit`
-- `github.com/Abeta-dev/go-libs/validation`
+- `github.com/abeta-dev/go-libs/ginmw`
+- `github.com/abeta-dev/go-libs/httpclient`
+- `github.com/abeta-dev/go-libs/httputil`
+- `github.com/abeta-dev/go-libs/pagination`
+- `github.com/abeta-dev/go-libs/idempotency`
+- `github.com/abeta-dev/go-libs/health`
+- `github.com/abeta-dev/go-libs/requestid`
+- `github.com/abeta-dev/go-libs/recovery`
+- `github.com/abeta-dev/go-libs/securityheaders`
+- `github.com/abeta-dev/go-libs/bodylimit`
+- `github.com/abeta-dev/go-libs/validation`
 
 ## 1. Canonical Gin Middleware Topology (`ginmw`)
 

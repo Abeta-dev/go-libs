@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-To validate the production readiness and resilience of `github.com/Abeta-dev/go-libs`, a comprehensive high-concurrency scale test was executed against the unified reference microservice architecture. 
+To validate the production readiness and resilience of `github.com/abeta-dev/go-libs`, a comprehensive high-concurrency scale test was executed against the unified reference microservice architecture. 
 
 The test simulated **1,000 concurrent client connections** continuously bombarding the service for **60 seconds (1 minute)** across cached queries, background task submissions, and health checks.
 

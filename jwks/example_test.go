@@ -5,7 +5,7 @@ package jwks_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/jwks"
+	"github.com/abeta-dev/go-libs/jwks"
 )
 
 func ExampleNewResolver() {

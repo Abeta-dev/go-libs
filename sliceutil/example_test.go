@@ -5,7 +5,7 @@ package sliceutil_test
 import (
 	"fmt"
 
-	"github.com/Abeta-dev/go-libs/sliceutil"
+	"github.com/abeta-dev/go-libs/sliceutil"
 )
 
 func ExampleChunk() {

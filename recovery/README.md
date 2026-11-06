@@ -30,7 +30,7 @@ import (
     "net/http"
     "os"
 
-    "github.com/Abeta-dev/go-libs/recovery"
+    "github.com/abeta-dev/go-libs/recovery"
 )
 
 func main() {
