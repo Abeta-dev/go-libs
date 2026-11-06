@@ -27,7 +27,7 @@ The `bodylimit` package provides HTTP request body bounding middleware, protecti
 ```go
 import (
     "github.com/gin-gonic/gin"
-    "github.com/umesh0492/go-libs/bodylimit"
+    "github.com/abeta-dev/go-libs/bodylimit"
 )
 
 r := gin.New()

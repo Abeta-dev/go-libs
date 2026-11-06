@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/umesh0492/go-libs/ginmw"
-	"github.com/umesh0492/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/ratelimit"
 )
 
 func init() { gin.SetMode(gin.TestMode) }
@@ -36,6 +36,16 @@ func TestCORS_ExactOriginAllowed(t *testing.T) {
 	req.Header.Set("Origin", "https://app.example.com")
 	r.ServeHTTP(w, req)
 	assert.Equal(t, "https://app.example.com", w.Header().Get("Access-Control-Allow-Origin"))
+}
+
+func TestCORS_StarWildcardOriginAllowed(t *testing.T) {
+	r := newRouter(ginmw.CORS([]string{"*"}))
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/test", nil)
+	req.Header.Set("Origin", "https://any-frontend.example.org")
+	r.ServeHTTP(w, req)
+	assert.Equal(t, "https://any-frontend.example.org", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, "Origin", w.Header().Get("Vary"))
 }
 
 func TestCORS_WildcardSuffixAllowed(t *testing.T) {
@@ -380,6 +390,28 @@ func TestAuthRateLimit_AllowsFirstRequest(t *testing.T) {
 	req.RemoteAddr = "1.2.3.5:9999"
 	r.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
+}
+
+func TestAuthRateLimit_AbortsDownstreamOn429(t *testing.T) {
+	downstreamRuns := 0
+	r := gin.New()
+	r.Use(ginmw.AuthRateLimit())
+	r.POST("/login", func(c *gin.Context) {
+		downstreamRuns++
+		c.String(http.StatusOK, "logged-in")
+	})
+
+	for i := 0; i < 12; i++ {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/login", nil)
+		req.RemoteAddr = "10.99.88.77:1234"
+		r.ServeHTTP(w, req)
+		if i == 11 {
+			assert.Equal(t, http.StatusTooManyRequests, w.Code)
+			assert.NotContains(t, w.Body.String(), "logged-in")
+		}
+	}
+	assert.Equal(t, 10, downstreamRuns)
 }
 
 func TestRateLimitWithLimiter_AllowsAndBlocksDefaultKey(t *testing.T) {

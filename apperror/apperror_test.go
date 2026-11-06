@@ -6,9 +6,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/apperror"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/apperror"
 )
 
 func TestNew(t *testing.T) {

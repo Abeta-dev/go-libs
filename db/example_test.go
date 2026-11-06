@@ -6,8 +6,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/abeta-dev/go-libs/db"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/umesh0492/go-libs/db"
 )
 
 func ExampleGetQuerier() {

@@ -14,10 +14,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/abeta-dev/go-libs/httpclient"
+	"github.com/abeta-dev/go-libs/retry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/httpclient"
-	"github.com/umesh0492/go-libs/retry"
 )
 
 func TestRoundTrip_DrainedBodyRewoundOnRetry(t *testing.T) {

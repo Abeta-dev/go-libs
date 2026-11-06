@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/ginmw"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/umesh0492/go-libs/ginmw"
 )
 
 func init() {

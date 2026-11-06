@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/umesh0492/go-libs/retry"
+	"github.com/abeta-dev/go-libs/retry"
 )
 
 func ExampleDo() {

@@ -1,6 +1,6 @@
 # System Architecture & Technical Blueprint
 
-This document defines the architectural topology, layering boundaries, middleware pipeline ordering, and systemic engineering contracts for `github.com/umesh0492/go-libs`.
+This document defines the architectural topology, layering boundaries, middleware pipeline ordering, and systemic engineering contracts for `github.com/abeta-dev/go-libs`.
 
 ---
 
@@ -102,38 +102,38 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 | Package | Layer | Primary Responsibility | Key Types / Constructors |
 |---|:---:|---|---|
 | `apperror` | 1 | Canonical error codes and structured error wrapping | `Error`, `Code`, `New`, `Wrap` |
-| `async` | 2 | Panic-safe goroutines and bounded concurrency orchestration | `Go`, `WaitAll`, `WithTimeout` |
+| `async` | 2 | Panic-safe goroutines and bounded concurrency orchestration | `Go`, `GoCtx`, `Parallel`, `ParallelLimit` |
 | `bodylimit` | 3 | HTTP request body size bounding | `New`, `MB`, `KB` |
 | `cache` | 2 | Typed cache with singleflight and eviction policies | `TypedCache`, `NewTypedCache`, `WithEvictionPolicy` |
 | `circuitbreaker` | 2 | 3-state failure machine for outbound dependencies | `ConsecutiveBreaker`, `RatioBreaker`, `NewConsecutiveBreaker` |
 | `clock` | 1 | Mockable time abstraction with RealClock and advanceable FakeClock | `Clock`, `RealClock`, `FakeClock`, `NewReal`, `NewFake` |
 | `cryptoutil` | 1 | Bcrypt hashing (cost 12) and CSPRNG string generation | `HashPassword`, `GenerateTempPassword` |
-| `db` | 3 | PostgreSQL pgxpool lifecycle and DBTX querier abstraction | `Connect`, `DBTX`, `WithMaxConns` |
+| `db` | 3 | PostgreSQL pgxpool lifecycle, DBTX querier abstraction, and transactional helpers | `Connect`, `DBTX`, `WithTx`, `WithQuerier`, `GetQuerier`, `WithMaxConns` |
 | `env` | 1 | Zero-dependency typed environment variable retrieval | `String`, `Int`, `Bool`, `MustString` |
-| `fsm` | 2 | Declarative in-memory finite state machine with O(1) state transitions | `Machine`, `New`, `Transition`, `Can` |
-| `ginmw` | 4 | Complete Gin-native middleware pipeline and token utilities | `RequestID`, `Telemetry`, `AuthMiddleware`, `RBAC` |
+| `fsm` | 2 | Declarative in-memory finite state machine with O(1) state transitions | `Machine`, `NewMachine`, `Transition`, `CanTransition`, `ValidateTransition` |
+| `ginmw` | 4 | Complete Gin-native middleware pipeline and token utilities | `RequestID`, `Telemetry`, `AuthMiddleware`, `RBAC`, `REDMetrics` |
 | `health` | 3 | Kubernetes-compliant liveness and readiness probes | `Handler`, `New`, `WithChecker` |
 | `httpclient` | 3 | Resilient composed HTTP client pipeline with circuit breaker, rate limit, and retry | `New`, `NewRoundTripper`, `WithRetry`, `WithCircuitBreaker` |
 | `httputil` | 3 | Standard JSON response envelopes and domain error mapping | `OK`, `Created`, `ErrorFromDomain` |
 | `idempotency` | 3 | Two-phase atomic request locking and response replay | `Store`, `MemoryStore`, `PGStore`, `NewPGStore`, `Middleware` |
-| `jwks` | 3 | Thread-safe cached ECDSA P-256 JWKS public key resolver | `KeySet`, `New`, `Fetch`, `Key` |
+| `jwks` | 3 | Thread-safe cached ECDSA P-256 JWKS public key resolver | `Resolver`, `NewResolver`, `GetECPublicKey` |
 | `logger` | 1 | Context-aware structured JSON logging via `log/slog` | `Default`, `WithContext`, `FromContext` |
 | `maputil` | 1 | Generic type-safe map transformations | `Merge`, `Filter` |
 | `metrics` | 1 | Framework-agnostic instrumentation interfaces | `Counter`, `Gauge`, `Histogram` |
-| `pagination` | 3 | Clamped offset pagination and SQL calculations | `Parse`, `Offset`, `Response` |
-| `ratelimit` | 3 | In-memory IP rate limiting (TokenBucket, SlidingWindow) | `NewTokenBucket`, `NewSlidingWindow` |
+| `pagination` | 3 | Clamped offset and cursor pagination and SQL calculations | `Parse`, `Offset`, `Response`, `ParseCursor`, `EncodeCursor`, `DecodeCursor` |
+| `ratelimit` | 3 | In-memory and PostgreSQL IP rate limiting (TokenBucket, SlidingWindow) | `NewTokenBucket`, `NewSlidingWindow`, `NewPGRateLimiter` |
 | `rbac` | 3 | Multi-segment wildcard permission evaluator | `Match`, `HasPermission` |
 | `rbaccontext` | 3 | Context-bound permission attachment and verification | `WithPermissions`, `Can`, `CanAll` |
 | `recovery` | 3 | Panic recovery middleware with structured logging | `Middleware`, `WithLogger` |
 | `requestid` | 3 | Correlation ID extraction and context propagation | `Middleware`, `FromContext` |
-| `retry` | 2 | Context-aware retry execution with backoff algorithms | `Do`, `Constant`, `ExponentialJitter` |
+| `retry` | 2 | Context-aware retry execution with backoff algorithms | `Do`, `DoWithResult`, `Constant`, `ExponentialJitter` |
 | `securityheaders` | 3 | OWASP defensive security headers middleware | `New`, `Default` |
 | `shutdown` | 2 | Coordinated graceful OS signal teardown manager | `Manager`, `New`, `Register`, `Wait` |
 | `sliceutil` | 1 | Generic slice algorithms | `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`, `First` |
-| `stringutil` | 1 | Sensitive data masking and secure random generators | `MaskEmail`, `MaskPhone`, `RandomAlphanumeric`, `RandomSecureString` |
+| `stringutil` | 1 | Sensitive data masking, truncation, and secure random generators | `MaskEmail`, `MaskPhone`, `Truncate`, `RandomAlphanumeric`, `RandomSecureString` |
 | `telemetry` | 3 | OpenTelemetry provider initialization and span helpers | `InitProvider`, `NewTracerProvider`, `StartSpan` |
 | `timeutil` | 1 | UTC normalization and business day calculations | `NowIn`, `FormatIn`, `AddBusinessDays`, `StartOfDay`, `EndOfDay` |
-| `uuidutil` | 1 | Centralized RFC 4122 UUID operations and validation | `New`, `Parse`, `IsValid`, `Nil` |
+| `uuidutil` | 1 | Centralized RFC 4122 / RFC 9562 UUID v4 & v7 operations and validation | `New`, `NewString`, `NewV7`, `NewV7String`, `Parse`, `IsValid`, `Nil` |
 | `validation` | 3 | Format `validator/v10` errors into clean client JSON | `FormatErrors`, `FieldError` |
 | `workerpool` | 2 | Bounded, panic-safe background worker pool | `Pool`, `New`, `Submit`, `SubmitContext` |
 
@@ -170,19 +170,19 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/cache"
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/db"
-	"github.com/umesh0492/go-libs/env"
-	"github.com/umesh0492/go-libs/ginmw"
-	"github.com/umesh0492/go-libs/health"
-	"github.com/umesh0492/go-libs/httputil"
-	"github.com/umesh0492/go-libs/idempotency"
-	"github.com/umesh0492/go-libs/logger"
-	"github.com/umesh0492/go-libs/recovery"
-	"github.com/umesh0492/go-libs/shutdown"
-	"github.com/umesh0492/go-libs/telemetry"
-	"github.com/umesh0492/go-libs/workerpool"
+	"github.com/abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/db"
+	"github.com/abeta-dev/go-libs/env"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/health"
+	"github.com/abeta-dev/go-libs/httputil"
+	"github.com/abeta-dev/go-libs/idempotency"
+	"github.com/abeta-dev/go-libs/logger"
+	"github.com/abeta-dev/go-libs/recovery"
+	"github.com/abeta-dev/go-libs/shutdown"
+	"github.com/abeta-dev/go-libs/telemetry"
+	"github.com/abeta-dev/go-libs/workerpool"
 )
 
 func main() {
@@ -190,9 +190,8 @@ func main() {
 	port := env.String("PORT", "8080")
 
 	// 1. Telemetry Provider (Instance-scoped or Global)
-	tp, tpCleanup, _ := telemetry.NewTracerProvider(
-		telemetry.WithServiceName("order-service"),
-	)
+	tp, tpCleanup, _ := telemetry.NewTracerProvider("order-service")
+	_ = tp
 	defer tpCleanup(context.Background())
 
 	// 2. Database Connection Pool
@@ -204,7 +203,7 @@ func main() {
 	}
 
 	// 3. Resiliency Components
-	memCache := cache.NewTypedCache[string](cache.WithCapacity(5000), cache.WithEvictionPolicy(cache.EvictionLRU))
+	memCache := cache.NewTypedCache[string](5000, cache.WithEvictionPolicy(cache.PolicyLRU))
 	idemStore := idempotency.NewMemoryStore()
 	breaker := circuitbreaker.NewConsecutiveBreaker(5, 30*time.Second)
 	poolWorker := workerpool.New(8, 200)
@@ -217,15 +216,15 @@ func main() {
 	r.Use(ginmw.RequestID())
 	r.Use(ginmw.LimitBodyDefault())
 	r.Use(ginmw.CORS([]string{"*"}))
-	r.Use(recovery.Middleware(recovery.WithLogger(log)))
+	r.Use(ginmw.Recovery(log))
 	r.Use(ginmw.Logger())
 	r.Use(ginmw.Telemetry("order-service"))
 	r.Use(ginmw.GlobalRateLimit())
 
 	// Health Probes
 	h := health.New(health.WithChecker("db", func(c context.Context) error { return pool.Ping(c) }))
-	r.GET("/healthz", gin.WrapH(h.LivenessHandler()))
-	r.GET("/readyz", gin.WrapH(h.ReadinessHandler()))
+	r.GET("/healthz", gin.WrapF(health.LivenessHandler))
+	r.GET("/readyz", gin.WrapF(h.Handler))
 
 	// Mutating route protected by idempotency
 	api := r.Group("/api/v1")
@@ -253,15 +252,13 @@ func main() {
 		}
 	}()
 
-	mgr := shutdown.New(15 * time.Second)
-	mgr.Register("http", func(c context.Context) error { return srv.Shutdown(c) })
-	mgr.Register("workers", func(c context.Context) error { poolWorker.Stop(); return nil })
-	mgr.Register("db", func(c context.Context) error { pool.Close(); return nil })
-	mgr.Register("cache", func(c context.Context) error { return memCache.Close() })
+	mgr := shutdown.New(shutdown.WithTimeout(15 * time.Second))
+	mgr.Register(func(c context.Context) error { return srv.Shutdown(c) })
+	mgr.Register(func(c context.Context) error { poolWorker.Stop(); return nil })
+	mgr.Register(func(c context.Context) error { pool.Close(); return nil })
+	mgr.Register(func(c context.Context) error { memCache.Stop(); return nil })
 
-	if err := mgr.Wait(); err != nil {
-		log.Error("shutdown failed", slog.Any("error", err))
-	}
+	mgr.Wait()
 }
 ```
 

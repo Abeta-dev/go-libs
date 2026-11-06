@@ -4,8 +4,8 @@
 package ginmw
 
 import (
+	"github.com/abeta-dev/go-libs/securityheaders"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/securityheaders"
 )
 
 // SecurityHeaders sets defensive HTTP headers on every response.

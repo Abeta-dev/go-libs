@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/abeta-dev/go-libs/shutdown"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/shutdown"
 )
 
 func TestManager_GracefulExecution(t *testing.T) {

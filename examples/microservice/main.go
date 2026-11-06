@@ -16,23 +16,30 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/abeta-dev/go-libs/apperror"
+	"github.com/abeta-dev/go-libs/async"
+	"github.com/abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/env"
+	"github.com/abeta-dev/go-libs/fsm"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/health"
+	"github.com/abeta-dev/go-libs/httpclient"
+	"github.com/abeta-dev/go-libs/httputil"
+	"github.com/abeta-dev/go-libs/idempotency"
+	"github.com/abeta-dev/go-libs/logger"
+	"github.com/abeta-dev/go-libs/maputil"
+	"github.com/abeta-dev/go-libs/pagination"
+	"github.com/abeta-dev/go-libs/retry"
+	"github.com/abeta-dev/go-libs/shutdown"
+	"github.com/abeta-dev/go-libs/sliceutil"
+	"github.com/abeta-dev/go-libs/stringutil"
+	"github.com/abeta-dev/go-libs/timeutil"
+	"github.com/abeta-dev/go-libs/uuidutil"
+	"github.com/abeta-dev/go-libs/validation"
+	"github.com/abeta-dev/go-libs/workerpool"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/apperror"
-	"github.com/umesh0492/go-libs/cache"
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/env"
-	"github.com/umesh0492/go-libs/ginmw"
-	"github.com/umesh0492/go-libs/health"
-	"github.com/umesh0492/go-libs/httpclient"
-	"github.com/umesh0492/go-libs/httputil"
-	"github.com/umesh0492/go-libs/logger"
-	"github.com/umesh0492/go-libs/pagination"
-	"github.com/umesh0492/go-libs/retry"
-	"github.com/umesh0492/go-libs/shutdown"
-	"github.com/umesh0492/go-libs/sliceutil"
-	"github.com/umesh0492/go-libs/timeutil"
-	"github.com/umesh0492/go-libs/workerpool"
 )
 
 // Config encapsulates environment-driven configuration for the microservice.
@@ -319,8 +326,10 @@ func NewApp(opts ...AppOption) *App {
 		ginmw.Recovery(ginmw.WithRecoveryLogger(appLogger)),
 		ginmw.Logger(),
 		ginmw.Telemetry("order-service"),
+		ginmw.REDMetrics(),
 		ginmw.GlobalRateLimit(),
 		ginmw.LimitBodyDefault(),
+		ginmw.Idempotency(idempotency.NewMemoryStore()),
 		func(c *gin.Context) {
 			start := appOpts.clk.Now()
 			c.Next()
@@ -379,6 +388,7 @@ func (a *App) registerRoutes() {
 
 	// Observability & Metrics
 	a.Router.GET("/metrics", a.handleMetrics)
+	a.Router.GET("/metrics/red", ginmw.MetricsEndpoint())
 
 	// API endpoints
 	v1 := a.Router.Group("/api/v1")
@@ -386,6 +396,7 @@ func (a *App) registerRoutes() {
 	v1.GET("/items/:id", a.handleGetItemByID)
 	v1.GET("/quotes", a.handleGetQuote)
 	v1.POST("/tasks", a.handleCreateTask)
+	v1.POST("/orders/transition", a.handleOrderTransition)
 }
 
 func (a *App) handleMetrics(c *gin.Context) {
@@ -635,24 +646,80 @@ type createTaskRequest struct {
 func (a *App) handleCreateTask(c *gin.Context) {
 	var req createTaskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		httputil.ValidationError(c.Writer, err.Error())
+		fields := validation.FormatErrors(err)
+		httputil.ValidationError(c.Writer, fields[0].Field+": "+fields[0].Message)
 		return
 	}
+
+	cleanPayload := stringutil.Truncate(req.Payload, 256)
+	taskID := uuidutil.NewV7String()
 
 	// Use logger from context
 	reqLogger := logger.FromContext(c.Request.Context())
 
 	// Submit async work to bounded workerpool
 	if err := a.Pool.Submit(func() {
-		reqLogger.Info("executing async background task", slog.String("payload", req.Payload))
+		reqLogger.Info("executing async background task",
+			slog.String("task_id", taskID),
+			slog.String("payload", cleanPayload),
+		)
 	}); err != nil {
 		httputil.Error(c.Writer, err.Error(), http.StatusServiceUnavailable)
 		return
 	}
 
-	httputil.Created(c.Writer, map[string]string{
-		"status":  "queued",
-		"payload": req.Payload,
+	resp := maputil.Merge(
+		map[string]string{"task_id": taskID, "status": "queued"},
+		map[string]string{"payload": cleanPayload},
+	)
+	httputil.Created(c.Writer, resp)
+}
+
+type orderTransitionRequest struct {
+	FromState string `json:"from_state" binding:"required"`
+	ToState   string `json:"to_state" binding:"required"`
+	Action    string `json:"action" binding:"required"`
+}
+
+var orderFSM = fsm.NewMachine([]fsm.Transition{
+	{From: "PENDING", To: "PAID", Action: "pay"},
+	{From: "PAID", To: "SHIPPED", Action: "ship"},
+	{From: "SHIPPED", To: "DELIVERED", Action: "deliver"},
+	{From: "PENDING", To: "CANCELLED", Action: "cancel"},
+})
+
+func (a *App) handleOrderTransition(c *gin.Context) {
+	var req orderTransitionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fields := validation.FormatErrors(err)
+		httputil.ValidationError(c.Writer, fields[0].Field+": "+fields[0].Message)
+		return
+	}
+
+	if err := orderFSM.ValidateTransition(req.FromState, req.ToState, req.Action); err != nil {
+		httputil.ErrorFromDomain(c.Writer, apperror.Conflict(err.Error()))
+		return
+	}
+
+	var auditChecked, inventoryChecked atomic.Bool
+	_ = async.Parallel(c.Request.Context(),
+		func(ctx context.Context) error {
+			auditChecked.Store(true)
+			return nil
+		},
+		func(ctx context.Context) error {
+			inventoryChecked.Store(true)
+			return nil
+		},
+	)
+
+	httputil.OK(c.Writer, map[string]any{
+		"order_id":          uuidutil.NewV7String(),
+		"from_state":        req.FromState,
+		"to_state":          req.ToState,
+		"action":            req.Action,
+		"audit_checked":     auditChecked.Load(),
+		"inventory_checked": inventoryChecked.Load(),
 	})
 }
 

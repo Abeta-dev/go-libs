@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/umesh0492/go-libs/cache"
+	"github.com/abeta-dev/go-libs/cache"
 )
 
 func BenchmarkTTL_GetSet(b *testing.B) {

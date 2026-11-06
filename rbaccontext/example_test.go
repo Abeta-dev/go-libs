@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/umesh0492/go-libs/rbaccontext"
+	"github.com/abeta-dev/go-libs/rbaccontext"
 )
 
 func ExampleCan() {

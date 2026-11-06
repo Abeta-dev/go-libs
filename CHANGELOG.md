@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-11-05
+
+### Added
+- **`db`**: Added `WithTx`, `WithQuerier`, and `TxBeginner` to execute transactional closures with automatic panic/error rollback and context-bound `DBTX` propagation via `GetQuerier`.
+- **`uuidutil`**: Added `NewV7` and `NewV7String` for RFC 9562 time-ordered UUIDv7 generation, plus `example_test.go` across `async`, `fsm`, `jwks`, and `uuidutil`, and package `README.md` documentation for `clock` and `httpclient`.
+
+### Changed
+- **Module Path Migration**: Migrated canonical Go module path from `github.com/umesh0492/go-libs` to `github.com/abeta-dev/go-libs` across `go.mod`, `examples/microservice`, all 35 packages, CI/CD workflows, and documentation.
+- **`ginmw`**:
+  - Fixed `GlobalRateLimit` and `AuthRateLimit` to call `c.Abort()` when the underlying rate limiter writes `429 Too Many Requests`, preventing downstream handlers from executing.
+  - Updated `CORS` to support `"*"` wildcard in `allowedOrigins` and omit `Access-Control-Allow-*` headers on disallowed origins.
+  - Updated `RequestID` and `Logger` to enrich `c.Request.Context()` with a request-scoped `slog.Logger` carrying `request_id`.
+- **`jwks`**: Fixed `Resolver` cache refresh to atomically swap the key map (evicting rotated-out keys) and restricted single-key fallback in `GetECPublicKey` to empty `kid` headers (`kid == ""`).
+- **Test Coverage**: Achieved 100.0% statement coverage across all packages in the repository.
+
 ## [0.3.3] - 2026-11-05
 
 ### Security & Hardening
@@ -30,14 +45,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security & Hardening
 - Dependency Updates: Bumped `github.com/gin-gonic/gin` to v1.12.0, `github.com/jackc/pgx/v5` to v5.11.0, `golang.org/x/crypto` to v0.57.0, and `golang.org/x/sync` to v0.23.0 to resolve downstream security advisories including transitive `quic-go` vulnerabilities.
-- OpenSSF Scorecard & CI Pinning: Corrected repository paths and OpenSSF Scorecard configuration for `Abeta-dev/go-libs`, and pinned GitHub Actions across all workflows to immutable commit SHAs.
+- OpenSSF Scorecard & CI Pinning: Corrected repository paths and OpenSSF Scorecard configuration for `abeta-dev/go-libs`, and pinned GitHub Actions across all workflows to immutable commit SHAs.
 
 ### Added
 - CI & Quality Gate: Introduced unified CI Quality Gate workflow with intelligent path filtering (`dorny/paths-filter`) to optimize build times and conserve CI minutes.
 - Documentation Portal: Added GitHub Pages deployment workflow deploying the interactive web portal for enterprise library documentation.
 
 ### Changed
-- Repository Attribution: Standardized canonical documentation links, code of conduct, and security disclosure policies to `Abeta-dev`.
+- Repository Attribution: Standardized canonical documentation links, code of conduct, and security disclosure policies to `abeta-dev`.
 
 ## [0.3.0] - 2026-09-17
 

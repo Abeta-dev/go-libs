@@ -1,6 +1,6 @@
 # Branch Protection & Community Access Policy
 
-To maintain production stability, zero-regression guarantees, and security compliance for `github.com/umesh0492/go-libs`, the `main` branch is protected by automated GitHub branch protection rules, paired with open community access policies.
+To maintain production stability, zero-regression guarantees, and security compliance for `github.com/abeta-dev/go-libs`, the `main` branch is protected by automated GitHub branch protection rules, paired with open community access policies.
 
 ---
 
@@ -38,7 +38,7 @@ To maintain production stability, zero-regression guarantees, and security compl
 1. **Issues**: Open for all community members to report bugs, propose feature requests, or discuss architectural enhancements.
 2. **Discussions**: Open for community questions, ideas, and architecture debates.
 3. **Fork & Pull Request Workflow**:
-   - Community contributors fork `https://github.com/Abeta-dev/go-libs`.
+   - Community contributors fork `https://github.com/abeta-dev/go-libs`.
    - Submit Pull Requests against `main`.
    - Automated CI runs verification on PRs.
    - Maintainers review and merge once all 4 mandatory status checks pass.

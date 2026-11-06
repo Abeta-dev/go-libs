@@ -6,7 +6,7 @@
 //
 // Usage:
 //
-//	import "github.com/umesh0492/go-libs/health"
+//	import "github.com/abeta-dev/go-libs/health"
 //
 //	// Minimal — liveness only
 //	router.Get("/health", health.LivenessHandler)

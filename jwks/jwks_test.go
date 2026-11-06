@@ -13,7 +13,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/umesh0492/go-libs/jwks"
+	"github.com/abeta-dev/go-libs/jwks"
 )
 
 func testExtractXY(t *testing.T, pub *ecdsa.PublicKey) (string, string) {
@@ -195,5 +195,17 @@ func TestJWKS_PackageLevelHelper(t *testing.T) {
 	key, err := jwks.GetECPublicKey("pkg-kid", server.URL)
 	if err != nil || key == nil {
 		t.Fatalf("expected package-level GetECPublicKey to succeed, got: %v", err)
+	}
+
+	// Empty kid falls back to single key in JWKS
+	keyEmpty, err := jwks.GetECPublicKey("", server.URL)
+	if err != nil || keyEmpty == nil {
+		t.Fatalf("expected empty kid to fall back to sole key, got: %v", err)
+	}
+
+	// Explicit mismatched kid returns error instead of wrong key
+	resolver := jwks.NewResolver()
+	if _, err := resolver.GetECPublicKey("wrong-kid", server.URL); err == nil {
+		t.Fatal("expected error for mismatched kid")
 	}
 }

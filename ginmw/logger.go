@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/abeta-dev/go-libs/logger"
+	"github.com/abeta-dev/go-libs/requestid"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/logger"
-	"github.com/umesh0492/go-libs/requestid"
 )
 
 // LoggerOption defines functional configuration for the Logger middleware.
@@ -37,6 +37,22 @@ func Logger(opts ...LoggerOption) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		start := time.Now()
+
+		baseLogger := cfg.logger
+		if baseLogger == nil {
+			baseLogger = logger.FromContext(c.Request.Context())
+		}
+
+		preReqID := c.GetString("request_id")
+		if preReqID == "" {
+			preReqID = requestid.FromContext(c.Request.Context())
+		}
+		if preReqID != "" {
+			c.Request = c.Request.WithContext(
+				logger.WithContext(c.Request.Context(), baseLogger.With(slog.String("request_id", preReqID))),
+			)
+		}
+
 		c.Next()
 		latency := time.Since(start)
 
@@ -45,12 +61,7 @@ func Logger(opts ...LoggerOption) gin.HandlerFunc {
 			reqID = requestid.FromContext(c.Request.Context())
 		}
 
-		l := cfg.logger
-		if l == nil {
-			l = logger.FromContext(c.Request.Context())
-		}
-
-		l.Info("HTTP request handled",
+		baseLogger.Info("HTTP request handled",
 			slog.String("request_id", reqID),
 			slog.String("method", c.Request.Method),
 			slog.String("path", c.Request.URL.Path),

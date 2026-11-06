@@ -1,12 +1,12 @@
-# go-libs · latest published v0.3.3
+# go-libs · latest published v0.4.0
 
 Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 35 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/umesh0492/go-libs.svg)](https://pkg.go.dev/github.com/umesh0492/go-libs)
+[![Go Reference](https://pkg.go.dev/badge/github.com/abeta-dev/go-libs.svg)](https://pkg.go.dev/github.com/abeta-dev/go-libs)
 [![Code Quality: golangci-lint](https://img.shields.io/badge/code%20quality-golangci--lint-brightgreen?logo=go)](https://golangci-lint.run/)
-[![CI](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/Abeta-dev/go-libs/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Abeta-dev/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Abeta-dev/go-libs/badge)](https://scorecard.dev/viewer/?uri=github.com/Abeta-dev/go-libs)
+[![CI](https://github.com/abeta-dev/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/abeta-dev/go-libs/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/abeta-dev/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/abeta-dev/go-libs/badge)](https://scorecard.dev/viewer/?uri=github.com/abeta-dev/go-libs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Shared, zero-business-logic Go libraries and middleware for cloud-native microservices.
@@ -14,7 +14,7 @@ Shared, zero-business-logic Go libraries and middleware for cloud-native microse
 > 📖 **Engineering Documentation & Architecture Blueprint**  
 > Complete subsystem guides, module selection flowcharts, architectural rationales, and execution topologies:  
 > - 🏛️ **[System Architecture & Blueprint](docs/ARCHITECTURE.md)** (Topology, Layering Boundaries, Middleware Order)  
-> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.3.3 release ledger, API errata, and evolution)
+> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.4.0 release ledger, API errata, and evolution)
 > - 🏷️ **[Versioning & Stability Matrix](docs/VERSIONING.md)** (Semantic versioning contracts and package tiers)  
 > - ⚡ **[Performance Benchmarks](BENCHMARKS.md)**  
 > - 📝 **[Decisions & Architecture Records](docs/adr/0001-domain-decoupling-and-audit-sink.md)**  
@@ -26,7 +26,7 @@ Each package is independently importable, fully tested with verified statement c
 This repository uses a **Single Module Monorepo** pattern. There is only *one* `go.mod` file at the root of `go-libs`. 
 
 **Why is this the best "BOM" (Bill of Materials) way?**
-By having a single `github.com/umesh0492/go-libs@v0.3.3` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
+By having a single `github.com/abeta-dev/go-libs@v0.4.0` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
 
 ### Minimal-Footprint Imports
 
@@ -46,7 +46,7 @@ package main
 import (
 	"fmt"
 	"time"
-	"github.com/umesh0492/go-libs/shutdown"
+	"github.com/abeta-dev/go-libs/shutdown"
 )
 
 func main() {
@@ -56,7 +56,7 @@ func main() {
 EOF
 
 # 3. Resolve dependencies
-go get github.com/umesh0492/go-libs@v0.3.3
+go get github.com/abeta-dev/go-libs@v0.4.0
 go mod tidy
 
 # 4. Prove no heavy frameworks exist in go.sum (exits 0 with zero output if clean)
@@ -70,7 +70,7 @@ grep -E 'gin-gonic|jackc/pgx|opentelemetry' go.sum || echo "VERIFIED: Zero heavy
 ## Installation
 
 ```bash
-go get github.com/umesh0492/go-libs@v0.3.3
+go get github.com/abeta-dev/go-libs@v0.4.0
 ```
 
 Requirements:
@@ -87,7 +87,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/umesh0492/go-libs/retry"
+	"github.com/abeta-dev/go-libs/retry"
 )
 
 cfg := retry.Config{
@@ -109,7 +109,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/umesh0492/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
 )
 
 // Trips open after 3 consecutive failures; re-tests after 500ms
@@ -127,7 +127,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/umesh0492/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/ratelimit"
 )
 
 // Standalone in-memory rate limiter (100 req / minute)
@@ -147,12 +147,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/umesh0492/go-libs/cache"
+	"github.com/abeta-dev/go-libs/cache"
 )
 
 c := cache.NewTypedCache[UserProfile](
-	cache.WithCapacity[UserProfile](10_000),
-	cache.WithEvictionPolicy[UserProfile](cache.EvictionSampledLRU),
+	10_000,
+	cache.WithEvictionPolicy(cache.PolicySampledLRU),
 )
 
 // Singleflight prevents concurrent thundering herd queries for identical keys
@@ -165,12 +165,12 @@ profile, err := c.GetOrFetch(ctx, "user:123", 5*time.Minute, func(ctx context.Co
 Fixed-size worker pools with task buffering, metric collection, and graceful drain-and-stop:
 ```go
 import (
-	"github.com/umesh0492/go-libs/workerpool"
+	"github.com/abeta-dev/go-libs/workerpool"
 )
 
 // 4 concurrent workers, queue buffer of 100 tasks
 wp := workerpool.New(4, 100)
-defer wp.StopWait() // drains remaining queue before shutting down
+defer wp.Stop() // drains remaining queue before shutting down
 
 _ = wp.Submit(func() {
 	processJob(job)
@@ -183,7 +183,7 @@ Safe environment parsing with sensible fallbacks and zero external reflection de
 import (
 	"time"
 
-	"github.com/umesh0492/go-libs/env"
+	"github.com/abeta-dev/go-libs/env"
 )
 
 port := env.Int("PORT", 8080)
@@ -196,7 +196,7 @@ appName := env.String("APP_NAME", "order-service")
 Canonical typed error codes mapping cleanly to HTTP status codes with `errors.Is` support:
 ```go
 import (
-	"github.com/umesh0492/go-libs/apperror"
+	"github.com/abeta-dev/go-libs/apperror"
 )
 
 func FindUser(id string) (*User, error) {
@@ -274,7 +274,7 @@ helm upgrade --install microservice ./deploy/helm/microservice
 | `stringutil` | `/stringutil` | `OrDefault`, `MaskEmail`, `MaskPhone`, `TrimAndLower`, `Truncate`, `RandomStringFromReader` — safe string operations |
 | `timeutil` | `/timeutil` | `NowIn(loc)`, `FormatIn`, `StartOfDay`, `EndOfDay`, `AddBusinessDays` — parametric time helpers |
 | `cryptoutil` | `/cryptoutil` | `GenerateTempPassword(n)`, `HashPassword(pwd)`, `ComparePassword(hash, pwd)` — secure credential helpers backed by `crypto/rand` (CSPRNG) and `golang.org/x/crypto/bcrypt` (OWASP cost factor 12) |
-| `uuidutil` | `/uuidutil` | `New`, `NewString`, `Parse`, `ParsePtr`, `MustParse`, `IsValid`, `IsNil` — centralized RFC 4122 UUID operations |
+| `uuidutil` | `/uuidutil` | `New`, `NewString`, `NewV7`, `NewV7String`, `Parse`, `ParsePtr`, `MustParse`, `IsValid`, `IsNil` — centralized RFC 4122 / RFC 9562 UUID v4 & v7 operations |
 
 ---
 
@@ -302,7 +302,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
  
 | Package | Import suffix | Key exports & Description |
 |---|---|---|
-| `db` | `/db` | `Connect(ctx, url, opts)`, `GetQuerier(ctx, pool)`, `DBTX` interface — pgx connection pool wrapper |
+| `db` | `/db` | `Connect(ctx, url, opts)`, `WithTx(ctx, pool, fn)`, `WithQuerier(ctx, q)`, `GetQuerier(ctx, pool)`, `DBTX` interface — pgx connection pool & transaction wrapper |
 | `rbac` | `/rbac` | `NewEngine()`, `Engine.Match(pattern, action)` — role-based access control engine |
 | `rbaccontext` | `/rbaccontext` | `WithPermissions(ctx, perms)`, `Can(ctx, perm)`, `CanAny(ctx, perms...)` — permission helpers |
 | `telemetry` | `/telemetry` | `NewTracerProvider(opts...)`, `InitProvider(tp)`, `StartSpan(ctx, tracer, span)` — OpenTelemetry distributed tracing |
@@ -310,7 +310,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 
 > [!NOTE]
 > **Domain & Application Accelerators**:
-> High-level business and application-layer capabilities (Multi-channel Notifications, PDF Generation with GST Invoice Templates, Transactional Outbox Engine with PostgreSQL DDL, Localized Indian Fintech Helpers, Partitioned Audit Logging, and Streaming Data Export) are maintained in the companion accelerator repository: [**`github.com/Abeta-dev/go-app-kit`**](https://github.com/Abeta-dev/go-app-kit).
+> High-level business and application-layer capabilities (Multi-channel Notifications, PDF Generation with GST Invoice Templates, Transactional Outbox Engine with PostgreSQL DDL, Localized Indian Fintech Helpers, Partitioned Audit Logging, and Streaming Data Export) are maintained in the companion accelerator repository: [**`github.com/abeta-dev/go-app-kit`**](https://github.com/abeta-dev/go-app-kit).
 
 ---
 
@@ -353,48 +353,48 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 Coverage across all 35 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
-> **Overall Repository Statement Coverage: 96.0%** (Zero data races across `-race`)
+> **Overall Repository Statement Coverage: 100.0%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
 > **Quality Standard: Strict per-package floor >= 85.0% enforced by `./scripts/check_coverage.sh`**
 
 | Package | Purpose | Statement Coverage |
 |---|---|---|
 | `apperror` | Canonical structured application error codes and helpers | **100.0%** |
-| `async` | Panic-safe goroutines and bounded concurrency orchestration | **95.7%** |
+| `async` | Panic-safe goroutines and bounded concurrency orchestration | **100.0%** |
 | `bodylimit` | Gin middleware to cap HTTP request body sizes | **100.0%** |
-| `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **87.5%** |
-| `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **93.3%** |
-| `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **95.2%** |
+| `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **100.0%** |
+| `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **100.0%** |
+| `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **100.0%** |
 | `cryptoutil` | Secure password hashing (`golang.org/x/crypto/bcrypt`) and CSPRNG password generation (`crypto/rand`) | **100.0%** |
 | `db` | Database Pool & Querier | **100.0%** |
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |
 | `fsm` | Declarative in-memory finite state machine with O(1) state transitions | **100.0%** |
 | `ginmw` | Unified Gin HTTP middleware chain & helper | **100.0%** |
 | `health` | Parallel dependency health check and Kubernetes probe handler | **100.0%** |
-| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **92.9%** |
+| `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **100.0%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
-| `idempotency` | Two-phase HTTP request deduplication | **98.8%** |
-| `jwks` | Thread-safe cached ECDSA P-256 JWKS public key resolver | **89.7%** |
-| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **96.0%** |
+| `idempotency` | Two-phase HTTP request deduplication | **100.0%** |
+| `jwks` | Thread-safe cached ECDSA P-256 JWKS public key resolver | **100.0%** |
+| `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **100.0%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |
-| `pagination` | Offset-based request query parser and generic slice pagination | **97.6%** |
+| `pagination` | Offset-based request query parser and generic slice pagination | **100.0%** |
 | `ratelimit` | IP rate limiters (TokenBucket, SlidingWindow) with CIDR proxy parsing | **100.0%** |
 | `rbac` | Role-Based Access Control logic engine | **100.0%** |
 | `rbaccontext` | Context-based permission lookup helpers | **100.0%** |
 | `recovery` | Panic-to-JSON-500 middleware with structured logging | **100.0%** |
 | `requestid` | Correlation ID generator and context propagator | **100.0%** |
-| `retry` | Context-aware backoff and retry execution algorithms | **90.7%** |
+| `retry` | Context-aware backoff and retry execution algorithms | **100.0%** |
 | `securityheaders` | OWASP secure header injector middleware | **100.0%** |
 | `shutdown` | Graceful concurrent teardown manager | **100.0%** |
 | `sliceutil` | Generic slice algorithms (Reduce, GroupBy, Chunk, Unique, Flatten, First) | **100.0%** |
 | `stringutil` | Sensitive info masking and text helpers | **100.0%** |
 | `telemetry` | OpenTelemetry distributed tracing wrapper | **100.0%** |
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |
-| `uuidutil` | Centralized RFC 4122 UUID operations and validation | **92.3%** |
+| `uuidutil` | Centralized RFC 4122 UUID operations and validation | **100.0%** |
 | `validation` | Declarative validation error formatter | **100.0%** |
 | `workerpool` | Bounded panic-safe concurrent worker pool with metrics & options | **100.0%** |
-| **Total Statement Coverage** | **Cumulative across all packages** | **96.0%** |
+| **Total Statement Coverage** | **Cumulative across all packages** | **100.0%** |
 
 > *Note: The standalone reference microservice (`examples/microservice`) achieves 87.4% integration statement coverage.*
 
@@ -414,7 +414,7 @@ docker compose -f deploy/docker-compose.observability.yml up --build
 ![Grafana Microservice Golden Signals & Resilience Dashboard](docs/assets/grafana-dashboard-preview.png)
 
 > **Looking for full enterprise cluster-wide observability?**  
-> Check out our companion platform repository: [**cloud-native-observability**](https://github.com/Abeta-dev/cloud-native-observability) featuring the complete LGTM stack (Loki, Grafana, Tempo, Prometheus) + OpenTelemetry with ArgoCD GitOps and Google SRE SLO alerting!
+> Check out our companion platform repository: [**cloud-native-observability**](https://github.com/abeta-dev/cloud-native-observability) featuring the complete LGTM stack (Loki, Grafana, Tempo, Prometheus) + OpenTelemetry with ArgoCD GitOps and Google SRE SLO alerting!
 
 ---
 
@@ -464,7 +464,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, [SECU
 
 ### 📦 Repository Provenance & Release Record
 
-`go-libs` is available from the Go module proxy at the latest verified published version, `v0.3.3`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
+`go-libs` is available from the Go module proxy at the latest verified published version, `v0.4.0`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
 
 ---
 

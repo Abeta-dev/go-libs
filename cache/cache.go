@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/metrics"
+	"github.com/abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/metrics"
 	"golang.org/x/sync/singleflight"
 )
 

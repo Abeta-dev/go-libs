@@ -29,7 +29,7 @@ import (
     "context"
     "os"
     "time"
-    "github.com/umesh0492/go-libs/db"
+    "github.com/abeta-dev/go-libs/db"
 )
 
 // Initialize with production pool limits matching container resources:
@@ -45,6 +45,13 @@ if err != nil {
     log.Fatalf("failed to connect to postgres: %v", err)
 }
 defer pool.Close()
+
+// Execute an atomic transaction with context-bound DBTX propagation:
+err = db.WithTx(context.Background(), pool, func(txCtx context.Context) error {
+    q := db.GetQuerier(txCtx, pool)
+    _, err := q.Exec(txCtx, "INSERT INTO orders (id) VALUES ($1)", "ord-1")
+    return err
+})
 ```
 
 ---

@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/abeta-dev/go-libs/clock"
+	"github.com/abeta-dev/go-libs/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/clock"
-	"github.com/umesh0492/go-libs/logger"
 )
 
 func TestDefault(t *testing.T) {

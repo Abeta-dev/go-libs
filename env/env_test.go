@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/abeta-dev/go-libs/env"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/env"
 )
 
 func TestString(t *testing.T) {

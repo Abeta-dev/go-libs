@@ -24,6 +24,20 @@ func NewString() string {
 	return uuid.New().String()
 }
 
+// NewV7 generates a new time-ordered v7 UUID (RFC 9562), falling back to v4 only if the CSPRNG fails.
+func NewV7() UUID {
+	id, err := uuid.NewV7()
+	if err != nil {
+		return uuid.New()
+	}
+	return id
+}
+
+// NewV7String generates a new time-ordered v7 UUID string.
+func NewV7String() string {
+	return NewV7().String()
+}
+
 // Parse parses a UUID string, returning an error on failure.
 func Parse(s string) (UUID, error) {
 	return uuid.Parse(s)

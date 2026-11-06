@@ -1,6 +1,6 @@
-# AGENTS.md — `go-libs` (`github.com/Abeta-dev/go-libs`)
+# AGENTS.md — `go-libs` (`github.com/abeta-dev/go-libs`)
 
-This repository provides **35 focused, production-hardened Go packages** (`v0.3.3`, `Go 1.26.0`) covering HTTP & Gin middleware, resilience & concurrency, data/caching/observability, security & RBAC, and foundational type-safe utilities.
+This repository provides **35 focused, production-hardened Go packages** (`v0.4.0`, `Go 1.26.0`) covering HTTP & Gin middleware, resilience & concurrency, data/caching/observability, security & RBAC, and foundational type-safe utilities.
 
 ## Skill Routing Table
 
@@ -24,5 +24,5 @@ go test -race ./...
 ```
 
 - **Package Count Gate**: `scripts/check_version.sh` enforces `EXPECTED_PKG_COUNT=35`. Adding or removing a top-level package requires updating `EXPECTED_PKG_COUNT` in `scripts/check_version.sh` and documenting the package in `README.md`.
-- **Version Parity Gate**: All `@v` version references in `README.md`, `CONTRIBUTING.md`, and `docs/**/*.md` must match the latest release tag (`@v0.3.3`).
+- **Version Parity Gate**: All `@v` version references in `README.md`, `CONTRIBUTING.md`, and `docs/**/*.md` must match the latest release tag (`@v0.4.0`).
 - **Toolchain Gate**: Requires `Go 1.26.0` (`go.mod` directive `go 1.26.0`).

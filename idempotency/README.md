@@ -28,8 +28,8 @@ The `idempotency` package provides HTTP middleware and store contracts to guaran
 ### 1. Register Idempotency Middleware (`router.go`)
 ```go
 import (
-    "github.com/umesh0492/go-libs/idempotency"
-    "github.com/umesh0492/go-libs/ginmw"
+    "github.com/abeta-dev/go-libs/idempotency"
+    "github.com/abeta-dev/go-libs/ginmw"
 )
 
 // NewMemoryStore is suitable for one process. Use PGStore for multi-replica deployments.

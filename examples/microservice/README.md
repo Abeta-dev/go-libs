@@ -61,23 +61,24 @@ flowchart TD
 
 | Module | Package | Role in Reference Microservice |
 |---|---|---|
-| **Resilient HTTP Client** | `github.com/umesh0492/go-libs/httpclient` | Outbound HTTP client composing circuit breaking, retries with backoff, and timeouts (`httpclient.New`) |
-| **Log Masking** | `github.com/umesh0492/go-libs/logger` | Automatically masks sensitive keys (`password`, `token`, `secret`, `authorization`) via `logger.NewRedactingHandler` |
-| **Time Utilities** | `github.com/umesh0492/go-libs/timeutil` | Date arithmetic and business day quote expiration calculation (`timeutil.AddBusinessDays`) |
-| **Clock Abstraction** | `github.com/umesh0492/go-libs/clock` | Pluggable time source (`clock.Clock`) with real (`clock.NewReal`) and deterministic simulated (`clock.NewFake`) backends |
-| **Circuit Breaker** | `github.com/umesh0492/go-libs/circuitbreaker` | Fails fast when downstream services experience consecutive errors (`circuitbreaker.NewConsecutiveBreaker`) |
-| **Retry with Jitter** | `github.com/umesh0492/go-libs/retry` | Exponential backoff with full jitter for transient failure recovery (`retry.DoWithResult`) |
-| **Typed Cache** | `github.com/umesh0492/go-libs/cache` | In-memory cache with sampled LRU eviction and atomic hit/miss metrics (`cache.NewTypedCache`) |
-| **Bounded Worker Pool** | `github.com/umesh0492/go-libs/workerpool` | Concurrent task dispatch with bounded queue and panic safety (`workerpool.New`) |
-| **Graceful Shutdown** | `github.com/umesh0492/go-libs/shutdown` | Coordinated shutdown hooks for HTTP server, worker pool, and caches (`shutdown.New`) |
-| **Health Probes** | `github.com/umesh0492/go-libs/health` | Kubernetes liveness, readiness, and component health status checkers (`health.New`) |
-| **HTTP Middleware** | `github.com/umesh0492/go-libs/ginmw` | Canonical 12-stage Gin pipeline: RequestID, SecurityHeaders, CORS, RateLimit, Telemetry |
-| **Type-safe Env** | `github.com/umesh0492/go-libs/env` | Environment configuration parsing with fallback defaults (`env.String`, `env.Duration`) |
-| **Domain AppErrors** | `github.com/umesh0492/go-libs/apperror` | Structured domain errors with canonical HTTP status mapping (`apperror.NotFound`, `apperror.BadRequest`) |
-| **Pagination** | `github.com/umesh0492/go-libs/pagination` | Type-safe query parsing and paginated response envelope generation (`pagination.Parse`) |
-| **Slice Utilities** | `github.com/umesh0492/go-libs/sliceutil` | Batching, grouping, and algorithmic slice partitioning (`sliceutil.Chunk`) |
-| **HTTP Utilities** | `github.com/umesh0492/go-libs/httputil` | Standardized JSON envelopes for API responses and errors (`httputil.OK`, `httputil.Error`) |
-| **Panic Recovery** | `github.com/umesh0492/go-libs/recovery` | HTTP middleware intercepting uncaught panics and logging stack traces (`recovery.Middleware`) |
+| **Resilient HTTP Client** | `github.com/abeta-dev/go-libs/httpclient` | Outbound HTTP client composing circuit breaking, retries with backoff, and timeouts (`httpclient.New`) |
+| **Log Masking** | `github.com/abeta-dev/go-libs/logger` | Automatically masks sensitive keys (`password`, `token`, `secret`, `authorization`) via `logger.NewRedactingHandler` |
+| **Time Utilities** | `github.com/abeta-dev/go-libs/timeutil` | Date arithmetic and business day quote expiration calculation (`timeutil.AddBusinessDays`) |
+| **Clock Abstraction** | `github.com/abeta-dev/go-libs/clock` | Pluggable time source (`clock.Clock`) with real (`clock.NewReal`) and deterministic simulated (`clock.NewFake`) backends |
+| **Circuit Breaker** | `github.com/abeta-dev/go-libs/circuitbreaker` | Fails fast when downstream services experience consecutive errors (`circuitbreaker.NewConsecutiveBreaker`) |
+| **Retry with Jitter** | `github.com/abeta-dev/go-libs/retry` | Exponential backoff with full jitter for transient failure recovery (`retry.DoWithResult`) |
+| **Typed Cache** | `github.com/abeta-dev/go-libs/cache` | In-memory cache with sampled LRU eviction and atomic hit/miss metrics (`cache.NewTypedCache`) |
+| **Bounded Worker Pool** | `github.com/abeta-dev/go-libs/workerpool` | Concurrent task dispatch with bounded queue and panic safety (`workerpool.New`) |
+| **Graceful Shutdown** | `github.com/abeta-dev/go-libs/shutdown` | Coordinated shutdown hooks for HTTP server, worker pool, and caches (`shutdown.New`) |
+| **Health Probes** | `github.com/abeta-dev/go-libs/health` | Kubernetes liveness, readiness, and component health status checkers (`health.New`) |
+| **HTTP Middleware** | `github.com/abeta-dev/go-libs/ginmw` | Canonical 12-stage Gin pipeline: RequestID, SecurityHeaders, CORS, RateLimit, Telemetry, Idempotency, REDMetrics |
+| **Type-safe Env** | `github.com/abeta-dev/go-libs/env` | Environment configuration parsing with fallback defaults (`env.String`, `env.Duration`) |
+| **Domain AppErrors** | `github.com/abeta-dev/go-libs/apperror` | Structured domain errors with canonical HTTP status mapping (`apperror.NotFound`, `apperror.BadRequest`) |
+| **Pagination** | `github.com/abeta-dev/go-libs/pagination` | Type-safe query parsing and paginated response envelope generation (`pagination.Parse`) |
+| **Slice & Map Utilities** | `github.com/abeta-dev/go-libs/sliceutil` | Batching, grouping, and algorithmic slice/map partitioning (`sliceutil.Chunk`, `maputil.Merge`) |
+| **HTTP Utilities** | `github.com/abeta-dev/go-libs/httputil` | Standardized JSON envelopes for API responses and errors (`httputil.OK`, `httputil.Error`) |
+| **Panic Recovery** | `github.com/abeta-dev/go-libs/recovery` | HTTP middleware intercepting uncaught panics and logging stack traces (`recovery.Middleware`) |
+| **FSM, Async & UUIDv7** | `github.com/abeta-dev/go-libs/fsm` | Declarative order state transitions (`fsm.NewMachine`), fan-out (`async.Parallel`), and UUIDv7 (`uuidutil.NewV7String`) |
 
 ---
 
@@ -85,7 +86,7 @@ flowchart TD
 
 ### 1. Run Locally (Zero Cloud Dependencies)
 ```bash
-# Run directly with Go 1.23+
+# Run directly with Go 1.26.0+
 go run ./examples/microservice
 ```
 The server binds to `:8080` (configurable via `PORT` environment variable).
@@ -110,7 +111,7 @@ curl -X POST http://localhost:8080/api/v1/tasks \
   -d '{"payload":"process-payment-991"}'
 
 # 5. Outbound Resilience with Circuit Breaker & Retry
-curl "http://localhost:8080/api/v1/quotes?symbols=AAPL,MSFT"
+curl "http://localhost:8080/api/v1/quotes?symbol=AAPL"
 
 # 6. Observability Metrics (Prometheus Text Format)
 curl -H "Accept: text/plain" http://localhost:8080/metrics

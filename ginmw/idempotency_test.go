@@ -9,10 +9,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/idempotency"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/ginmw"
-	"github.com/umesh0492/go-libs/idempotency"
 )
 
 // mockStore for testing errors and specific states

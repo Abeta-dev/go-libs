@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/umesh0492/go-libs/recovery"
+	"github.com/abeta-dev/go-libs/recovery"
 )
 
 func ExampleMiddleware() {

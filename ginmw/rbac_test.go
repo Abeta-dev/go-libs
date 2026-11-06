@@ -8,11 +8,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/rbaccontext"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/ginmw"
-	"github.com/umesh0492/go-libs/rbaccontext"
 )
 
 // MockProvider implements ginmw.PermissionProvider

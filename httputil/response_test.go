@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/umesh0492/go-libs/httputil"
+	"github.com/abeta-dev/go-libs/httputil"
 )
 
 type mockAPIError struct {

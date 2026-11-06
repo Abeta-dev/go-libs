@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/umesh0492/go-libs/async"
+	"github.com/abeta-dev/go-libs/async"
 )
 
 func TestParallel_Success(t *testing.T) {
@@ -184,15 +184,35 @@ func TestParallelLimit_EmptyAndNil(t *testing.T) {
 }
 
 func TestParallelLimit_ContextCancellation(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	cancel()
+	// Case 1: Pre-cancelled context (run multiple iterations so select covers both branches:
+	// outer ctx.Done() before semaphore acquisition and inner ctx.Done() inside worker goroutine)
+	for i := 0; i < 64; i++ {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
 
-	err := async.ParallelLimit(ctx, 2,
+		err := async.ParallelLimit(ctx, 2,
+			func(c context.Context) error {
+				return nil
+			},
+		)
+
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("expected context.Canceled, got: %v", err)
+		}
+	}
+
+	// Case 2: Semaphore full when context cancels (deterministically hits outer select <-ctx.Done())
+	ctx2, cancel2 := context.WithCancel(context.Background())
+	err := async.ParallelLimit(ctx2, 1,
+		func(c context.Context) error {
+			cancel2()
+			time.Sleep(10 * time.Millisecond)
+			return nil
+		},
 		func(c context.Context) error {
 			return nil
 		},
 	)
-
 	if !errors.Is(err, context.Canceled) {
 		t.Fatalf("expected context.Canceled, got: %v", err)
 	}

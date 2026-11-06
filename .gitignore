@@ -17,5 +17,6 @@ gh_*
 gosec.json
 scratch/
 graphify-out/
+release-manifest.json
 testdata/fuzz/
 benchmarks/bench-current.txt

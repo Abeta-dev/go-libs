@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/metrics"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/metrics"
 )
 
 func TestPool_Internal_NilMetricsFallback(t *testing.T) {

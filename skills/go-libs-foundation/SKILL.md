@@ -1,18 +1,18 @@
 ---
 name: go-libs-foundation
-description: Foundational Go utilities and domain error handling using github.com/Abeta-dev/go-libs (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and UUIDs.
+description: Foundational Go utilities and domain error handling using github.com/abeta-dev/go-libs (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and UUIDs.
 ---
 
-# `go-libs-foundation` Subskill (`v0.3.3`)
+# `go-libs-foundation` Subskill (`v0.4.0`)
 
 Packages covered:
-- `github.com/umesh0492/go-libs/apperror`
-- `github.com/umesh0492/go-libs/env`
-- `github.com/umesh0492/go-libs/sliceutil`
-- `github.com/umesh0492/go-libs/maputil`
-- `github.com/umesh0492/go-libs/stringutil`
-- `github.com/umesh0492/go-libs/timeutil`
-- `github.com/umesh0492/go-libs/uuidutil`
+- `github.com/abeta-dev/go-libs/apperror`
+- `github.com/abeta-dev/go-libs/env`
+- `github.com/abeta-dev/go-libs/sliceutil`
+- `github.com/abeta-dev/go-libs/maputil`
+- `github.com/abeta-dev/go-libs/stringutil`
+- `github.com/abeta-dev/go-libs/timeutil`
+- `github.com/abeta-dev/go-libs/uuidutil`
 
 ## 1. Domain Error Taxonomy (`apperror`)
 
@@ -25,7 +25,7 @@ Never return raw database or internal errors (`pgx.ErrNoRows`, SQL syntax errors
 | `apperror.Forbidden(msg)` | `CodeForbidden` (`403`) | RBAC permission denied |
 | `apperror.NotFound(msg)` | `CodeNotFound` (`404`) | Entity lookup miss |
 | `apperror.Conflict(msg)` | `CodeConflict` (`409`) | Duplicate idempotency key or state conflict |
-| `apperror.Internal(msg, cause)` | `CodeInternal` (`500`) | Unexpected infrastructure failure (cause wrapped, never leaked) |
+| `apperror.Internal(cause)` | `CodeInternal` (`500`) | Unexpected infrastructure failure (cause wrapped, never leaked) |
 
 Inspect error codes using `apperror.Is(err, apperror.CodeNotFound)` and `apperror.CodeOf(err)`.
 
@@ -41,6 +41,6 @@ Fail fast at process startup (`main.go`) using `env.MustString("DATABASE_URL")`,
 
 ## 4. String Masking, Time & UUID Helpers (`stringutil`, `timeutil`, `uuidutil`)
 
-- **`stringutil`**: `stringutil.MaskEmail(email)`, `stringutil.MaskPhone(phone)`, `stringutil.RandomAlphanumeric(n)`, `stringutil.RandomSecureString(n)`.
+- **`stringutil`**: `stringutil.MaskEmail(email)`, `stringutil.MaskPhone(phone)`, `stringutil.Truncate(s, n)`, `stringutil.RandomAlphanumeric(n)`, `stringutil.RandomSecureString(n)`.
 - **`timeutil`**: `timeutil.AddBusinessDays(t, days)`, `timeutil.BusinessDays(start, end)`, `timeutil.StartOfDay(t)`, `timeutil.EndOfDay(t)`, `timeutil.NowIn(tz)`.
-- **`uuidutil`**: `uuidutil.New()`, `uuidutil.Parse(s)`, `uuidutil.IsValid(s)`, `uuidutil.Nil`.
+- **`uuidutil`**: `uuidutil.New()`, `uuidutil.NewString()`, `uuidutil.NewV7()`, `uuidutil.NewV7String()`, `uuidutil.Parse(s)`, `uuidutil.IsValid(s)`, `uuidutil.Nil`.

@@ -37,7 +37,7 @@ The `workerpool` package provides a bounded, panic-safe worker pool for concurre
 
 ### Basic Initialization
 ```go
-import "github.com/umesh0492/go-libs/workerpool"
+import "github.com/abeta-dev/go-libs/workerpool"
 
 // Initialize pool with 8 workers and a queue capacity of 200
 pool := workerpool.New(8, 200)
