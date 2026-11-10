@@ -30,8 +30,8 @@ package main
 
 import (
     "time"
-    "github.com/umesh0492/go-libs/circuitbreaker"
-    "github.com/umesh0492/go-libs/metrics"
+    "github.com/abeta-dev/go-libs/circuitbreaker"
+    "github.com/abeta-dev/go-libs/metrics"
 )
 
 // Custom Prometheus counter adapter

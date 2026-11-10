@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/umesh0492/go-libs/httputil"
+	"github.com/abeta-dev/go-libs/httputil"
 )
 
 func ExampleOK() {

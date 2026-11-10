@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/abeta-dev/go-libs/ratelimit"
 	"github.com/jackc/pgx/v5"
-	"github.com/umesh0492/go-libs/ratelimit"
 )
 
 // DefaultRateLimitTableName is the default table name for distributed rate limiting.

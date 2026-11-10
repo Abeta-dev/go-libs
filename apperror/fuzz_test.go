@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/umesh0492/go-libs/apperror"
+	"github.com/abeta-dev/go-libs/apperror"
 )
 
 func FuzzErrorChain(f *testing.F) {

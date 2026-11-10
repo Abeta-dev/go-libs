@@ -5,8 +5,8 @@ package ginmw
 import (
 	"log/slog"
 
+	"github.com/abeta-dev/go-libs/httputil"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/httputil"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"

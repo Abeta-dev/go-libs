@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/umesh0492/go-libs/pagination"
+	"github.com/abeta-dev/go-libs/pagination"
 )
 
 func TestParse_Defaults(t *testing.T) {

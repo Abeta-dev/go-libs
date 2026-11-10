@@ -5,7 +5,7 @@ package rbac_test
 import (
 	"testing"
 
-	"github.com/umesh0492/go-libs/rbac"
+	"github.com/abeta-dev/go-libs/rbac"
 )
 
 func BenchmarkRBAC_ExactMatch(b *testing.B) {

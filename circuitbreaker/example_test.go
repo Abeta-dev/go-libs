@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/umesh0492/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
 )
 
 func ExampleConsecutiveBreaker() {

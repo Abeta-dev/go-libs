@@ -40,7 +40,7 @@ The `pagination` package provides high-performance, standard-library pagination 
 import (
     "encoding/json"
     "net/http"
-    "github.com/umesh0492/go-libs/pagination"
+    "github.com/abeta-dev/go-libs/pagination"
 )
 
 func ListAuditEventsHandler(w http.ResponseWriter, r *http.Request) {

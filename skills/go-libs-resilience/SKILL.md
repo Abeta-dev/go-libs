@@ -1,58 +1,63 @@
 ---
 name: go-libs-resilience
-description: Resilience, concurrency, caching, and lifecycle patterns using github.com/Abeta-dev/go-libs (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics). Use when hardening external calls, background workers, caches, or state machines.
+description: Resilience, concurrency, caching, and lifecycle patterns using github.com/abeta-dev/go-libs@v0.4.0 (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics — 100.0% statement coverage). Use when hardening external calls, background workers, caches, or state machines.
 ---
 
-# `go-libs-resilience` Subskill (`v0.3.3`)
+# `go-libs-resilience` Subskill (`@v0.4.0` · `100.0%` coverage)
 
 Packages covered:
-- `github.com/umesh0492/go-libs/retry`
-- `github.com/umesh0492/go-libs/circuitbreaker`
-- `github.com/umesh0492/go-libs/ratelimit`
-- `github.com/umesh0492/go-libs/workerpool`
-- `github.com/umesh0492/go-libs/cache`
-- `github.com/umesh0492/go-libs/async`
-- `github.com/umesh0492/go-libs/shutdown`
-- `github.com/umesh0492/go-libs/fsm`
-- `github.com/umesh0492/go-libs/clock`
-- `github.com/umesh0492/go-libs/metrics`
+- `github.com/abeta-dev/go-libs/retry`
+- `github.com/abeta-dev/go-libs/circuitbreaker`
+- `github.com/abeta-dev/go-libs/ratelimit`
+- `github.com/abeta-dev/go-libs/workerpool`
+- `github.com/abeta-dev/go-libs/cache`
+- `github.com/abeta-dev/go-libs/async`
+- `github.com/abeta-dev/go-libs/shutdown`
+- `github.com/abeta-dev/go-libs/fsm`
+- `github.com/abeta-dev/go-libs/clock`
+- `github.com/abeta-dev/go-libs/metrics`
 
 ## 1. Layered Outbound Call Hardening (`circuitbreaker` + `retry`)
 
-Wrap outbound calls with `circuitbreaker.NewConsecutiveBreaker` (or `NewRatioBreaker`) and `retry.Do` / `retry.DoWithResult` with `retry.ExponentialJitter`:
+Wrap outbound calls with `circuitbreaker.NewConsecutiveBreaker` (or `NewRatioBreaker`) and `retry.Do` / `retry.DoWithResult` with `retry.Config`:
 
 ```go
 breaker := circuitbreaker.NewConsecutiveBreaker(5, 30*time.Second)
 
-err := retry.Do(ctx, func(ctx context.Context) error {
+err := retry.Do(ctx, retry.Config{
+	Attempts:    3,
+	InitialWait: 100 * time.Millisecond,
+	MaxWait:     2 * time.Second,
+	Strategy:    retry.ExponentialJitter,
+}, func(ctx context.Context) error {
 	return breaker.Execute(ctx, func() error {
 		return client.SendPayout(ctx, req)
 	})
-}, retry.WithBackoff(retry.ExponentialJitter(100*time.Millisecond, 2*time.Second)), retry.WithMaxAttempts(3))
+})
 ```
 
 ## 2. Stampede-Safe Caching (`cache`)
 
-Use `cache.NewTypedCache[T]` with `GetOrFetch` to coalesce concurrent cache misses via singleflight across SampledLRU, LRU, LFU, FIFO, or TTL eviction policies:
+Use `cache.NewTypedCache[T]` with `GetOrFetch` to coalesce concurrent cache misses via singleflight across `PolicySampledLRU`, `PolicyLRU`, `PolicyLFU`, `PolicyFIFO`, or `PolicyTTL` eviction policies:
 
 ```go
 memCache := cache.NewTypedCache[TenantConfig](
-	cache.WithCapacity(5000),
-	cache.WithEvictionPolicy(cache.EvictionLRU),
-	cache.WithTTL(5 * time.Minute),
+	5000,
+	cache.WithEvictionPolicy(cache.PolicyLRU),
 )
 
-cfg, err := memCache.GetOrFetch(ctx, tenantID, func(ctx context.Context) (TenantConfig, error) {
+cfg, err := memCache.GetOrFetch(ctx, tenantID, 5*time.Minute, func(ctx context.Context) (TenantConfig, error) {
 	return repo.FetchTenantConfig(ctx, tenantID)
 })
 ```
 
-## 3. Bounded Concurrency (`workerpool` & `async`)
+## 3. Bounded Concurrency & State Machines (`workerpool`, `async`, `fsm`)
 
 - Prohibit naked `go func()` in production paths. Use `workerpool.New(workers, queueSize)` with `Submit` / `SubmitContext` and `Stop()` for panic-isolated background execution.
-- Use `async.Go`, `async.WaitAll`, and `async.WithTimeout` when fanning out bounded concurrent tasks inside a request.
+- Use `async.Go`, `async.GoCtx`, `async.Parallel`, and `async.ParallelLimit` when fanning out bounded concurrent tasks inside a request.
+- Use `fsm.NewMachine[S](fsm.Transition[S]{From: "PENDING", To: "CONFIRMED"})` and `m.CanTransition(from, to)` / `m.ValidateTransition(from, to)` for O(1) declarative state validation.
 
 ## 4. Deterministic Time & Graceful Shutdown (`clock` & `shutdown`)
 
 - Inject `clock.Clock` (`clock.NewReal()` in production, `clock.NewFake(t0)` in unit tests) into caches, circuit breakers, and rate limiters for deterministic testing without `time.Sleep`.
-- Trap `SIGINT`/`SIGTERM` with `shutdown.New(15 * time.Second)` and `Register` cleanup hooks (`srv.Shutdown`, `poolWorker.Stop`, `dbPool.Close`, `memCache.Close`) followed by `mgr.Wait()`.
+- Trap `SIGINT`/`SIGTERM` with `shutdown.New(shutdown.WithTimeout(15 * time.Second))` and `Register` cleanup hooks (`srv.Shutdown`, `poolWorker.Stop`, `dbPool.Close`, `memCache.Stop`) followed by `mgr.Wait()`.

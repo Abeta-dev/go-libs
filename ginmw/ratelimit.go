@@ -7,20 +7,34 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/abeta-dev/go-libs/ratelimit"
 	"github.com/gin-gonic/gin"
-	"github.com/umesh0492/go-libs/ratelimit"
 )
 
 // GlobalRateLimit applies standard API protection: 200 req/min per IP.
 func GlobalRateLimit() gin.HandlerFunc {
-	limiter := ratelimit.NewGlobal()
-	return gin.WrapH(limiter(noopHandler))
+	return wrapRateLimitMiddleware(ratelimit.NewGlobal())
 }
 
 // AuthRateLimit applies strict brute-force protection: 10 req/min per IP.
 func AuthRateLimit() gin.HandlerFunc {
-	limiter := ratelimit.NewAuth()
-	return gin.WrapH(limiter(noopHandler))
+	return wrapRateLimitMiddleware(ratelimit.NewAuth())
+}
+
+func wrapRateLimitMiddleware(mw func(http.Handler) http.Handler) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		allowed := false
+		h := mw(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+			allowed = true
+			c.Request = r
+		}))
+		h.ServeHTTP(c.Writer, c.Request)
+		if !allowed {
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }
 
 // RateLimitWithLimiter applies rate limiting using any ratelimit.Limiter implementation.

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/umesh0492/go-libs/clock"
+	"github.com/abeta-dev/go-libs/clock"
 )
 
 func TestDeterministic_TokenBucket_AllBranches(t *testing.T) {

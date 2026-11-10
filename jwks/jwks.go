@@ -45,6 +45,8 @@ type Resolver struct {
 // DefaultResolver is the package-level default JWKS resolver instance.
 var DefaultResolver = NewResolver()
 
+var timeSince = time.Since
+
 // NewResolver creates a new JWKS public key resolver with sensible defaults.
 func NewResolver() *Resolver {
 	return &Resolver{
@@ -64,7 +66,7 @@ func (r *Resolver) GetECPublicKey(kid, jwksURL string) (*ecdsa.PublicKey, error)
 	defer r.mu.Unlock()
 
 	// Double check under write lock
-	if key, exists := r.cache[kid]; exists && time.Since(r.lastFetch) < r.cacheTTL {
+	if key, exists := r.cache[kid]; exists && timeSince(r.lastFetch) < r.cacheTTL {
 		return key, nil
 	}
 
@@ -83,9 +85,11 @@ func (r *Resolver) GetECPublicKey(kid, jwksURL string) (*ecdsa.PublicKey, error)
 	if found, ok := r.cache[kid]; ok {
 		return found, nil
 	}
-	// Fallback to first available P-256 EC key if kid was omitted or changed
-	for _, k := range r.cache {
-		return k, nil
+	// Fallback to sole P-256 EC key only when kid was omitted by the token
+	if kid == "" && len(r.cache) == 1 {
+		for _, k := range r.cache {
+			return k, nil
+		}
 	}
 	return nil, fmt.Errorf("public key with kid '%s' not found in JWKS", kid)
 }
@@ -93,7 +97,7 @@ func (r *Resolver) GetECPublicKey(kid, jwksURL string) (*ecdsa.PublicKey, error)
 func (r *Resolver) getCachedKey(kid string) *ecdsa.PublicKey {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	if key, exists := r.cache[kid]; exists && time.Since(r.lastFetch) < r.cacheTTL {
+	if key, exists := r.cache[kid]; exists && timeSince(r.lastFetch) < r.cacheTTL {
 		return key
 	}
 	return nil
@@ -136,13 +140,15 @@ func (r *Resolver) fetchAndCacheKeys(targetURL string) error {
 		return fmt.Errorf("failed to decode JWKS payload: %w", err)
 	}
 
+	newCache := make(map[string]*ecdsa.PublicKey, len(set.Keys))
 	for _, k := range set.Keys {
 		if k.KTY == "EC" && k.Crv == "P-256" {
 			if pubKey := parseECP256Key(k); pubKey != nil {
-				r.cache[k.KID] = pubKey
+				newCache[k.KID] = pubKey
 			}
 		}
 	}
+	r.cache = newCache
 	r.lastFetch = time.Now()
 	return nil
 }

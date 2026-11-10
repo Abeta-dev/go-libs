@@ -5,7 +5,7 @@ package sliceutil_test
 import (
 	"testing"
 
-	"github.com/umesh0492/go-libs/sliceutil"
+	"github.com/abeta-dev/go-libs/sliceutil"
 )
 
 func BenchmarkFirst(b *testing.B) {

@@ -6,9 +6,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/validation"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/validation"
 )
 
 type TestUser struct {

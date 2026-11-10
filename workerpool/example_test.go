@@ -7,7 +7,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/umesh0492/go-libs/workerpool"
+	"github.com/abeta-dev/go-libs/workerpool"
 )
 
 func ExamplePool() {

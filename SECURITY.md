@@ -2,11 +2,12 @@
 
 ## Supported Versions
 
-`go-libs` provides security updates for the current release series (currently v0.3.3):
+`go-libs` provides security updates for the current release series (currently v0.4.0):
 
 | Version Series | Status             | Security Updates |
 | -------------- | ------------------ | ---------------- |
-| 0.3.x          | **Active / Current** | :white_check_mark: Yes |
+| 0.4.x          | **Active / Current** | :white_check_mark: Yes |
+| 0.3.x          | Maintenance        | :white_check_mark: Yes |
 | 0.2.x          | Maintenance        | :white_check_mark: Yes |
 | 0.1.x          | Maintenance        | :white_check_mark: Yes |
 | < 0.1.0        | End-of-Life        | :x: No           |
@@ -21,7 +22,7 @@ Instead, report vulnerabilities through one of the following confidential channe
 
 ### 1. GitHub Private Vulnerability Reporting (Preferred)
 Submit a confidential advisory directly via GitHub:
-- Navigate to the **Security** tab of `github.com/Abeta-dev/go-libs`.
+- Navigate to the **Security** tab of `github.com/abeta-dev/go-libs`.
 - Click **"Report a vulnerability"** to open a private advisory draft.
 - Include a description, affected package(s), minimal reproduction or proof-of-concept (PoC), and potential impact.
 

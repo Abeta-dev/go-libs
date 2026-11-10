@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/abeta-dev/go-libs/db"
 	"github.com/jackc/pgx/v5"
-	"github.com/umesh0492/go-libs/db"
 )
 
 const (
@@ -228,10 +228,7 @@ func (s *PGStore) Save(ctx context.Context, key string, response Response) error
 		return errors.New("idempotency: key cannot be empty")
 	}
 
-	headersJSON, err := json.Marshal(response.Headers)
-	if err != nil {
-		return fmt.Errorf("idempotency: failed to marshal headers: %w", err)
-	}
+	headersJSON, _ := json.Marshal(response.Headers)
 
 	now := s.nowFunc()
 	expiresAt := now.Add(s.responseTTL)
@@ -242,7 +239,7 @@ func (s *PGStore) Save(ctx context.Context, key string, response Response) error
 		s.tableName,
 	)
 
-	_, err = s.db.Exec(ctx, query, key, string(StatusCompleted), response.StatusCode, headersJSON, response.Body, expiresAt, now)
+	_, err := s.db.Exec(ctx, query, key, string(StatusCompleted), response.StatusCode, headersJSON, response.Body, expiresAt, now)
 	if err != nil {
 		return fmt.Errorf("idempotency: save response failed: %w", err)
 	}

@@ -5,9 +5,9 @@ package ginmw
 import (
 	"context"
 
+	"github.com/abeta-dev/go-libs/rbaccontext"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/umesh0492/go-libs/rbaccontext"
 )
 
 // PermissionProvider abstracts the source of truth for Role-Based Access Control.

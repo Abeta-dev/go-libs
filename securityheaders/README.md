@@ -28,7 +28,7 @@ The `securityheaders` package provides HTTP middleware that injects hardened, OW
 ```go
 import (
     "net/http"
-    "github.com/umesh0492/go-libs/securityheaders"
+    "github.com/abeta-dev/go-libs/securityheaders"
 )
 
 // Default: strict CSP, no framing, HSTS 2 years
@@ -48,7 +48,7 @@ http.ListenAndServe(":8080", handler)
 ```go
 import (
     "github.com/gin-gonic/gin"
-    "github.com/umesh0492/go-libs/ginmw"
+    "github.com/abeta-dev/go-libs/ginmw"
 )
 
 r := gin.New()

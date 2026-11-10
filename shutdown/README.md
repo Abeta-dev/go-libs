@@ -26,7 +26,7 @@ The `shutdown` package manages graceful termination on `SIGINT`/`SIGTERM` OS sig
 
 ```go
 import (
-    "github.com/umesh0492/go-libs/shutdown"
+    "github.com/abeta-dev/go-libs/shutdown"
     "time"
 )
 
@@ -76,7 +76,7 @@ if err := sd.Wait(); err != nil {
 - **Persistent state flushing** — flush queues in your worker hook; shutdown does not know about application state.
 
 ## 📊 Test Coverage Status
-- **Coverage**: `93.5% of statements` (verified via `go tool cover`)
+- **Coverage**: `100.0% of statements` (verified via `go tool cover`)
 - **Tests**: `shutdown_test.go`
 
 ---

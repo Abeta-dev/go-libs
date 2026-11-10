@@ -5,7 +5,7 @@ package pagination_test
 import (
 	"testing"
 
-	"github.com/umesh0492/go-libs/pagination"
+	"github.com/abeta-dev/go-libs/pagination"
 )
 
 func TestPaginateSlice(t *testing.T) {
@@ -48,5 +48,11 @@ func TestPaginateSlice(t *testing.T) {
 	pAll, metaAll := pagination.PaginateSlice(data, 1, 0)
 	if len(pAll) != 10 || metaAll.Total != 10 {
 		t.Fatalf("expected all items when limit <= 0, got: %v", pAll)
+	}
+
+	// Zero / negative page defaults to page 1
+	pZeroPage, metaZeroPage := pagination.PaginateSlice(data, 0, 3)
+	if len(pZeroPage) != 3 || metaZeroPage.Page != 1 {
+		t.Fatalf("expected page 1 and 3 items for page <= 0, got: %v, %+v", pZeroPage, metaZeroPage)
 	}
 }

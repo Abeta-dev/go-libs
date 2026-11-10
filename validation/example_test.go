@@ -5,8 +5,8 @@ package validation_test
 import (
 	"fmt"
 
+	"github.com/abeta-dev/go-libs/validation"
 	"github.com/go-playground/validator/v10"
-	"github.com/umesh0492/go-libs/validation"
 )
 
 type UserRequest struct {

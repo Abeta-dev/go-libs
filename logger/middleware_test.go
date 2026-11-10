@@ -10,9 +10,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/umesh0492/go-libs/logger"
 )
 
 type logCaptureHandler struct {
@@ -154,5 +154,27 @@ func TestMiddleware_Levels(t *testing.T) {
 			return true
 		})
 		assert.Equal(t, 128, len(recordedID))
+	})
+
+	t.Run("default logger from context and disallowed correlation header", func(t *testing.T) {
+		capture := &logCaptureHandler{}
+		mw := logger.Middleware(
+			logger.WithRequestIDHeader("X-Disallowed-Secret-Header"),
+		)
+
+		handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/default-logger", nil)
+		req = req.WithContext(logger.WithContext(req.Context(), slog.New(capture)))
+		req.Header.Set("X-Disallowed-Secret-Header", "secret-val")
+		handler.ServeHTTP(httptest.NewRecorder(), req)
+
+		require.Len(t, capture.records, 1)
+		capture.records[0].Attrs(func(a slog.Attr) bool {
+			assert.NotEqual(t, "request_id", a.Key)
+			return true
+		})
 	})
 }

@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/umesh0492/go-libs/logger"
+	"github.com/abeta-dev/go-libs/logger"
 )
 
 func ExampleFromContext() {

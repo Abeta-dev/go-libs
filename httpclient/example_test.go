@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/httpclient"
-	"github.com/umesh0492/go-libs/ratelimit"
-	"github.com/umesh0492/go-libs/retry"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/httpclient"
+	"github.com/abeta-dev/go-libs/ratelimit"
+	"github.com/abeta-dev/go-libs/retry"
 )
 
 func ExampleNew() {

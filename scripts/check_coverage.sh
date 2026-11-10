@@ -20,7 +20,7 @@ echo "   - ginmw Gate:         == ${GINMW_REQUIRED}%"
 echo "========================================================"
 
 # List library packages, excluding the root documentation-test package and load generators.
-PACKAGES=$(go list ./... | grep -vE '^github\.com/umesh0492/go-libs$|/loadgen$')
+PACKAGES=$(go list ./... | grep -vE '^github\.com/abeta-dev/go-libs$|/loadgen$')
 PKGS_COMMA=$(echo "${PACKAGES}" | tr '\n' ',' | sed 's/,$//')
 
 # Generate merged coverage profile across all packages. Never continue with a
@@ -43,7 +43,7 @@ PER_PKG_OUTPUT=$(go test -cover ${PACKAGES})
 
 while IFS= read -r line; do
     if [[ "${line}" =~ coverage:\ ([0-9.]+)%\ of\ statements ]]; then
-        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/umesh0492/go-libs/||')
+        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/abeta-dev/go-libs/||')
         PKG_COV="${BASH_REMATCH[1]}"
         TABLE_ROWS="${TABLE_ROWS}\n| \`${PKG_NAME}\` | **${PKG_COV}%** |"
         
@@ -61,7 +61,7 @@ while IFS= read -r line; do
             FAILED_PACKAGES+=("${PKG_NAME} (${PKG_COV}% < ${PACKAGE_FLOOR}%)")
         fi
     elif [[ "${line}" =~ coverage:\ \[no\ statements\] ]]; then
-        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/umesh0492/go-libs/||')
+        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/abeta-dev/go-libs/||')
         TABLE_ROWS="${TABLE_ROWS}\n| \`${PKG_NAME}\` | *No statements (interfaces/types)* |"
     fi
 done <<< "${PER_PKG_OUTPUT}"
@@ -83,7 +83,7 @@ fi
 
 while IFS= read -r line; do
     if [[ "${line}" =~ coverage:\ ([0-9.]+)%\ of\ statements ]]; then
-        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/umesh0492/go-libs/||')
+        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/abeta-dev/go-libs/||')
         PKG_COV="${BASH_REMATCH[1]}"
         
         README_ROW=$(echo "${COVERAGE_TABLE}" | grep -E "^\| \`${PKG_NAME}\` \|" || true)
@@ -106,7 +106,7 @@ while IFS= read -r line; do
             fi
         fi
     elif [[ "${line}" =~ coverage:\ \[no\ statements\] ]]; then
-        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/umesh0492/go-libs/||')
+        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/abeta-dev/go-libs/||')
         README_ROW=$(echo "${COVERAGE_TABLE}" | grep -E "^\| \`${PKG_NAME}\` \|" || true)
         if [ -z "${README_ROW}" ]; then
             echo "❌ Package '${PKG_NAME}' missing from README.md coverage table"
@@ -145,7 +145,7 @@ fi
 
 while IFS= read -r line; do
     if [[ "${line}" =~ coverage:\ ([0-9.]+)%\ of\ statements ]]; then
-        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/umesh0492/go-libs/||')
+        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/abeta-dev/go-libs/||')
         PKG_COV="${BASH_REMATCH[1]}"
         
         VER_ROW=$(echo "${VERSIONING_TABLE}" | grep -E "^\| \`${PKG_NAME}\` \|" || true)
@@ -168,7 +168,7 @@ while IFS= read -r line; do
             fi
         fi
     elif [[ "${line}" =~ coverage:\ \[no\ statements\] ]]; then
-        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/umesh0492/go-libs/||')
+        PKG_NAME=$(echo "${line}" | awk '{print $2}' | sed 's|github.com/abeta-dev/go-libs/||')
         VER_ROW=$(echo "${VERSIONING_TABLE}" | grep -E "^\| \`${PKG_NAME}\` \|" || true)
         if [ -z "${VER_ROW}" ]; then
             echo "❌ Package '${PKG_NAME}' missing from docs/VERSIONING.md coverage table"

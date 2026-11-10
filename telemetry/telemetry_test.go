@@ -6,8 +6,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/abeta-dev/go-libs/telemetry"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/telemetry"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace/noop"
 )

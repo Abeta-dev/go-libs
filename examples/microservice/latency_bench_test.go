@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/abeta-dev/go-libs/cache"
+	"github.com/abeta-dev/go-libs/circuitbreaker"
+	"github.com/abeta-dev/go-libs/ginmw"
+	"github.com/abeta-dev/go-libs/workerpool"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/umesh0492/go-libs/cache"
-	"github.com/umesh0492/go-libs/circuitbreaker"
-	"github.com/umesh0492/go-libs/ginmw"
-	"github.com/umesh0492/go-libs/workerpool"
 )
 
 func init() {

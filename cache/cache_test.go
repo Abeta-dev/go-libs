@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/abeta-dev/go-libs/cache"
 	"github.com/stretchr/testify/assert"
-	"github.com/umesh0492/go-libs/cache"
 )
 
 func TestMemoryCache_GetOrFetch(t *testing.T) {

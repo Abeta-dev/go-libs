@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/umesh0492/go-libs/timeutil"
+	"github.com/abeta-dev/go-libs/timeutil"
 )
 
 func ExampleAddBusinessDays() {

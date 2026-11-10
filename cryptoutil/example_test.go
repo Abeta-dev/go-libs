@@ -5,7 +5,7 @@ package cryptoutil_test
 import (
 	"fmt"
 
-	"github.com/umesh0492/go-libs/cryptoutil"
+	"github.com/abeta-dev/go-libs/cryptoutil"
 )
 
 func ExampleHashPassword() {
