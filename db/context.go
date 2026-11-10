@@ -58,7 +58,7 @@ func GetQuerier(ctx context.Context, pool *pgxpool.Pool) DBTX {
 // The active pgx.Tx is automatically injected into the context passed to fn so downstream
 // repositories calling db.GetQuerier(ctx, pool) participate in the same transaction.
 // If fn returns an error or panics, the transaction is rolled back; otherwise it is committed.
-func WithTx(ctx context.Context, pool TxBeginner, fn func(ctx context.Context, tx pgx.Tx) error) (err error) {
+func WithTx(ctx context.Context, pool TxBeginner, fn func(ctx context.Context, tx pgx.Tx) error) error {
 	if pool == nil {
 		return errors.New("db: transaction beginner pool is nil")
 	}
@@ -76,17 +76,16 @@ func WithTx(ctx context.Context, pool TxBeginner, fn func(ctx context.Context, t
 			_ = tx.Rollback(ctx)
 			panic(p)
 		}
-		if err != nil {
-			_ = tx.Rollback(ctx)
-		}
 	}()
 
 	txCtx := WithQuerier(ctx, tx)
-	if err = fn(txCtx, tx); err != nil {
-		return err
+	if fnErr := fn(txCtx, tx); fnErr != nil {
+		_ = tx.Rollback(ctx)
+		return fnErr
 	}
 
 	if commitErr := tx.Commit(ctx); commitErr != nil {
+		_ = tx.Rollback(ctx)
 		return fmt.Errorf("db: commit transaction: %w", commitErr)
 	}
 	return nil

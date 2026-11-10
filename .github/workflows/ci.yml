@@ -227,8 +227,13 @@ jobs:
           go-version: '1.26.x'
           cache: true
 
+      - name: Install TruffleHog
+        run: |
+          curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v3.88.14/trufflehog_3.88.14_linux_amd64.tar.gz" | tar -xz -C /tmp trufflehog && echo "/tmp" >> $GITHUB_PATH
+
       - name: Verify Documentation & Version Match Tree
         run: |
+          ./scripts/check_secrets.sh
           ./scripts/check_version.sh
           ./scripts/check_leaf_imports.sh
 
