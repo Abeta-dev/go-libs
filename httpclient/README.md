@@ -16,11 +16,11 @@ import (
 )
 
 func main() {
-	cb := circuitbreaker.NewConsecutive(5, 30*time.Second)
+	cb := circuitbreaker.NewConsecutiveBreaker(5, 30*time.Second)
 	client := httpclient.New(
-		httpclient.WithBreaker(cb),
+		httpclient.WithCircuitBreaker(cb),
 		httpclient.WithRetry(retry.Config{
-			MaxAttempts: 3,
+			Attempts:    3,
 			InitialWait: 100 * time.Millisecond,
 			MaxWait:     2 * time.Second,
 			Strategy:    retry.ExponentialJitter,

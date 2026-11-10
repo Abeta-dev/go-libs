@@ -1,9 +1,9 @@
 ---
 name: go-libs-resilience
-description: Resilience, concurrency, caching, and lifecycle patterns using github.com/abeta-dev/go-libs (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics). Use when hardening external calls, background workers, caches, or state machines.
+description: Resilience, concurrency, caching, and lifecycle patterns using github.com/abeta-dev/go-libs@v0.4.0 (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics — 100.0% statement coverage). Use when hardening external calls, background workers, caches, or state machines.
 ---
 
-# `go-libs-resilience` Subskill (`v0.4.0`)
+# `go-libs-resilience` Subskill (`@v0.4.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/retry`
@@ -25,9 +25,11 @@ Wrap outbound calls with `circuitbreaker.NewConsecutiveBreaker` (or `NewRatioBre
 breaker := circuitbreaker.NewConsecutiveBreaker(5, 30*time.Second)
 
 err := retry.Do(ctx, retry.Config{
-	MaxAttempts: 3,
-	Backoff:     retry.ExponentialJitter(100*time.Millisecond, 2*time.Second),
-}, func() error {
+	Attempts:    3,
+	InitialWait: 100 * time.Millisecond,
+	MaxWait:     2 * time.Second,
+	Strategy:    retry.ExponentialJitter,
+}, func(ctx context.Context) error {
 	return breaker.Execute(ctx, func() error {
 		return client.SendPayout(ctx, req)
 	})

@@ -1,9 +1,9 @@
 ---
 name: go-libs-http-gin
-description: HTTP server/client and Gin middleware patterns using github.com/abeta-dev/go-libs (ginmw, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation). Use when building REST APIs, middleware chains, or resilient HTTP clients.
+description: HTTP server/client and Gin middleware patterns using github.com/abeta-dev/go-libs@v0.4.0 (ginmw, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation — 100.0% statement coverage). Use when building REST APIs, middleware chains, or resilient HTTP clients.
 ---
 
-# `go-libs-http-gin` Subskill (`v0.4.0`)
+# `go-libs-http-gin` Subskill (`@v0.4.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/ginmw`
@@ -37,7 +37,7 @@ r.Use(
 	ginmw.Telemetry("order-service"),                 // 6. Root OpenTelemetry span & W3C propagation
 	ginmw.REDMetrics("order_service"),                // 6b. Prometheus RED metrics (pair with ginmw.MetricsEndpoint())
 	ginmw.GlobalRateLimit(),                          // 7. TokenBucket / SlidingWindow IP rate limit (aborts on 429)
-	ginmw.AuthMiddleware(),                           // 8. Validate Bearer JWT claims (via InitJWT)
+	ginmw.AuthMiddleware(),                           // 8. Validate Bearer JWT claims (via SetJWTSecret)
 	ginmw.RBAC(permissionProvider),                   // 9. Resolve permissions into rbaccontext
 	ginmw.Idempotency(idemStore),                     // 10. Two-phase lock on mutating endpoints
 )

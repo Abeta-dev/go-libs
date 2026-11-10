@@ -20,16 +20,15 @@ The `ginmw` package provides unified, production-grade Gin HTTP middleware combi
 | **Gin Default Middlewares (`gin.Default()`)** | Built-in logger and recovery | Basic console output; no structured JSON logs; lacks auth, RBAC, CORS, or rate limiting | Production-ready middleware chain with OWASP headers, APM tracing, and structured logging |
 | **Custom Handlers per Route** | Maximum flexibility | Code duplication; easy to forget security headers, rate limits, or auth checks on new endpoints | Declarative middleware guarantees uniform defense across all routes |
 
-## Breaking Changes in v0.5.0
+## Multi-Tenant Claims & RBAC Design
 
-| Symbol | v0.4.4 | v0.5.0 |
+| Capability | Legacy Pattern | Current `ginmw` Contract |
 |---|---|---|
-| `Claims.Role string` | Single role string | **Removed** → `Claims.Roles []string` |
-| `Claims.UserType` | Present | **Removed** |
-| `Claims` multi-tenant | — | `TenantID uuid.UUID`, `Custom map[string]any` |
-| JWT access token TTL | 24h | **15 minutes** (or custom parameter) |
-| `PermissionProvider` method | `GetPermissionsForRole(ctx, role)` | **`GetPermissionsForUser(ctx, userID, tenantID)`** |
-| `RequireType(...)` | Present | **Removed** → use `RequirePermission` or `AdminOnly` |
+| `Claims.Roles` | Single role string | `Claims.Roles []string` (`HasRole`, `PrimaryRole`) |
+| Multi-tenant context | — | `TenantID uuid.UUID`, `Custom map[string]any` |
+| JWT access token TTL | Fixed 24h | Configurable per-mint (`timeInMins int64`) |
+| `PermissionProvider` method | Static role lookup | **`GetPermissionsForUser(ctx, userID, tenantID)`** |
+| Route authorization | Role strings | `RequirePermission`, `RequireAnyPermission`, or `AdminOnly` |
 
 ---
 

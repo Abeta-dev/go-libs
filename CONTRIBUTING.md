@@ -45,12 +45,12 @@ This guide provides everything you need to know to get started, run the test sui
 
 ## 3. The Truth-Gate Scripts: What They Check and Why
 
-In addition to standard `go test` and `golangci-lint`, `go-libs` includes two deterministic truth-gate scripts that run in CI:
+In addition to standard `go test` and `golangci-lint`, `go-libs` includes deterministic truth-gate scripts that run in CI:
 
 ### A. `./scripts/check_version.sh`
 - **What it checks**:
   - Ensures the version in `README.md` matches `CHANGELOG.md` and release tags.
-  - Asserts that all 30 packages documented in `README.md` match `go list ./...`.
+  - Asserts that all 35 packages documented in `README.md` match `go list ./...`.
   - Verifies that every exported symbol listed under `### Added` in `CHANGELOG.md` actually exists in the Go source code.
   - Confirms zero stale references to deprecated Go versions or unreleased major tags.
 - **Why it exists**: To ensure that documentation never claims features or APIs that do not exist or have drifted.
@@ -58,11 +58,21 @@ In addition to standard `go test` and `golangci-lint`, `go-libs` includes two de
 ### B. `./scripts/check_coverage.sh`
 - **What it checks**:
   - Measures statement coverage across all packages.
-  - Asserts global repository statement coverage is `>= 90.0%` (currently **96.0%**).
-  - Asserts that every individual package meets a minimum floor of `>= 85.0%`.
+  - Asserts global repository statement coverage is `>= 90.0%` (currently **100.0%**).
+  - Asserts that every individual package meets a minimum floor of `>= 85.0%` (currently **100.0%** across all packages).
   - Asserts that the core authentication/middleware package (`ginmw`) maintains **100.0%** statement coverage.
   - **Zero-Drift README Sync**: Parses the per-package coverage table in `README.md` line-by-line and fails if any number deviates from live toolchain measurements.
 - **Why it exists**: To prevent coverage numbers in documentation from becoming stale or aspirational.
+
+### C. `./scripts/check_secrets.sh`
+- **What it checks**:
+  - Runs TruffleHog (`--results=verified,unknown --fail`) across both git commit history and the working tree.
+- **Why it exists**: To guarantee zero leaked credentials, tokens, or private keys enter the repository.
+
+### D. `./scripts/check_leaf_imports.sh`
+- **What it checks**:
+  - Verifies in an isolated module sandbox that leaf packages never pull heavy framework dependencies (`gin`, `pgx`, `opentelemetry`).
+- **Why it exists**: To preserve minimal dependency footprints for consumers importing foundational packages.
 
 ---
 
@@ -89,7 +99,9 @@ In addition to standard `go test` and `golangci-lint`, `go-libs` includes two de
    - [ ] `golangci-lint run ./...` exits with code 0 (zero issues).
    - [ ] `gofmt -l $(git ls-files '*.go')` reports no unformatted files.
    - [ ] `go test -race ./...` passes with zero race warnings.
+   - [ ] `./scripts/check_secrets.sh` exits with code 0.
    - [ ] `./scripts/check_version.sh` exits with code 0.
+   - [ ] `./scripts/check_leaf_imports.sh` exits with code 0.
    - [ ] `./scripts/check_coverage.sh` exits with code 0.
    - [ ] If changing any documented metric or table row, numbers were regenerated via `./scripts/check_coverage.sh`, not hand-typed.
    - [ ] In `examples/microservice`: `go build -v . && go test -v ./...` passes.

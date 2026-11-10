@@ -1,17 +1,17 @@
 ---
 name: go-libs
-description: Umbrella router and integration guide for github.com/abeta-dev/go-libs (v0.4.0, 35 Go packages). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
+description: Umbrella router and integration guide for github.com/abeta-dev/go-libs (v0.4.0, 35 Go packages, 100.0% statement coverage). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
 ---
 
 # `go-libs` Umbrella Skill (`v0.4.0`)
 
-Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`v0.4.0`, `Go 1.26.0`)
+Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`@v0.4.0`, `Go 1.26.0`, **100.0% statement coverage**)
 
 ## When to Use
 
 - Choosing which of the **35 packages** in `github.com/abeta-dev/go-libs` solves a backend engineering requirement
 - Wiring a production HTTP/Gin service with structured logging, OpenTelemetry, resilience, and RBAC
-- Maintaining or contributing to `go-libs` and passing `./scripts/check_version.sh`
+- Maintaining or contributing to `go-libs` and passing `./scripts/check_secrets.sh`, `./scripts/check_version.sh`, `./scripts/check_leaf_imports.sh`, and `./scripts/check_coverage.sh`
 
 ## Subskill Routing
 
@@ -31,7 +31,7 @@ Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`v0.4.0`, `Go 1.2
 5. `circuitbreaker` — Outbound 3-state (`Closed`, `Open`, `HalfOpen`) failure machine (`ConsecutiveBreaker`, `RatioBreaker`, `NewConsecutiveBreaker`, `NewRatioBreaker`).
 6. `clock` — Deterministic mockable time abstraction (`Clock`, `RealClock`, `FakeClock`, `NewReal`, `NewFake`).
 7. `cryptoutil` — Bcrypt password hashing (cost 12) and CSPRNG password generation (`HashPassword`, `ComparePassword`, `IsCorrectPassword`, `GenerateTempPassword`).
-8. `db` — PostgreSQL `pgxpool` lifecycle management, `DBTX` querier abstraction, and transactional helper (`Connect`, `DBTX`, `WithTx`, `WithQuerier`, `GetQuerier`, `WithMaxConns`).
+8. `db` — PostgreSQL `pgxpool` lifecycle management, `DBTX` / `TxBeginner` abstractions, and transactional helpers (`Connect`, `DBTX`, `TxBeginner`, `WithTx`, `WithQuerier`, `GetQuerier`, `WithMaxConns`).
 9. `env` — Zero-dependency typed environment variable parsers (`String`, `Int`, `Bool`, `Duration`, `MustString`, `MustInt`).
 10. `fsm` — Declarative in-memory finite state machine with O(1) state transitions (`Machine`, `NewMachine`, `Transition`, `CanTransition`, `ValidateTransition`).
 11. `ginmw` — Unified Gin middleware pipeline (`RequestID`, `LimitBodyDefault`, `LimitBodyAuth`, `CORS`, `Logger`, `Telemetry`, `REDMetrics`, `MetricsEndpoint`, `GlobalRateLimit`, `AuthRateLimit`, `AuthMiddleware`, `RBAC`, `RequirePermission`, `Idempotency`, `ErrorHandler`).
@@ -60,7 +60,9 @@ Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`v0.4.0`, `Go 1.2
 34. `validation` — Declarative `validator/v10` error formatter (`FormatErrors`, `FieldError`).
 35. `workerpool` — Bounded panic-safe concurrent worker pool (`Pool`, `New`, `Submit`, `SubmitContext`, `Stop`).
 
-## Truth Gates (`./scripts/check_version.sh`)
+## Truth Gates & Verification (`./scripts/check_*.sh`)
 
-- `EXPECTED_PKG_COUNT=35` must match the number of top-level Go package directories.
-- All versioned install commands and references in docs must match `@v0.4.0`.
+- **`./scripts/check_secrets.sh`**: Scans git commit history and the working tree with TruffleHog (`--results=verified,unknown --fail`) to ensure zero leaked credentials or keys.
+- **`./scripts/check_version.sh`**: Enforces `EXPECTED_PKG_COUNT=35`, `@v0.4.0` tag parity across docs, `Go 1.26.0` baseline, and AST verification of `CHANGELOG.md` symbols.
+- **`./scripts/check_coverage.sh`**: Verifies **100.0% statement coverage** across all 35 packages and zero drift against `README.md` and `.github/badges/coverage.json`.
+- **`./scripts/check_leaf_imports.sh`**: Verifies in an isolated sandbox that leaf packages never pull heavy framework dependencies (`gin`, `pgx`, `opentelemetry`).

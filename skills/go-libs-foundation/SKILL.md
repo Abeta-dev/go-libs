@@ -1,9 +1,9 @@
 ---
 name: go-libs-foundation
-description: Foundational Go utilities and domain error handling using github.com/abeta-dev/go-libs (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and UUIDs.
+description: Foundational Go utilities and domain error handling using github.com/abeta-dev/go-libs@v0.4.0 (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil — 100.0% statement coverage). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and RFC 9562 UUIDv7 / UUIDv4 identifiers.
 ---
 
-# `go-libs-foundation` Subskill (`v0.4.0`)
+# `go-libs-foundation` Subskill (`@v0.4.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/apperror`
@@ -39,8 +39,10 @@ Fail fast at process startup (`main.go`) using `env.MustString("DATABASE_URL")`,
   - *(Note: For simple slice mapping/filtering or map keys/values, use standard library `slices`/`maps` packages; do not reference removed `sliceutil` or `maputil` helpers).*
 - **`maputil`**: `maputil.Merge(m1, m2)` and `maputil.Filter(m, pred)`.
 
-## 4. String Masking, Time & UUID Helpers (`stringutil`, `timeutil`, `uuidutil`)
+## 4. String Masking, Time & UUIDv4/UUIDv7 Helpers (`stringutil`, `timeutil`, `uuidutil`)
 
 - **`stringutil`**: `stringutil.MaskEmail(email)`, `stringutil.MaskPhone(phone)`, `stringutil.Truncate(s, n)`, `stringutil.RandomAlphanumeric(n)`, `stringutil.RandomSecureString(n)`.
 - **`timeutil`**: `timeutil.AddBusinessDays(t, days)`, `timeutil.BusinessDays(start, end)`, `timeutil.StartOfDay(t)`, `timeutil.EndOfDay(t)`, `timeutil.NowIn(tz)`.
-- **`uuidutil`**: `uuidutil.New()`, `uuidutil.NewString()`, `uuidutil.NewV7()`, `uuidutil.NewV7String()`, `uuidutil.Parse(s)`, `uuidutil.IsValid(s)`, `uuidutil.Nil`.
+- **`uuidutil`**:
+  - Time-ordered RFC 9562 UUIDv7 (recommended for B-Tree database primary keys): `uuidutil.NewV7()` (`uuid.UUID`) and `uuidutil.NewV7String()` (`string`).
+  - Random RFC 4122 UUIDv4 & parsing/validation: `uuidutil.New()`, `uuidutil.NewString()`, `uuidutil.Parse(s)`, `uuidutil.ParsePtr(s)`, `uuidutil.MustParse(s)`, `uuidutil.IsValid(s)`, `uuidutil.IsNil(id)`, `uuidutil.Nil`.

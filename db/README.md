@@ -46,8 +46,9 @@ if err != nil {
 }
 defer pool.Close()
 
-// Execute an atomic transaction with context-bound DBTX propagation:
-err = db.WithTx(context.Background(), pool, func(txCtx context.Context) error {
+// Execute an atomic transaction with context-bound DBTX propagation (pool implements db.TxBeginner):
+err = db.WithTx(context.Background(), pool, func(txCtx context.Context, tx pgx.Tx) error {
+    // db.WithTx automatically injects tx into txCtx via db.WithQuerier(ctx, tx)
     q := db.GetQuerier(txCtx, pool)
     _, err := q.Exec(txCtx, "INSERT INTO orders (id) VALUES ($1)", "ord-1")
     return err

@@ -1,9 +1,9 @@
 ---
 name: go-libs-data-security
-description: Database pools, RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/abeta-dev/go-libs (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger).
+description: Database pools, transactional helpers (db.WithTx, db.WithQuerier, db.TxBeginner), RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/abeta-dev/go-libs@v0.4.0 (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger — 100.0% statement coverage).
 ---
 
-# `go-libs-data-security` Subskill (`v0.4.0`)
+# `go-libs-data-security` Subskill (`@v0.4.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/db`
@@ -14,14 +14,15 @@ Packages covered:
 - `github.com/abeta-dev/go-libs/telemetry`
 - `github.com/abeta-dev/go-libs/logger`
 
-## 1. PostgreSQL Pool, `DBTX` Abstraction & Transactions (`db`)
+## 1. PostgreSQL Pool, `DBTX` / `TxBeginner` & Transactions (`db`)
 
-Connect using `db.Connect(ctx, dsn, db.WithMaxConns(25))`, run atomic transactions with `db.WithTx`, and accept `db.DBTX` in repositories so methods run transparently against either `*pgxpool.Pool` or an active `pgx.Tx` transaction:
+Connect using `db.Connect(ctx, dsn, db.WithMaxConns(25))`. Run atomic transactions with `db.WithTx(ctx, pool, fn)` (which accepts any `db.TxBeginner`, automatically injects the `pgx.Tx` into context via `db.WithQuerier(ctx, tx)`, and rolls back on error or panic). Repositories calling `db.GetQuerier(ctx, pool)` receive a `db.DBTX` that transparently executes against the active `pgx.Tx` inside `db.WithTx` or falls back to `*pgxpool.Pool`:
 
 ```go
 pool, err := db.Connect(ctx, dsn, db.WithMaxConns(25))
 
-err = db.WithTx(ctx, pool, func(txCtx context.Context) error {
+err = db.WithTx(ctx, pool, func(txCtx context.Context, tx pgx.Tx) error {
+	// db.WithTx already binds tx into txCtx via db.WithQuerier(ctx, tx)
 	querier := db.GetQuerier(txCtx, pool) // Returns context-bound pgx.Tx inside WithTx, else pool
 	_, err := querier.Exec(txCtx, "INSERT INTO orders (id) VALUES ($1)", orderID)
 	return err
