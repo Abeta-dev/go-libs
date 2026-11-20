@@ -3,6 +3,8 @@
 Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 35 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/abeta-dev/go-libs.svg)](https://pkg.go.dev/github.com/abeta-dev/go-libs)
+[![Docs Portal](https://img.shields.io/badge/docs-abeta--dev.github.io%2Fgo--libs-00ADD8?logo=read-the-docs&logoColor=white)](https://abeta-dev.github.io/go-libs/)
+[![llms.txt](https://img.shields.io/badge/llms.txt-AI--Ready-7C3AED)](https://abeta-dev.github.io/go-libs/llms.txt)
 [![Code Quality: golangci-lint](https://img.shields.io/badge/code%20quality-golangci--lint-brightgreen?logo=go)](https://golangci-lint.run/)
 [![CI](https://github.com/abeta-dev/go-libs/actions/workflows/ci.yml/badge.svg)](https://github.com/abeta-dev/go-libs/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/abeta-dev/go-libs/main/.github/badges/coverage.json)](#-verified-statement-coverage-status)
@@ -429,6 +431,21 @@ docker compose -f deploy/docker-compose.observability.yml up --build
 | **`go-libs-http-gin`** | [`skills/go-libs-http-gin/SKILL.md`](skills/go-libs-http-gin/SKILL.md) | `ginmw`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation` |
 | **`go-libs-data-security`** | [`skills/go-libs-data-security/SKILL.md`](skills/go-libs-data-security/SKILL.md) | `db`, `rbac`, `rbaccontext`, `jwks`, `cryptoutil`, `telemetry`, `logger` |
 | **`go-libs-foundation`** | [`skills/go-libs-foundation/SKILL.md`](skills/go-libs-foundation/SKILL.md) | `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, `uuidutil` |
+
+Machine-readable LLM context is also published at **[`llms.txt`](llms.txt)** (and served live at [`https://abeta-dev.github.io/go-libs/llms.txt`](https://abeta-dev.github.io/go-libs/llms.txt)).
+
+---
+
+## 🌐 Abeta Go Ecosystem
+
+`go-libs` serves as the foundational operational layer across the 4-repository **Abeta Go Ecosystem**:
+
+| Repository | Architectural Role | Live Documentation Portal | API Reference (`pkg.go.dev`) |
+| :--- | :--- | :--- | :--- |
+| **[`github.com/abeta-dev/go-libs`](https://github.com/abeta-dev/go-libs)** | Foundational zero-business-logic Go primitives: HTTP/Gin middleware, resilience, concurrency, PostgreSQL, RBAC, and OpenTelemetry | [`abeta-dev.github.io/go-libs`](https://abeta-dev.github.io/go-libs/) | [`pkg.go.dev/github.com/abeta-dev/go-libs`](https://pkg.go.dev/github.com/abeta-dev/go-libs) |
+| **[`github.com/abeta-dev/go-fintech-india`](https://github.com/abeta-dev/go-fintech-india)** | Zero-float Indian fintech & statutory compliance primitives (`paise`, `gst`, `tds`, `pan`, `gstin`, `aadhaar`, `ifsc`, `upi`, `emvqr`) | [`abeta-dev.github.io/go-fintech-india`](https://abeta-dev.github.io/go-fintech-india/) | [`pkg.go.dev/github.com/abeta-dev/go-fintech-india`](https://pkg.go.dev/github.com/abeta-dev/go-fintech-india) |
+| **[`github.com/abeta-dev/go-app-kit`](https://github.com/abeta-dev/go-app-kit)** | Application-layer accelerators composing `go-libs` and `go-fintech-india` (`audit`, `export`, `notifications`, `outbox`, `pdf` GST invoices) | [`abeta-dev.github.io/go-app-kit`](https://abeta-dev.github.io/go-app-kit/) | [`pkg.go.dev/github.com/abeta-dev/go-app-kit`](https://pkg.go.dev/github.com/abeta-dev/go-app-kit) |
+| **[`github.com/abeta-dev/cloud-native-observability`](https://github.com/abeta-dev/cloud-native-observability)** | Production LGTM observability stack (Loki, Grafana, Tempo, Prometheus, OTel), Terraform IaC, ArgoCD GitOps, and Google SRE SLO alerting | [`abeta-dev.github.io/cloud-native-observability`](https://abeta-dev.github.io/cloud-native-observability/) | [`github.com/abeta-dev/cloud-native-observability`](https://github.com/abeta-dev/cloud-native-observability) |
 
 ---
 
