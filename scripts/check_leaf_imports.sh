@@ -30,6 +30,7 @@ LEAF_PACKAGES=(
   "clock"
   "async"
   "bodylimit"
+  "compress"
   "fsm"
   "metrics"
   "rbaccontext"

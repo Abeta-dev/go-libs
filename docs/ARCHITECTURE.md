@@ -97,7 +97,7 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 
 ---
 
-## 4. Master Module Directory (35 Packages)
+## 4. Master Module Directory (36 Packages)
 
 | Package | Layer | Primary Responsibility | Key Types / Constructors |
 |---|:---:|---|---|
@@ -107,6 +107,7 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 | `cache` | 2 | Typed cache with singleflight and eviction policies | `TypedCache`, `NewTypedCache`, `WithEvictionPolicy` |
 | `circuitbreaker` | 2 | 3-state failure machine for outbound dependencies | `ConsecutiveBreaker`, `RatioBreaker`, `NewConsecutiveBreaker` |
 | `clock` | 1 | Mockable time abstraction with RealClock and advanceable FakeClock | `Clock`, `RealClock`, `FakeClock`, `NewReal`, `NewFake` |
+| `compress` | 3 | RFC 9110 Brotli (`br`) & Gzip (`gzip`) HTTP compression and bounded request decompression | `Middleware`, `Negotiate`, `Config`, `DefaultConfig` |
 | `cryptoutil` | 1 | Bcrypt hashing (cost 12) and CSPRNG string generation | `HashPassword`, `GenerateTempPassword` |
 | `db` | 3 | PostgreSQL pgxpool lifecycle, DBTX querier abstraction, and transactional helpers | `Connect`, `DBTX`, `WithTx`, `WithQuerier`, `GetQuerier`, `WithMaxConns` |
 | `env` | 1 | Zero-dependency typed environment variable retrieval | `String`, `Int`, `Bool`, `MustString` |
@@ -277,10 +278,10 @@ func main() {
 
 ## 8. AI Agent Skills & Context Routing (`AGENTS.md` + `skills/`)
 
-To prevent LLM context bloat across all 35 packages, `go-libs` ships progressive-disclosure Agent Skills (`SKILL.md`) routed via the root [`AGENTS.md`](../AGENTS.md):
-- [`skills/go-libs/SKILL.md`](../skills/go-libs/SKILL.md) — Umbrella 35-package router and truth-gate guide
+To prevent LLM context bloat across all 36 packages, `go-libs` ships progressive-disclosure Agent Skills (`SKILL.md`) routed via the root [`AGENTS.md`](../AGENTS.md):
+- [`skills/go-libs/SKILL.md`](../skills/go-libs/SKILL.md) — Umbrella 36-package router and truth-gate guide
 - [`skills/go-libs-resilience/SKILL.md`](../skills/go-libs-resilience/SKILL.md) — Layer 2 resilience, caching, concurrency, and deterministic time
-- [`skills/go-libs-http-gin/SKILL.md`](../skills/go-libs-http-gin/SKILL.md) — Layer 3 & 4 Gin middleware pipeline, HTTP client/utilities, idempotency, and pagination
+- [`skills/go-libs-http-gin/SKILL.md`](../skills/go-libs-http-gin/SKILL.md) — Layer 3 & 4 Gin middleware pipeline, HTTP compression (`compress`), HTTP client/utilities, idempotency, and pagination
 - [`skills/go-libs-data-security/SKILL.md`](../skills/go-libs-data-security/SKILL.md) — PostgreSQL `db.DBTX`, JWKS, dynamic RBAC, bcrypt `cryptoutil`, `logger`, and `telemetry`
 - [`skills/go-libs-foundation/SKILL.md`](../skills/go-libs-foundation/SKILL.md) — Layer 1 `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, and `uuidutil`
 

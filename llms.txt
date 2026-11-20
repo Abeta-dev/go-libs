@@ -1,8 +1,8 @@
 # go-libs (github.com/abeta-dev/go-libs@v0.4.0)
 
-> 35 focused, production-hardened Go packages (Go 1.26.0, 100.0% statement coverage) covering HTTP & Gin middleware, resilience & concurrency, PostgreSQL/caching/OpenTelemetry observability, security & RBAC, and foundational type-safe utilities.
+> 36 focused, production-hardened Go packages (Go 1.26.0, 100.0% statement coverage) covering HTTP & Gin middleware, resilience & concurrency, PostgreSQL/caching/OpenTelemetry observability, security & RBAC, and foundational type-safe utilities.
 
-`go-libs` uses a single-module Bill of Materials (BOM) architecture (`github.com/abeta-dev/go-libs@v0.4.0`) with zero business domain logic. Every package is independently importable; lightweight leaf packages (`apperror`, `async`, `circuitbreaker`, `clock`, `env`, `fsm`, `maputil`, `metrics`, `retry`, `shutdown`, `sliceutil`, `stringutil`, `timeutil`) never pull heavy third-party frameworks (`gin`, `pgx`, or `opentelemetry`) into downstream consumer binaries.
+`go-libs` uses a single-module Bill of Materials (BOM) architecture (`github.com/abeta-dev/go-libs@v0.4.0`) with zero business domain logic. Every package is independently importable; lightweight leaf packages (`apperror`, `async`, `bodylimit`, `circuitbreaker`, `clock`, `compress`, `env`, `fsm`, `maputil`, `metrics`, `retry`, `securityheaders`, `shutdown`, `sliceutil`, `stringutil`, `timeutil`) never pull heavy third-party frameworks (`gin`, `pgx`, or `opentelemetry`) into downstream consumer binaries.
 
 ## Quick Installation
 
@@ -18,23 +18,23 @@ npx skills add abeta-dev/go-libs
 
 - [Documentation Portal](https://abeta-dev.github.io/go-libs/): Interactive package catalog, architecture blueprints, and copy-ready snippets.
 - [LLM Discovery Index (`llms.txt`)](https://abeta-dev.github.io/go-libs/llms.txt): Structured index for AI coding assistants and LLM context ingestion.
-- [pkg.go.dev API Reference](https://pkg.go.dev/github.com/abeta-dev/go-libs): Full GoDoc symbol documentation for all 35 packages.
+- [pkg.go.dev API Reference](https://pkg.go.dev/github.com/abeta-dev/go-libs): Full GoDoc symbol documentation for all 36 packages.
 - [GitHub Repository](https://github.com/abeta-dev/go-libs): Source repository, CI/CD pipelines, and issue tracker.
 - [AGENTS.md](https://github.com/abeta-dev/go-libs/blob/main/AGENTS.md): Multi-agent skill routing table and mandatory verification gates.
-- [Umbrella Skill (`skills/go-libs/SKILL.md`)](https://github.com/abeta-dev/go-libs/blob/main/skills/go-libs/SKILL.md): Complete 35-package router and truth gate instructions.
+- [Umbrella Skill (`skills/go-libs/SKILL.md`)](https://github.com/abeta-dev/go-libs/blob/main/skills/go-libs/SKILL.md): Complete 36-package router and truth gate instructions.
 - [System Architecture Blueprint (`docs/ARCHITECTURE.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/ARCHITECTURE.md): Layering boundaries, execution topology, and middleware chain order.
 - [Versioning & Stability Matrix (`docs/VERSIONING.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/VERSIONING.md): Semantic versioning contracts and package stability tiers.
 - [Performance Benchmarks (`BENCHMARKS.md`)](https://github.com/abeta-dev/go-libs/blob/main/BENCHMARKS.md): Throughput and zero-allocation benchmark baselines.
 
 ## AI Agent Skills (`skills/`)
 
-- `skills/go-libs/SKILL.md`: Umbrella router across all 35 packages and repository verification gates.
+- `skills/go-libs/SKILL.md`: Umbrella router across all 36 packages and repository verification gates.
 - `skills/go-libs-resilience/SKILL.md`: `retry`, `circuitbreaker`, `ratelimit`, `workerpool`, `cache`, `async`, `shutdown`, `fsm`, `clock`, `metrics`.
-- `skills/go-libs-http-gin/SKILL.md`: `ginmw`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation`.
+- `skills/go-libs-http-gin/SKILL.md`: `ginmw`, `compress`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation`.
 - `skills/go-libs-data-security/SKILL.md`: `db`, `rbac`, `rbaccontext`, `jwks`, `cryptoutil`, `telemetry`, `logger`.
 - `skills/go-libs-foundation/SKILL.md`: `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, `uuidutil`.
 
-## 35-Package Catalog & Primary Exported APIs
+## 36-Package Catalog & Primary Exported APIs
 
 ### 1. Resilience, Concurrency & Runtime Infrastructure (9 Packages)
 
@@ -57,10 +57,12 @@ npx skills add abeta-dev/go-libs
 - `github.com/abeta-dev/go-libs/metrics` (`@v0.4.0`): Framework-agnostic instrumentation interfaces with zero-allocation no-op defaults.
   - Exports: `metrics.Counter`, `metrics.Gauge`, `metrics.Histogram`, `metrics.NoopCounter`, `metrics.NoopGauge`, `metrics.NoopHistogram`.
 
-### 2. HTTP Transport, Edge Middleware & Gin Pipeline (12 Packages)
+### 2. HTTP Transport, Edge Middleware & Gin Pipeline (13 Packages)
 
-- `github.com/abeta-dev/go-libs/ginmw` (`@v0.4.0`): Unified Gin HTTP middleware suite (22 production middleware helpers).
-  - Exports: `ginmw.AuthMiddleware`, `ginmw.GenerateToken`, `ginmw.GetClaims`, `ginmw.RBAC`, `ginmw.RequirePermission`, `ginmw.RequireAnyPermission`, `ginmw.AdminOnly`, `ginmw.CORS`, `ginmw.GlobalRateLimit`, `ginmw.AuthRateLimit`, `ginmw.LimitBodyDefault`, `ginmw.LimitBodyAuth`, `ginmw.SecurityHeaders`, `ginmw.RequestID`, `ginmw.Logger`, `ginmw.Telemetry`, `ginmw.Idempotency`, `ginmw.RequireTenant`, `ginmw.RespondSuccess`, `ginmw.RespondError`, `ginmw.REDMetrics`, `ginmw.MetricsEndpoint`, `ginmw.ErrorHandler`, `ginmw.Recovery`, `ginmw.RateLimit`.
+- `github.com/abeta-dev/go-libs/ginmw` (`@v0.4.0`): Unified Gin HTTP middleware suite (23 production middleware helpers).
+  - Exports: `ginmw.AuthMiddleware`, `ginmw.GenerateToken`, `ginmw.GetClaims`, `ginmw.Compress`, `ginmw.RBAC`, `ginmw.RequirePermission`, `ginmw.RequireAnyPermission`, `ginmw.AdminOnly`, `ginmw.CORS`, `ginmw.GlobalRateLimit`, `ginmw.AuthRateLimit`, `ginmw.LimitBodyDefault`, `ginmw.LimitBodyAuth`, `ginmw.SecurityHeaders`, `ginmw.RequestID`, `ginmw.Logger`, `ginmw.Telemetry`, `ginmw.Idempotency`, `ginmw.RequireTenant`, `ginmw.RespondSuccess`, `ginmw.RespondError`, `ginmw.REDMetrics`, `ginmw.MetricsEndpoint`, `ginmw.ErrorHandler`, `ginmw.Recovery`, `ginmw.RateLimit`.
+- `github.com/abeta-dev/go-libs/compress` (`@v0.4.0`): RFC 9110 Brotli (`br`) & Gzip (`gzip`) HTTP response compression middleware with pooled writers, minimum size buffering, and bounded request decompression.
+  - Exports: `compress.Middleware`, `compress.Negotiate`, `compress.Config`, `compress.DefaultConfig`, `compress.EncodingBrotli`, `compress.EncodingGzip`, `compress.EncodingIdentity`.
 - `github.com/abeta-dev/go-libs/httpclient` (`@v0.4.0`): Resilient composed HTTP client chaining RateLimiter -> CircuitBreaker -> Retry -> Per-Attempt Timeout -> Transport.
   - Exports: `httpclient.New`, `httpclient.NewRoundTripper`, `WithRetry`, `WithCircuitBreaker`, `WithRateLimiter`, `WithPerAttemptTimeout`, `WithHeader`.
 - `github.com/abeta-dev/go-libs/ratelimit` (`@v0.4.0`): In-memory and PostgreSQL rate limiters (Token Bucket & Sliding Window) with CIDR trusted-proxy parsing and RFC `RateLimit-*` HTTP headers.
@@ -122,7 +124,7 @@ npx skills add abeta-dev/go-libs
 
 `go-libs` is the foundational operational layer of the 4-repository **Abeta Go Ecosystem**:
 
-1. **`go-libs@v0.4.0`** (`github.com/abeta-dev/go-libs`): 35 zero-business-logic foundational Go packages for HTTP/Gin middleware, resilience, concurrency, PostgreSQL, RBAC, and OpenTelemetry.
+1. **`go-libs@v0.4.0`** (`github.com/abeta-dev/go-libs`): 36 zero-business-logic foundational Go packages for HTTP/Gin middleware, resilience, concurrency, PostgreSQL, RBAC, and OpenTelemetry.
    - Docs Portal: https://abeta-dev.github.io/go-libs/
    - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-libs
 2. **`go-fintech-india@v0.3.0`** (`github.com/abeta-dev/go-fintech-india`): Zero-float Indian fintech primitives (`paise`, `gst`, `tds`, `pan`, `gstin`, `aadhaar`, `ifsc`, `upi`, `emvqr`, `fy`, `cin`, `din`, `tan`, `udyam`, `lut`, `hsn`, `inwords`).

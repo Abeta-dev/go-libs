@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>go-libs · Production-Hardened Go Microservice Foundations</title>
-  <meta name="description" content="35 hardened, framework-agnostic Go microservice packages with verified 100.0% statement coverage, zero heavy dependencies in core leaves, and zero data races under -race.">
+  <meta name="description" content="36 hardened, framework-agnostic Go microservice packages with verified 100.0% statement coverage, zero heavy dependencies in core leaves, and zero data races under -race.">
   <meta name="theme-color" content="#0b0f19">
 
   <!-- Open Graph -->
   <meta property="og:title" content="go-libs · Production-Hardened Go Microservice Foundations">
-  <meta property="og:description" content="35 production-ready Go packages with verified 100.0% statement coverage and zero data races.">
+  <meta property="og:description" content="36 production-ready Go packages with verified 100.0% statement coverage and zero data races.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://abeta-dev.github.io/go-libs/">
 
@@ -879,7 +879,7 @@
       </a>
       <ul class="nav-links">
         <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#packages">Packages (35)</a></li>
+        <li><a href="#packages">Packages (36)</a></li>
         <li><a href="#quickstart">Quick Start</a></li>
         <li><a href="#benchmarks">Benchmarks</a></li>
         <li><a href="#branch-protection">Security Gate</a></li>
@@ -898,7 +898,7 @@
     <div class="container">
       <h1>Production-Hardened Go Microservice Foundations</h1>
       <p class="hero-sub">
-        Unified, zero-business-logic foundation primitives for high-throughput Go backends. Hardened with verified 100.0% statement coverage across 35 packages, zero heavy dependencies in core leaves, and zero data races under <code>-race</code>.
+        Unified, zero-business-logic foundation primitives for high-throughput Go backends. Hardened with verified 100.0% statement coverage across 36 packages, zero heavy dependencies in core leaves, and zero data races under <code>-race</code>.
       </p>
       <div class="hero-meta">
         <span>Release v0.4.0 · Go 1.26.0+ · Single-Module BOM</span>
@@ -936,7 +936,7 @@
       <!-- Stats Grid -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-val">35</div>
+          <div class="stat-val">36</div>
           <div class="stat-lbl">Hardened Packages</div>
         </div>
         <div class="stat-card">
@@ -993,6 +993,7 @@
           </div>
           <p class="tier-desc">Standard library <code>http.Handler</code> compatible middleware, context propagation, and transports.</p>
           <div class="tier-pkgs">
+            <span class="pkg-chip">compress</span>
             <span class="pkg-chip">httpclient</span>
             <span class="pkg-chip">ratelimit</span>
             <span class="pkg-chip">securityheaders</span>
@@ -1070,10 +1071,10 @@
       </div>
     </section>
 
-    <!-- Interactive Package Directory (35 Packages) -->
+    <!-- Interactive Package Directory (36 Packages) -->
     <section id="packages" class="container page-section">
       <div class="section-head">
-        <h2>Package Directory (35 Packages)</h2>
+        <h2>Package Directory (36 Packages)</h2>
         <p>Explore the complete collection of production-hardened microservice packages with live filtering.</p>
       </div>
 
@@ -1081,10 +1082,10 @@
         <label for="pkgSearch" class="sr-only">Search packages by name, exported symbol, or purpose</label>
         <input type="search" id="pkgSearch" class="search-input" placeholder="Search packages by name, exported symbol, or purpose..." aria-label="Search packages by name, exported symbol, or purpose">
         <div class="category-pills" role="group" aria-label="Filter packages by category">
-          <button type="button" class="pill-btn active" aria-pressed="true" onclick="filterCategory('all', this)">All (35)</button>
+          <button type="button" class="pill-btn active" aria-pressed="true" onclick="filterCategory('all', this)">All (36)</button>
           <button type="button" class="pill-btn" aria-pressed="false" onclick="filterCategory('resilience', this)">Core Resilience (9)</button>
           <button type="button" class="pill-btn" aria-pressed="false" onclick="filterCategory('primitives', this)">Generics &amp; Primitives (10)</button>
-          <button type="button" class="pill-btn" aria-pressed="false" onclick="filterCategory('http', this)">HTTP &amp; Transport (9)</button>
+          <button type="button" class="pill-btn" aria-pressed="false" onclick="filterCategory('http', this)">HTTP &amp; Transport (10)</button>
           <button type="button" class="pill-btn" aria-pressed="false" onclick="filterCategory('security', this)">Data &amp; Security (5)</button>
           <button type="button" class="pill-btn" aria-pressed="false" onclick="filterCategory('framework', this)">Framework Adapters (2)</button>
         </div>
@@ -1519,6 +1520,13 @@ func main() {
         exports: ["Clock", "RealClock", "FakeClock", "NewReal", "NewFake"]
       },
       {
+        name: "compress",
+        category: "http",
+        coverage: "100.0%",
+        desc: "RFC 9110 Brotli (br) and Gzip (gzip) HTTP response compression with pooled writers and bounded request decompression.",
+        exports: ["Middleware", "Negotiate", "Config", "DefaultConfig", "EncodingBrotli", "EncodingGzip"]
+      },
+      {
         name: "cryptoutil",
         category: "primitives",
         coverage: "100.0%",
@@ -1550,8 +1558,8 @@ func main() {
         name: "ginmw",
         category: "framework",
         coverage: "100.0%",
-        desc: "Hardened Gin-specific middleware suite with unified imports (CORS, JWT Auth, RBAC, Recovery, RequestID, REDMetrics).",
-        exports: ["CORS", "Logger", "Recovery", "RequestID", "SecurityHeaders", "Telemetry", "Idempotency", "AuthMiddleware", "REDMetrics"]
+        desc: "Hardened Gin-specific middleware suite with unified imports (CORS, Compress, JWT Auth, RBAC, Recovery, RequestID, REDMetrics).",
+        exports: ["CORS", "Compress", "Logger", "Recovery", "RequestID", "SecurityHeaders", "Telemetry", "Idempotency", "AuthMiddleware", "REDMetrics"]
       },
       {
         name: "health",
@@ -1766,7 +1774,7 @@ func main() {
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No packages match "${searchTerm}". Try clearing the search filter or selecting "All (35)".</div>`;
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No packages match "${searchTerm}". Try clearing the search filter or selecting "All (36)".</div>`;
       }
     }
 

@@ -1,6 +1,6 @@
 # go-libs · latest published v0.4.0
 
-Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 35 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
+Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 36 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/abeta-dev/go-libs.svg)](https://pkg.go.dev/github.com/abeta-dev/go-libs)
 [![Docs Portal](https://img.shields.io/badge/docs-abeta--dev.github.io%2Fgo--libs-00ADD8?logo=read-the-docs&logoColor=white)](https://abeta-dev.github.io/go-libs/)
@@ -290,6 +290,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 | `ratelimit` | `/ratelimit` | `New(cap, window, opts...)`, `NewGlobal()`, `NewAuth()`, RFC `RateLimit-*` headers, `WithMetrics` |
 | `securityheaders` | `/securityheaders` | `New(opts...)` — OWASP defensive security headers (CSP, HSTS, X-Frame) |
 | `bodylimit` | `/bodylimit` | `New(maxBytes)`, `MB(n)`, `KB(n)`, `String(bytes)` — HTTP request body size limiter preventing payload inflation attacks |
+| `compress` | `/compress` | `Middleware(cfg...)`, `Negotiate(acceptEncoding)`, `Config`, `DefaultConfig()` — RFC 9110 Brotli (`br`) & Gzip (`gzip`) response compression with pooled writers and bounded request decompression |
 | `requestid` | `/requestid` | `Middleware`, `FromContext(ctx)`, `Header` constant — W3C correlation ID propagation |
 | `recovery` | `/recovery` | `Middleware(opts...)` — JSON panic recovery with structured `slog` output |
 | `httputil` | `/httputil` | `OK`, `Created`, `NoContent`, `Error`, `ErrorFromDomain`, `ValidationError` — standardized responses |
@@ -322,7 +323,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 | Package | Import suffix | Key exports & Description |
 |---|---|---|
-| `ginmw` | `/ginmw` | `AuthMiddleware`, `GenerateToken`, `GetClaims`, `RateLimit`, `Recovery`, `RequestID`, `SecurityHeaders`, `Idempotency`, `Logger`, `RequireTenant`, `RespondSuccess`, `RespondError`, `REDMetrics` — unified Gin web framework middleware suite |
+| `ginmw` | `/ginmw` | `AuthMiddleware`, `GenerateToken`, `GetClaims`, `Compress`, `RateLimit`, `Recovery`, `RequestID`, `SecurityHeaders`, `Idempotency`, `Logger`, `RequireTenant`, `RespondSuccess`, `RespondError`, `REDMetrics` — unified Gin web framework middleware suite |
 
 | Function | Purpose |
 |---|---|
@@ -338,6 +339,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 | `ginmw.AuthRateLimit()` | IP token-bucket: 10 req/min (brute-force protection) |
 | `ginmw.LimitBodyDefault()` | 2 MB max body for all API routes |
 | `ginmw.LimitBodyAuth()` | 4 KB max body for auth endpoints |
+| `ginmw.Compress(cfg...)` | RFC 9110 Brotli (`br`) & Gzip (`gzip`) response compression and request decompression |
 | `ginmw.SecurityHeaders(name)` | OWASP defensive headers (CSP, HSTS, X-Frame) |
 | `ginmw.RequestID()` | Injects/propagates `X-Request-ID` |
 | `ginmw.Logger()` | Structured access log (method, path, status, latency) |
@@ -353,7 +355,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 ## 📊 Verified Statement Coverage Status
 
-Coverage across all 35 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
+Coverage across all 36 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
 > **Overall Repository Statement Coverage: 100.0%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
@@ -367,6 +369,7 @@ Coverage across all 35 packages in `go-libs` is measured using Go's official sta
 | `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **100.0%** |
 | `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **100.0%** |
 | `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **100.0%** |
+| `compress` | Brotli (`br`) & Gzip (`gzip`) HTTP compression and bounded request decompression middleware | **100.0%** |
 | `cryptoutil` | Secure password hashing (`golang.org/x/crypto/bcrypt`) and CSPRNG password generation (`crypto/rand`) | **100.0%** |
 | `db` | Database Pool & Querier | **100.0%** |
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |
@@ -426,9 +429,9 @@ docker compose -f deploy/docker-compose.observability.yml up --build
 
 | Skill | Path | Covered Packages |
 | :--- | :--- | :--- |
-| **`go-libs` (Umbrella)** | [`skills/go-libs/SKILL.md`](skills/go-libs/SKILL.md) | Full 35-package catalog router, architectural invariants, and truth gates |
+| **`go-libs` (Umbrella)** | [`skills/go-libs/SKILL.md`](skills/go-libs/SKILL.md) | Full 36-package catalog router, architectural invariants, and truth gates |
 | **`go-libs-resilience`** | [`skills/go-libs-resilience/SKILL.md`](skills/go-libs-resilience/SKILL.md) | `retry`, `circuitbreaker`, `ratelimit`, `workerpool`, `cache`, `async`, `shutdown`, `fsm`, `clock`, `metrics` |
-| **`go-libs-http-gin`** | [`skills/go-libs-http-gin/SKILL.md`](skills/go-libs-http-gin/SKILL.md) | `ginmw`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation` |
+| **`go-libs-http-gin`** | [`skills/go-libs-http-gin/SKILL.md`](skills/go-libs-http-gin/SKILL.md) | `ginmw`, `compress`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation` |
 | **`go-libs-data-security`** | [`skills/go-libs-data-security/SKILL.md`](skills/go-libs-data-security/SKILL.md) | `db`, `rbac`, `rbaccontext`, `jwks`, `cryptoutil`, `telemetry`, `logger` |
 | **`go-libs-foundation`** | [`skills/go-libs-foundation/SKILL.md`](skills/go-libs-foundation/SKILL.md) | `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, `uuidutil` |
 

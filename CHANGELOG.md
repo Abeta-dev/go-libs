@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.0] - 2026-11-05
 
 ### Added
+- `compress`: Added `Middleware`, `Negotiate`, `Config`, `DefaultConfig`, `EncodingBrotli`, `EncodingGzip`, and `EncodingIdentity` for RFC 9110 Brotli and Gzip HTTP response compression with pooled writers and bounded request decompression.
+- `ginmw`: Added `Compress` middleware adapter integrating Brotli and Gzip response compression and request decompression with Gin handlers.
 - `db`: Added `WithTx`, `WithQuerier`, and `TxBeginner` to execute transactional closures with automatic panic/error rollback and context-bound `DBTX` propagation via `GetQuerier`.
 - `uuidutil`: Added `NewV7` and `NewV7String` for RFC 9562 time-ordered UUIDv7 generation, plus `example_test.go` across `async`, `fsm`, `jwks`, and `uuidutil`, and package `README.md` documentation for `clock` and `httpclient`.
 - **Security & Secret Scanning**: Added `scripts/check_secrets.sh` and CI TruffleHog secret scanning (`secret-scan` job) across git commit history and working tree.
 
 ### Changed
-- **Module Path Migration**: Migrated canonical Go module path from `github.com/umesh0492/go-libs` to `github.com/abeta-dev/go-libs` across `go.mod`, `examples/microservice`, all 35 packages, CI/CD workflows, and documentation.
+- **Module Path Migration**: Migrated canonical Go module path from `github.com/umesh0492/go-libs` to `github.com/abeta-dev/go-libs` across `go.mod`, `examples/microservice`, all 36 packages, CI/CD workflows, and documentation.
 - `ginmw`:
   - Fixed `GlobalRateLimit` and `AuthRateLimit` to call `c.Abort()` when the underlying rate limiter writes `429 Too Many Requests`, preventing downstream handlers from executing.
   - Updated `CORS` to support `"*"` wildcard in `allowedOrigins` and omit `Access-Control-Allow-*` headers on disallowed origins.

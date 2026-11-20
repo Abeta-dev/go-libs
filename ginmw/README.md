@@ -102,6 +102,12 @@ router.Use(ginmw.LimitBodyDefault())
 
 // 4 KB maximum — apply to login/register endpoints  
 authGroup.Use(ginmw.LimitBodyAuth())
+
+// Brotli (br) & Gzip (gzip) response compression and optional request decompression
+router.Use(ginmw.Compress(compress.Config{
+    MinSize:           1024,
+    DecompressRequest: true,
+}))
 ```
 
 ### Request ID, CORS, Security, Logging

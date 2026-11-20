@@ -25,7 +25,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 - **Early**: Production-ready implementation that has undergone recent surface consolidation or is subject to ergonomic refinements based on community feedback.
 - **Experimental / Deprecated**: Transitional APIs that may be superseded by standard CNCF/Go patterns or scheduled for deprecation.
 
-### Complete Inventory (35 Packages: 27 Stable, 8 Early, 0 Deprecated)
+### Complete Inventory (36 Packages: 28 Stable, 8 Early, 0 Deprecated)
 
 | Package | Maturity Tier | Measured Coverage | API Status & Production Risk |
 | :--- | :--- | :--- | :--- |
@@ -33,6 +33,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `async` | **Stable** | 100.0% | Panic-safe goroutines and bounded concurrency orchestration. API frozen. |
 | `bodylimit` | **Stable** | 100.0% | Request body cap Gin middleware. Complete and stable. |
 | `circuitbreaker` | **Stable** | 100.0% | Consecutive-failure and failure-ratio state machines. Low risk. |
+| `compress` | **Stable** | 100.0% | Brotli (`br`) & Gzip (`gzip`) HTTP compression and request decompression middleware. API frozen. |
 | `cryptoutil` | **Stable** | 100.0% | Bcrypt password hashing and CSPRNG token generators. API frozen. |
 | `env` | **Stable** | 100.0% | Zero-dependency typed environment variable parser. API frozen. |
 | `fsm` | **Stable** | 100.0% | Declarative in-memory finite state machine with O(1) state transitions. API frozen. |

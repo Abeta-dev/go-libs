@@ -50,7 +50,7 @@ In addition to standard `go test` and `golangci-lint`, `go-libs` includes determ
 ### A. `./scripts/check_version.sh`
 - **What it checks**:
   - Ensures the version in `README.md` matches `CHANGELOG.md` and release tags.
-  - Asserts that all 35 packages documented in `README.md` match `go list ./...`.
+  - Asserts that all 36 packages documented in `README.md` match `go list ./...`.
   - Verifies that every exported symbol listed under `### Added` in `CHANGELOG.md` actually exists in the Go source code.
   - Confirms zero stale references to deprecated Go versions or unreleased major tags.
 - **Why it exists**: To ensure that documentation never claims features or APIs that do not exist or have drifted.
