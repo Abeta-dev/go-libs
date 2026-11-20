@@ -1,50 +1,29 @@
-## Description
-<!-- Provide a concise summary of the changes introduced by this PR. -->
+## Summary
+<!-- Provide a concise summary of the architectural problem solved and the changes introduced by this PR. -->
 
 ## Related Issue
 <!-- Fixes #(issue) or Relates to #(issue) -->
 
-## Package(s) Affected
-- [ ] `apperror`
-- [ ] `bodylimit`
-- [ ] `cache`
-- [ ] `circuitbreaker`
-- [ ] `clock`
-- [ ] `cryptoutil`
-- [ ] `db`
-- [ ] `env`
-- [ ] `ginmw`
-- [ ] `health`
-- [ ] `httpclient`
-- [ ] `httputil`
-- [ ] `idempotency`
-- [ ] `logger`
-- [ ] `maputil`
-- [ ] `metrics`
-- [ ] `pagination`
-- [ ] `ratelimit`
-- [ ] `rbac` / `rbaccontext`
-- [ ] `recovery`
-- [ ] `requestid`
-- [ ] `retry`
-- [ ] `securityheaders`
-- [ ] `shutdown`
-- [ ] `sliceutil`
-- [ ] `stringutil`
-- [ ] `telemetry`
-- [ ] `timeutil`
-- [ ] `validation`
-- [ ] `workerpool`
+## Type of Change
+- [ ] `feat`: New package primitive or backward-compatible capability
+- [ ] `fix`: Bug fix, concurrency/race fix, or security hardening
+- [ ] `perf`: Zero-allocation or throughput optimization with benchmark evidence
+- [ ] `docs` / `skills`: Documentation, `llms.txt`, `docs/index.html`, or `skills/*/SKILL.md` sync
+- [ ] `ci` / `chore`: Build, dependency, or verification gate update
 
-## Quality Checklist
-- [ ] `make lint` passed with 0 warnings or errors (`golangci-lint run ./...`).
-- [ ] `make test-race` passed with 0 data races (`go test -race ./...`).
-- [ ] `./scripts/check_version.sh` passed with exit code 0.
-- [ ] `./scripts/check_coverage.sh` passed with exit code 0.
-- [ ] **Documented Numbers**: Does this PR touch any documented number (coverage %, package count, benchmark)? If yes, was it regenerated via toolchain scripts, NOT hand-typed?
-- [ ] If `ginmw` was touched, statement coverage strictly remains at **100.0%**.
-- [ ] Unit tests added or updated to cover all new branches.
-- [ ] Godoc comments added for all newly exported identifiers.
-- [ ] `Example*()` testable examples added if introducing a new public API.
-- [ ] In `examples/microservice`: `go build -v .` and `go test -v ./...` pass cleanly.
+## Subsystem / Package(s) Affected
+- [ ] **HTTP & Gin Middleware**: `ginmw` · `bodylimit` · `health` · `httpclient` · `httputil` · `idempotency` · `pagination` · `recovery` · `requestid` · `securityheaders` · `validation`
+- [ ] **Resilience & Concurrency**: `async` · `cache` · `circuitbreaker` · `clock` · `fsm` · `metrics` · `ratelimit` · `retry` · `shutdown` · `workerpool`
+- [ ] **Data, Security & Observability**: `cryptoutil` · `db` · `jwks` · `logger` · `rbac` · `rbaccontext` · `telemetry`
+- [ ] **Foundational Utilities**: `apperror` · `env` · `maputil` · `sliceutil` · `stringutil` · `timeutil` · `uuidutil`
+- [ ] **Reference Service & Docs**: `examples/microservice` · `docs/` · `skills/` · `.github/workflows/`
 
+## Mandatory Quality & Security Gates
+- [ ] `./scripts/check_secrets.sh` passed with **0 leaked credentials or verified TruffleHog findings**.
+- [ ] `./scripts/check_version.sh` passed (`vMAJOR.MINOR.PATCH` parity, 35-package BOM sync, `gofmt`, and AST-verified `CHANGELOG.md` symbols).
+- [ ] `./scripts/check_leaf_imports.sh` passed (all 20 leaf packages remain free of `gin`, `pgx`, or `otel` dependencies).
+- [ ] `./scripts/check_coverage.sh` passed with **100.0% statement coverage** across all 35 packages and zero badge drift.
+- [ ] `go test -race ./...` and `(cd examples/microservice && go test -race -cover ./...)` passed with **0 data races** and **100.0% coverage**.
+- [ ] `golangci-lint run ./...` passed with **0 issues**.
+- [ ] **Documentation & AI Context Sync**: Updated `README.md`, `CHANGELOG.md`, `docs/index.html`, `docs/llms.txt` (`llms.txt`), `AGENTS.md`, and `skills/*/SKILL.md` where applicable.
+- [ ] **Public API Contract**: Added Godoc comments and testable `Example*()` functions for all newly exported symbols.
