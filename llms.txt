@@ -1,0 +1,136 @@
+# go-libs (github.com/abeta-dev/go-libs@v0.4.0)
+
+> 35 focused, production-hardened Go packages (Go 1.26.0, 100.0% statement coverage) covering HTTP & Gin middleware, resilience & concurrency, PostgreSQL/caching/OpenTelemetry observability, security & RBAC, and foundational type-safe utilities.
+
+`go-libs` uses a single-module Bill of Materials (BOM) architecture (`github.com/abeta-dev/go-libs@v0.4.0`) with zero business domain logic. Every package is independently importable; lightweight leaf packages (`apperror`, `async`, `circuitbreaker`, `clock`, `env`, `fsm`, `maputil`, `metrics`, `retry`, `shutdown`, `sliceutil`, `stringutil`, `timeutil`) never pull heavy third-party frameworks (`gin`, `pgx`, or `opentelemetry`) into downstream consumer binaries.
+
+## Quick Installation
+
+```bash
+# Install Go module (requires Go 1.26.0+)
+go get github.com/abeta-dev/go-libs@v0.4.0
+
+# Install AI Agent Skills (Antigravity, Claude Code, Gemini CLI, Codex, Cursor)
+npx skills add abeta-dev/go-libs
+```
+
+## Key Links & Documentation
+
+- [Documentation Portal](https://abeta-dev.github.io/go-libs/): Interactive package catalog, architecture blueprints, and copy-ready snippets.
+- [LLM Discovery Index (`llms.txt`)](https://abeta-dev.github.io/go-libs/llms.txt): Structured index for AI coding assistants and LLM context ingestion.
+- [pkg.go.dev API Reference](https://pkg.go.dev/github.com/abeta-dev/go-libs): Full GoDoc symbol documentation for all 35 packages.
+- [GitHub Repository](https://github.com/abeta-dev/go-libs): Source repository, CI/CD pipelines, and issue tracker.
+- [AGENTS.md](https://github.com/abeta-dev/go-libs/blob/main/AGENTS.md): Multi-agent skill routing table and mandatory verification gates.
+- [Umbrella Skill (`skills/go-libs/SKILL.md`)](https://github.com/abeta-dev/go-libs/blob/main/skills/go-libs/SKILL.md): Complete 35-package router and truth gate instructions.
+- [System Architecture Blueprint (`docs/ARCHITECTURE.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/ARCHITECTURE.md): Layering boundaries, execution topology, and middleware chain order.
+- [Versioning & Stability Matrix (`docs/VERSIONING.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/VERSIONING.md): Semantic versioning contracts and package stability tiers.
+- [Performance Benchmarks (`BENCHMARKS.md`)](https://github.com/abeta-dev/go-libs/blob/main/BENCHMARKS.md): Throughput and zero-allocation benchmark baselines.
+
+## AI Agent Skills (`skills/`)
+
+- `skills/go-libs/SKILL.md`: Umbrella router across all 35 packages and repository verification gates.
+- `skills/go-libs-resilience/SKILL.md`: `retry`, `circuitbreaker`, `ratelimit`, `workerpool`, `cache`, `async`, `shutdown`, `fsm`, `clock`, `metrics`.
+- `skills/go-libs-http-gin/SKILL.md`: `ginmw`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation`.
+- `skills/go-libs-data-security/SKILL.md`: `db`, `rbac`, `rbaccontext`, `jwks`, `cryptoutil`, `telemetry`, `logger`.
+- `skills/go-libs-foundation/SKILL.md`: `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, `uuidutil`.
+
+## 35-Package Catalog & Primary Exported APIs
+
+### 1. Resilience, Concurrency & Runtime Infrastructure (9 Packages)
+
+- `github.com/abeta-dev/go-libs/retry` (`@v0.4.0`): Context-aware backoff and retry execution algorithms with non-retryable error classification.
+  - Exports: `retry.Do`, `retry.DoWithResult[T]`, `retry.Config`, `retry.Constant`, `retry.Linear`, `retry.Exponential`, `retry.ExponentialJitter`, `retry.MarkPermanent`, `retry.IsPermanent`.
+- `github.com/abeta-dev/go-libs/circuitbreaker` (`@v0.4.0`): Outbound 3-state (`Closed`, `Open`, `HalfOpen`) failure state machine.
+  - Exports: `circuitbreaker.ConsecutiveBreaker`, `circuitbreaker.RatioBreaker`, `circuitbreaker.NewConsecutiveBreaker`, `circuitbreaker.NewRatioBreaker`, `Execute`, `State`, `ErrCircuitOpen`.
+- `github.com/abeta-dev/go-libs/workerpool` (`@v0.4.0`): Bounded panic-safe concurrent worker pool with graceful queue draining and metrics hooks.
+  - Exports: `workerpool.Pool`, `workerpool.New`, `Submit`, `SubmitContext`, `Stop`, `WithMetrics`, `WithPanicHandler`.
+- `github.com/abeta-dev/go-libs/cache` (`@v0.4.0`): Generic singleflight stampede-protected multi-policy in-memory cache.
+  - Exports: `cache.TypedCache[T]`, `cache.NewTypedCache[T]`, `cache.NewMemoryCache`, `Get`, `Set`, `Delete`, `GetOrFetch`, `WithEvictionPolicy`, `PolicySampledLRU`, `PolicyLRU`, `PolicyLFU`, `PolicyFIFO`, `PolicyTTL`, `WithMetrics`, `WithEvictionInterval`.
+- `github.com/abeta-dev/go-libs/async` (`@v0.4.0`): Panic-safe goroutines and bounded concurrency orchestration.
+  - Exports: `async.Go`, `async.GoCtx`, `async.Parallel`, `async.ParallelLimit`.
+- `github.com/abeta-dev/go-libs/shutdown` (`@v0.4.0`): Coordinated concurrent graceful teardown manager for OS signals (`SIGINT`, `SIGTERM`).
+  - Exports: `shutdown.Manager`, `shutdown.New`, `Register`, `Execute`, `Wait`.
+- `github.com/abeta-dev/go-libs/fsm` (`@v0.4.0`): Declarative in-memory finite state machine with O(1) transitions.
+  - Exports: `fsm.Machine`, `fsm.NewMachine`, `Transition`, `CanTransition`, `ValidateTransition`.
+- `github.com/abeta-dev/go-libs/clock` (`@v0.4.0`): Deterministic mockable time abstraction for sleep-free unit tests.
+  - Exports: `clock.Clock`, `clock.RealClock`, `clock.FakeClock`, `clock.NewReal`, `clock.NewFake`.
+- `github.com/abeta-dev/go-libs/metrics` (`@v0.4.0`): Framework-agnostic instrumentation interfaces with zero-allocation no-op defaults.
+  - Exports: `metrics.Counter`, `metrics.Gauge`, `metrics.Histogram`, `metrics.NoopCounter`, `metrics.NoopGauge`, `metrics.NoopHistogram`.
+
+### 2. HTTP Transport, Edge Middleware & Gin Pipeline (12 Packages)
+
+- `github.com/abeta-dev/go-libs/ginmw` (`@v0.4.0`): Unified Gin HTTP middleware suite (22 production middleware helpers).
+  - Exports: `ginmw.AuthMiddleware`, `ginmw.GenerateToken`, `ginmw.GetClaims`, `ginmw.RBAC`, `ginmw.RequirePermission`, `ginmw.RequireAnyPermission`, `ginmw.AdminOnly`, `ginmw.CORS`, `ginmw.GlobalRateLimit`, `ginmw.AuthRateLimit`, `ginmw.LimitBodyDefault`, `ginmw.LimitBodyAuth`, `ginmw.SecurityHeaders`, `ginmw.RequestID`, `ginmw.Logger`, `ginmw.Telemetry`, `ginmw.Idempotency`, `ginmw.RequireTenant`, `ginmw.RespondSuccess`, `ginmw.RespondError`, `ginmw.REDMetrics`, `ginmw.MetricsEndpoint`, `ginmw.ErrorHandler`, `ginmw.Recovery`, `ginmw.RateLimit`.
+- `github.com/abeta-dev/go-libs/httpclient` (`@v0.4.0`): Resilient composed HTTP client chaining RateLimiter -> CircuitBreaker -> Retry -> Per-Attempt Timeout -> Transport.
+  - Exports: `httpclient.New`, `httpclient.NewRoundTripper`, `WithRetry`, `WithCircuitBreaker`, `WithRateLimiter`, `WithPerAttemptTimeout`, `WithHeader`.
+- `github.com/abeta-dev/go-libs/ratelimit` (`@v0.4.0`): In-memory and PostgreSQL rate limiters (Token Bucket & Sliding Window) with CIDR trusted-proxy parsing and RFC `RateLimit-*` HTTP headers.
+  - Exports: `ratelimit.New`, `ratelimit.NewTokenBucket`, `ratelimit.NewSlidingWindow`, `ratelimit.NewPGRateLimiter`, `ratelimit.NewGlobal`, `ratelimit.NewAuth`, `TokenBucketLimiter`, `SlidingWindowLimiter`, `WithMetrics`.
+- `github.com/abeta-dev/go-libs/httputil` (`@v0.4.0`): Standardized JSON response writers and domain error status mapping for `net/http`.
+  - Exports: `httputil.OK`, `httputil.Created`, `httputil.NoContent`, `httputil.Error`, `httputil.ErrorFromDomain`, `httputil.ValidationError`.
+- `github.com/abeta-dev/go-libs/pagination` (`@v0.4.0`): Clamped offset and cursor pagination query parsers, generic slice pagination, and typed response envelopes.
+  - Exports: `pagination.Parse`, `pagination.Offset`, `pagination.NewResponse`, `pagination.NewTypedResponse[T]`, `pagination.PaginateSlice[T]`, `pagination.ParseCursor`, `pagination.EncodeCursor`, `pagination.DecodeCursor`.
+- `github.com/abeta-dev/go-libs/idempotency` (`@v0.4.0`): Two-phase atomic HTTP request deduplication with in-memory and PostgreSQL backing stores.
+  - Exports: `idempotency.Store`, `idempotency.MemoryStore`, `idempotency.PGStore`, `idempotency.NewMemoryStore`, `idempotency.NewPGStore`, `idempotency.Middleware`.
+- `github.com/abeta-dev/go-libs/health` (`@v0.4.0`): Parallel dependency health check aggregator and Kubernetes liveness/readiness HTTP probe handlers.
+  - Exports: `health.Service`, `health.New`, `health.WithChecker`, `LivenessHandler`, `ReadinessHandler`, `Handler`.
+- `github.com/abeta-dev/go-libs/requestid` (`@v0.4.0`): W3C correlation ID (`X-Request-ID`) generator, HTTP middleware, and context propagator.
+  - Exports: `requestid.Middleware`, `requestid.FromContext`, `requestid.GetRequestID`, `requestid.Header`.
+- `github.com/abeta-dev/go-libs/recovery` (`@v0.4.0`): Panic-to-JSON-500 `net/http` middleware with structured `slog` stack logging.
+  - Exports: `recovery.Middleware`, `recovery.WithLogger`.
+- `github.com/abeta-dev/go-libs/securityheaders` (`@v0.4.0`): OWASP defensive HTTP header middleware (`Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`).
+  - Exports: `securityheaders.New`, `securityheaders.Default`.
+- `github.com/abeta-dev/go-libs/bodylimit` (`@v0.4.0`): HTTP request body byte-limit middleware preventing payload inflation attacks.
+  - Exports: `bodylimit.New`, `bodylimit.MB`, `bodylimit.KB`, `bodylimit.String`.
+- `github.com/abeta-dev/go-libs/validation` (`@v0.4.0`): Human-readable `go-playground/validator/v10` struct validation error formatter.
+  - Exports: `validation.FormatErrors`, `validation.FieldError`.
+
+### 3. Data Access, Security, RBAC & Observability (7 Packages)
+
+- `github.com/abeta-dev/go-libs/db` (`@v0.4.0`): PostgreSQL `pgxpool` connection lifecycle, `DBTX` / `TxBeginner` interfaces, and context-propagated transactional execution.
+  - Exports: `db.Connect`, `db.WithTx`, `db.WithQuerier`, `db.GetQuerier`, `db.DBTX`, `db.TxBeginner`, `db.WithMaxConns`, `db.WithMinConns`.
+- `github.com/abeta-dev/go-libs/rbac` (`@v0.4.0`): Multi-segment wildcard Role-Based Access Control policy evaluator.
+  - Exports: `rbac.Engine`, `rbac.NewEngine`, `Match`, `HasPermission`, `HasAnyPermission`, `HasAllPermissions`.
+- `github.com/abeta-dev/go-libs/rbaccontext` (`@v0.4.0`): Context-bound permission injection and lookup helpers.
+  - Exports: `rbaccontext.WithPermissions`, `rbaccontext.Permissions`, `rbaccontext.Can`, `rbaccontext.CanAny`, `rbaccontext.CanAll`.
+- `github.com/abeta-dev/go-libs/jwks` (`@v0.4.0`): Thread-safe cached ECDSA P-256 JWKS public key resolver with stale-key fallback on upstream outage.
+  - Exports: `jwks.Resolver`, `jwks.NewResolver`, `jwks.GetECPublicKey`.
+- `github.com/abeta-dev/go-libs/cryptoutil` (`@v0.4.0`): Bcrypt password hashing (OWASP cost 12) and CSPRNG temporary password generation.
+  - Exports: `cryptoutil.HashPassword`, `cryptoutil.ComparePassword`, `cryptoutil.IsCorrectPassword`, `cryptoutil.GenerateTempPassword`.
+- `github.com/abeta-dev/go-libs/telemetry` (`@v0.4.0`): OpenTelemetry distributed tracing provider setup and W3C trace context span helpers.
+  - Exports: `telemetry.NewTracerProvider`, `telemetry.InitProvider`, `telemetry.StartSpan`.
+- `github.com/abeta-dev/go-libs/logger` (`@v0.4.0`): Request-context aware structured `slog` logger with PII field redaction and log sampling.
+  - Exports: `logger.Default`, `logger.FromContext`, `logger.WithContext`, `logger.WithField`, `logger.WithFields`, `logger.NewRedactingHandler`, `logger.NewSamplingHandler`.
+
+### 4. Foundational Type-Safe Utilities & Domain Errors (7 Packages)
+
+- `github.com/abeta-dev/go-libs/apperror` (`@v0.4.0`): Canonical structured domain error hierarchy mapping cleanly to HTTP status codes with `errors.Is` support.
+  - Exports: `apperror.Error`, `apperror.Code`, `apperror.New`, `apperror.Wrap`, `apperror.Is`, `apperror.BadRequest`, `apperror.Unauthorized`, `apperror.Forbidden`, `apperror.NotFound`, `apperror.Conflict`, `apperror.Internal`, `CodeBadRequest`, `CodeUnauthorized`, `CodeForbidden`, `CodeNotFound`, `CodeConflict`, `CodeInternal`.
+- `github.com/abeta-dev/go-libs/uuidutil` (`@v0.4.0`): Centralized RFC 4122 / RFC 9562 UUID v4 and time-ordered UUID v7 generation and validation.
+  - Exports: `uuidutil.New`, `uuidutil.NewString`, `uuidutil.NewV7`, `uuidutil.NewV7String`, `uuidutil.Parse`, `uuidutil.ParsePtr`, `uuidutil.MustParse`, `uuidutil.IsValid`, `uuidutil.IsNil`, `uuidutil.Nil`.
+- `github.com/abeta-dev/go-libs/env` (`@v0.4.0`): Zero-dependency typed OS environment variable parsers with fallback defaults and panic-on-missing `Must*` variants.
+  - Exports: `env.String`, `env.Int`, `env.Bool`, `env.Duration`, `env.MustString`, `env.MustInt`.
+- `github.com/abeta-dev/go-libs/sliceutil` (`@v0.4.0`): Generic slice transformations and functional aggregators beyond standard library `slices`.
+  - Exports: `sliceutil.Reduce`, `sliceutil.GroupBy`, `sliceutil.Chunk`, `sliceutil.Unique`, `sliceutil.Flatten`, `sliceutil.First`.
+- `github.com/abeta-dev/go-libs/maputil` (`@v0.4.0`): Generic type-safe map operations beyond standard library `maps`.
+  - Exports: `maputil.Merge`, `maputil.Filter`.
+- `github.com/abeta-dev/go-libs/stringutil` (`@v0.4.0`): Sensitive PII masking (`MaskEmail`, `MaskPhone`), safe truncation, and CSPRNG string generation.
+  - Exports: `stringutil.OrDefault`, `stringutil.MaskEmail`, `stringutil.MaskPhone`, `stringutil.TrimAndLower`, `stringutil.Truncate`, `stringutil.RandomAlphanumeric`, `stringutil.RandomSecureString`, `stringutil.RandomStringFromReader`.
+- `github.com/abeta-dev/go-libs/timeutil` (`@v0.4.0`): Parametric timezone conversion, day boundary helpers, and business day arithmetic.
+  - Exports: `timeutil.NowIn`, `timeutil.FormatIn`, `timeutil.StartOfDay`, `timeutil.EndOfDay`, `timeutil.AddBusinessDays`, `timeutil.BusinessDays`.
+
+## Abeta Go Ecosystem Cross-Reference
+
+`go-libs` is the foundational operational layer of the 4-repository **Abeta Go Ecosystem**:
+
+1. **`go-libs@v0.4.0`** (`github.com/abeta-dev/go-libs`): 35 zero-business-logic foundational Go packages for HTTP/Gin middleware, resilience, concurrency, PostgreSQL, RBAC, and OpenTelemetry.
+   - Docs Portal: https://abeta-dev.github.io/go-libs/
+   - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-libs
+2. **`go-fintech-india@v0.3.0`** (`github.com/abeta-dev/go-fintech-india`): Zero-float Indian fintech primitives (`paise`, `gst`, `tds`, `pan`, `gstin`, `aadhaar`, `ifsc`, `upi`, `emvqr`, `fy`, `cin`, `din`, `tan`, `udyam`, `lut`, `hsn`, `inwords`).
+   - Docs Portal: https://abeta-dev.github.io/go-fintech-india/
+   - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-fintech-india
+3. **`go-app-kit@v0.5.0`** (`github.com/abeta-dev/go-app-kit`): Application-layer accelerators built on `go-libs` and `go-fintech-india` (`audit`, `export`, `notifications`, `outbox`, `pdf` with GST Tax Invoice generation).
+   - Docs Portal: https://abeta-dev.github.io/go-app-kit/
+   - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-app-kit
+4. **`cloud-native-observability@v0.3.0`** (`github.com/abeta-dev/cloud-native-observability`): Production LGTM observability platform (Loki, Grafana, Tempo, Prometheus, OpenTelemetry Collector), Terraform IaC, ArgoCD GitOps, and Google SRE multi-window multi-burn-rate SLO alerting.
+   - Docs Portal: https://abeta-dev.github.io/cloud-native-observability/
+   - Repository: https://github.com/abeta-dev/cloud-native-observability
