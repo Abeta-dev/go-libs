@@ -1,9 +1,9 @@
 ---
 name: go-libs-data-security
-description: Database pools, transactional helpers (db.WithTx, db.WithQuerier, db.TxBeginner), RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/abeta-dev/go-libs@v0.4.0 (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger — 100.0% statement coverage).
+description: Database pools, transactional helpers (db.WithTx, db.WithQuerier, db.TxBeginner), RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/abeta-dev/go-libs@v0.5.0 (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger — 100.0% statement coverage).
 ---
 
-# `go-libs-data-security` Subskill (`@v0.4.0` · `100.0%` coverage)
+# `go-libs-data-security` Subskill (`@v0.5.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/db`

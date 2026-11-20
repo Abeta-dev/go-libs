@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-11-21
+
+### Added
+- `compress`: Added `Middleware`, `Negotiate`, `Config`, `DefaultConfig`, `EncodingBrotli`, `EncodingGzip`, and `EncodingIdentity` for RFC 9110 Brotli (`br`) and Gzip (`gzip`) HTTP response compression with pooled writers, minimum-size threshold buffering, and bounded request decompression with zip-bomb protection.
+- `ginmw`: Added `Compress` middleware adapter integrating Brotli and Gzip response compression and request decompression with Gin handlers.
+- **Module Code-Owner Agent System & Multi-Skill PR Review**: Added 5 Module Code-Owner Agents (`.github/CODEOWNERS`, `.github/module-agents.json`), Bash 3.2-compatible scoped PR verifier (`scripts/module_agent_review.sh`), and automated GitHub Actions PR review workflow (`.github/workflows/module-agent-review.yml`) executing `/impeccable`, `@uncle-bob-craft`, `@effective-agent-skills`, and `@security-auditor` quality gates.
+- **AI Discovery & Ecosystem Documentation**: Added `llms.txt` and `docs/llms.txt` AI discovery indexes, Abeta Go Ecosystem cross-project navigation in `docs/index.html`, unified Dependabot governance (`.github/dependabot.yml`), and enterprise PR template (`.github/PULL_REQUEST_TEMPLATE.md`).
+
+### Changed
+- **Dependencies & CI Actions**: Upgraded Go module dependencies across root and `examples/microservice`, pinned GitHub Actions to latest commit SHAs with `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true` across all 8 workflows, and expanded `ci.yml` PR branch triggers to include `feat/**` and `stack/**`.
+
 ## [0.4.0] - 2026-11-05
 
 ### Added
-- `compress`: Added `Middleware`, `Negotiate`, `Config`, `DefaultConfig`, `EncodingBrotli`, `EncodingGzip`, and `EncodingIdentity` for RFC 9110 Brotli and Gzip HTTP response compression with pooled writers and bounded request decompression.
-- `ginmw`: Added `Compress` middleware adapter integrating Brotli and Gzip response compression and request decompression with Gin handlers.
 - `db`: Added `WithTx`, `WithQuerier`, and `TxBeginner` to execute transactional closures with automatic panic/error rollback and context-bound `DBTX` propagation via `GetQuerier`.
 - `uuidutil`: Added `NewV7` and `NewV7String` for RFC 9562 time-ordered UUIDv7 generation, plus `example_test.go` across `async`, `fsm`, `jwks`, and `uuidutil`, and package `README.md` documentation for `clock` and `httpclient`.
 - **Security & Secret Scanning**: Added `scripts/check_secrets.sh` and CI TruffleHog secret scanning (`secret-scan` job) across git commit history and working tree.

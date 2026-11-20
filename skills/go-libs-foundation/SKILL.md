@@ -1,9 +1,9 @@
 ---
 name: go-libs-foundation
-description: Foundational Go utilities and domain error handling using github.com/abeta-dev/go-libs@v0.4.0 (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil — 100.0% statement coverage). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and RFC 9562 UUIDv7 / UUIDv4 identifiers.
+description: Foundational Go utilities and domain error handling using github.com/abeta-dev/go-libs@v0.5.0 (apperror, env, sliceutil, maputil, stringutil, timeutil, uuidutil — 100.0% statement coverage). Use when modeling domain errors, parsing environment config, or manipulating slices, maps, strings, business days, and RFC 9562 UUIDv7 / UUIDv4 identifiers.
 ---
 
-# `go-libs-foundation` Subskill (`@v0.4.0` · `100.0%` coverage)
+# `go-libs-foundation` Subskill (`@v0.5.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/apperror`

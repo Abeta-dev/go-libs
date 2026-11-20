@@ -1,9 +1,9 @@
 ---
 name: go-libs-http-gin
-description: HTTP server/client and Gin middleware patterns using github.com/abeta-dev/go-libs@v0.4.0 (ginmw, compress, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation — 100.0% statement coverage). Use when building REST APIs, middleware chains, or resilient HTTP clients.
+description: HTTP server/client and Gin middleware patterns using github.com/abeta-dev/go-libs@v0.5.0 (ginmw, compress, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation — 100.0% statement coverage). Use when building REST APIs, middleware chains, or resilient HTTP clients.
 ---
 
-# `go-libs-http-gin` Subskill (`@v0.4.0` · `100.0%` coverage)
+# `go-libs-http-gin` Subskill (`@v0.5.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/ginmw`

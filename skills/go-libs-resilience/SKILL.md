@@ -1,9 +1,9 @@
 ---
 name: go-libs-resilience
-description: Resilience, concurrency, caching, and lifecycle patterns using github.com/abeta-dev/go-libs@v0.4.0 (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics — 100.0% statement coverage). Use when hardening external calls, background workers, caches, or state machines.
+description: Resilience, concurrency, caching, and lifecycle patterns using github.com/abeta-dev/go-libs@v0.5.0 (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics — 100.0% statement coverage). Use when hardening external calls, background workers, caches, or state machines.
 ---
 
-# `go-libs-resilience` Subskill (`@v0.4.0` · `100.0%` coverage)
+# `go-libs-resilience` Subskill (`@v0.5.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/retry`

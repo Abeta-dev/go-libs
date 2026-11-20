@@ -1,11 +1,11 @@
 ---
 name: go-libs
-description: Umbrella router and integration guide for github.com/abeta-dev/go-libs (v0.4.0, 36 Go packages, 100.0% statement coverage). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
+description: Umbrella router and integration guide for github.com/abeta-dev/go-libs (v0.5.0, 36 Go packages, 100.0% statement coverage). Use when selecting packages, wiring HTTP/Gin services with resilience, RBAC, PostgreSQL, or OpenTelemetry, or running go-libs truth gates.
 ---
 
-# `go-libs` Umbrella Skill (`v0.4.0`)
+# `go-libs` Umbrella Skill (`v0.5.0`)
 
-Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`@v0.4.0`, `Go 1.26.0`, **100.0% statement coverage**)
+Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`@v0.5.0`, `Go 1.26.0`, **100.0% statement coverage**)
 
 ## When to Use
 
@@ -64,6 +64,6 @@ Module (`go.mod` import path): `github.com/abeta-dev/go-libs` (`@v0.4.0`, `Go 1.
 ## Truth Gates & Verification (`./scripts/check_*.sh`)
 
 - **`./scripts/check_secrets.sh`**: Scans git commit history and the working tree with TruffleHog (`--results=verified,unknown --fail`) to ensure zero leaked credentials or keys.
-- **`./scripts/check_version.sh`**: Enforces `EXPECTED_PKG_COUNT=36`, `@v0.4.0` tag parity across docs, `Go 1.26.0` baseline, and AST verification of `CHANGELOG.md` symbols.
+- **`./scripts/check_version.sh`**: Enforces `EXPECTED_PKG_COUNT=36`, `@v0.5.0` tag parity across docs, `Go 1.26.0` baseline, and AST verification of `CHANGELOG.md` symbols.
 - **`./scripts/check_coverage.sh`**: Verifies **100.0% statement coverage** across all 36 packages and zero drift against `README.md` and `.github/badges/coverage.json`.
 - **`./scripts/check_leaf_imports.sh`**: Verifies in an isolated sandbox that leaf packages never pull heavy framework dependencies (`gin`, `pgx`, `opentelemetry`).

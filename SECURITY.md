@@ -2,11 +2,11 @@
 
 ## Supported Versions
 
-`go-libs` provides security updates for the current release series (currently v0.4.0):
+`go-libs` provides security updates for the current release series (currently v0.5.0):
 
 | Version Series | Status             | Security Updates |
 | -------------- | ------------------ | ---------------- |
-| 0.4.x          | **Active / Current** | :white_check_mark: Yes |
+| 0.5.x          | **Active / Current** | :white_check_mark: Yes |
 | 0.3.x          | Maintenance        | :white_check_mark: Yes |
 | 0.2.x          | Maintenance        | :white_check_mark: Yes |
 | 0.1.x          | Maintenance        | :white_check_mark: Yes |

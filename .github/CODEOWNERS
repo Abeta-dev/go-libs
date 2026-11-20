@@ -1,2 +1,84 @@
-# Global code ownership for go-libs
+# ==============================================================================
+# go-libs — Module Code-Owner Agent System (.github/CODEOWNERS)
+#
+# Machine-readable companion config: .github/module-agents.json
+# Automated PR review runner:        scripts/module_agent_review.sh
+# CI workflow:                       .github/workflows/module-agent-review.yml
+# ==============================================================================
+
+# Default fallback owner (@go-libs-platform-governance-agent)
 * @umesh0492
+
+# ------------------------------------------------------------------------------
+# 1. @go-libs-foundation-agent (skills/go-libs-foundation/SKILL.md)
+#    Foundational, zero-dependency, type-safe generics and utility packages.
+# ------------------------------------------------------------------------------
+/apperror/          @umesh0492
+/env/               @umesh0492
+/sliceutil/         @umesh0492
+/maputil/           @umesh0492
+/stringutil/        @umesh0492
+/timeutil/          @umesh0492
+/uuidutil/          @umesh0492
+
+# ------------------------------------------------------------------------------
+# 2. @go-libs-resilience-agent (skills/go-libs-resilience/SKILL.md)
+#    Resilience, concurrency, state machines, rate limiting, caching & metrics.
+# ------------------------------------------------------------------------------
+/retry/             @umesh0492
+/circuitbreaker/    @umesh0492
+/ratelimit/         @umesh0492
+/workerpool/        @umesh0492
+/cache/             @umesh0492
+/async/             @umesh0492
+/shutdown/          @umesh0492
+/fsm/               @umesh0492
+/clock/             @umesh0492
+/metrics/           @umesh0492
+
+# ------------------------------------------------------------------------------
+# 3. @go-libs-http-gin-agent (skills/go-libs-http-gin/SKILL.md)
+#    HTTP transport, Gin middleware, compression, pagination & request safety.
+# ------------------------------------------------------------------------------
+/ginmw/             @umesh0492
+/compress/          @umesh0492
+/httpclient/        @umesh0492
+/httputil/          @umesh0492
+/pagination/        @umesh0492
+/idempotency/       @umesh0492
+/health/            @umesh0492
+/requestid/         @umesh0492
+/recovery/          @umesh0492
+/securityheaders/   @umesh0492
+/bodylimit/         @umesh0492
+/validation/        @umesh0492
+
+# ------------------------------------------------------------------------------
+# 4. @go-libs-data-security-agent (skills/go-libs-data-security/SKILL.md)
+#    PostgreSQL transactions, RBAC, JWKS, cryptography, telemetry & logging.
+# ------------------------------------------------------------------------------
+/db/                @umesh0492
+/rbac/              @umesh0492
+/rbaccontext/       @umesh0492
+/jwks/              @umesh0492
+/cryptoutil/        @umesh0492
+/telemetry/         @umesh0492
+/logger/            @umesh0492
+
+# ------------------------------------------------------------------------------
+# 5. @go-libs-platform-governance-agent (skills/go-libs/SKILL.md)
+#    CI/CD workflows, verification gates, documentation, skills & release ops.
+# ------------------------------------------------------------------------------
+/.github/           @umesh0492
+/scripts/           @umesh0492
+/docs/              @umesh0492
+/skills/            @umesh0492
+/examples/          @umesh0492
+/deploy/            @umesh0492
+/benchmarks/        @umesh0492
+/AGENTS.md          @umesh0492
+/README.md          @umesh0492
+/CHANGELOG.md       @umesh0492
+/llms.txt           @umesh0492
+/go.mod             @umesh0492
+/go.sum             @umesh0492
