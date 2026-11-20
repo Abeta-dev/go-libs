@@ -1,0 +1,205 @@
+{
+  "version": "1.0.0",
+  "repository": "github.com/abeta-dev/go-libs",
+  "default_owner": "@umesh0492",
+  "required_coverage_percent": 100.0,
+  "leaf_packages": [
+    "apperror",
+    "async",
+    "bodylimit",
+    "cache",
+    "circuitbreaker",
+    "clock",
+    "compress",
+    "cryptoutil",
+    "env",
+    "fsm",
+    "maputil",
+    "metrics",
+    "ratelimit",
+    "rbaccontext",
+    "retry",
+    "securityheaders",
+    "shutdown",
+    "sliceutil",
+    "stringutil",
+    "timeutil",
+    "workerpool"
+  ],
+  "agents": [
+    {
+      "id": "foundation",
+      "name": "Foundation & Generics Module Agent",
+      "handle": "@go-libs-foundation-agent",
+      "skill": "skills/go-libs-foundation/SKILL.md",
+      "owner": "@umesh0492",
+      "paths": [
+        "apperror/",
+        "env/",
+        "sliceutil/",
+        "maputil/",
+        "stringutil/",
+        "timeutil/",
+        "uuidutil/"
+      ],
+      "packages": [
+        "apperror",
+        "env",
+        "sliceutil",
+        "maputil",
+        "stringutil",
+        "timeutil",
+        "uuidutil"
+      ],
+      "rules": [
+        "100.0% statement coverage across all foundation packages",
+        "Zero heavy transitive imports (gin, pgx, otel) in leaf foundation packages",
+        "Type-safe Go 1.26 generics without reflection in sliceutil and maputil",
+        "Allocation-conscious error wrapping, PII masking, and UUIDv7 monotonic ordering"
+      ]
+    },
+    {
+      "id": "resilience",
+      "name": "Resilience & Concurrency Module Agent",
+      "handle": "@go-libs-resilience-agent",
+      "skill": "skills/go-libs-resilience/SKILL.md",
+      "owner": "@umesh0492",
+      "paths": [
+        "retry/",
+        "circuitbreaker/",
+        "ratelimit/",
+        "workerpool/",
+        "cache/",
+        "async/",
+        "shutdown/",
+        "fsm/",
+        "clock/",
+        "metrics/"
+      ],
+      "packages": [
+        "retry",
+        "circuitbreaker",
+        "ratelimit",
+        "workerpool",
+        "cache",
+        "async",
+        "shutdown",
+        "fsm",
+        "clock",
+        "metrics"
+      ],
+      "rules": [
+        "100.0% statement coverage across all resilience and concurrency packages",
+        "Zero data races under go test -race across concurrent goroutines, worker pools, and shards",
+        "Strict leaf import isolation (no gin, pgx, or otel in resilience leaf packages)",
+        "Context cancellation propagation and panic recovery in async and workerpool"
+      ]
+    },
+    {
+      "id": "http-gin",
+      "name": "HTTP Transport & Gin Middleware Module Agent",
+      "handle": "@go-libs-http-gin-agent",
+      "skill": "skills/go-libs-http-gin/SKILL.md",
+      "owner": "@umesh0492",
+      "paths": [
+        "ginmw/",
+        "compress/",
+        "httpclient/",
+        "httputil/",
+        "pagination/",
+        "idempotency/",
+        "health/",
+        "requestid/",
+        "recovery/",
+        "securityheaders/",
+        "bodylimit/",
+        "validation/"
+      ],
+      "packages": [
+        "ginmw",
+        "compress",
+        "httpclient",
+        "httputil",
+        "pagination",
+        "idempotency",
+        "health",
+        "requestid",
+        "recovery",
+        "securityheaders",
+        "bodylimit",
+        "validation"
+      ],
+      "rules": [
+        "100.0% statement coverage across all HTTP and Gin middleware packages",
+        "Zero heavy Gin imports inside pure net/http leaf packages (compress, bodylimit, securityheaders)",
+        "Pooled compression writers/readers and zero-leak response body handling",
+        "RFC 7807 / RFC 9457 Problem Details parity between net/http and Gin middlewares"
+      ]
+    },
+    {
+      "id": "data-security",
+      "name": "Data, Security & Observability Module Agent",
+      "handle": "@go-libs-data-security-agent",
+      "skill": "skills/go-libs-data-security/SKILL.md",
+      "owner": "@umesh0492",
+      "paths": [
+        "db/",
+        "rbac/",
+        "rbaccontext/",
+        "jwks/",
+        "cryptoutil/",
+        "telemetry/",
+        "logger/"
+      ],
+      "packages": [
+        "db",
+        "rbac",
+        "rbaccontext",
+        "jwks",
+        "cryptoutil",
+        "telemetry",
+        "logger"
+      ],
+      "rules": [
+        "100.0% statement coverage across data, security, and observability packages",
+        "Constant-time cryptographic comparisons and authenticated AES-256-GCM encryption",
+        "Context-propagated pgx transaction nesting (WithTx / savepoints) with rollback safety",
+        "Zero heavy dependencies in leaf security packages (cryptoutil, rbaccontext)"
+      ]
+    },
+    {
+      "id": "platform-governance",
+      "name": "Platform Governance, CI & Documentation Agent",
+      "handle": "@go-libs-platform-governance-agent",
+      "skill": "skills/go-libs/SKILL.md",
+      "owner": "@umesh0492",
+      "paths": [
+        ".github/",
+        "scripts/",
+        "docs/",
+        "skills/",
+        "examples/",
+        "deploy/",
+        "benchmarks/",
+        "AGENTS.md",
+        "README.md",
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "SECURITY.md",
+        "BENCHMARKS.md",
+        "Makefile",
+        ".golangci.yml",
+        "llms.txt",
+        "go.mod",
+        "go.sum"
+      ],
+      "packages": [],
+      "rules": [
+        "Bash 3.2 compatibility across all scripts/*.sh (scripts/test_shell_compatibility.sh)",
+        "36-package inventory and version parity across README.md, CHANGELOG.md, and docs/ (scripts/check_version.sh)",
+        "SHA-pinned GitHub Actions with explicit least-privilege permissions and Node 24 opt-in",
+        "Companion agent skills synchronized with repository APIs and verification gates"
+      ]
+    }
+  ]
+}

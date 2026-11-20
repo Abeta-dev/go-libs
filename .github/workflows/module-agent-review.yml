@@ -1,0 +1,181 @@
+name: Module Code-Owner Agent Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Optional PR number to review (reviews all open PRs if omitted)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  module-agent-review:
+    name: Module Code-Owner Agents (Scoped Tests, 100% Coverage, SOLID & Rules)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository (Full History for Stacked Diffs)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go 1.26.0
+        uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.0.2
+        with:
+          go-version: '1.26.0'
+          cache: true
+
+      - name: Stage Module Code-Owner Agent Runner in /tmp
+        run: |
+          cp scripts/module_agent_review.sh /tmp/module_agent_review.sh
+          cp .github/module-agents.json /tmp/module-agents.json
+          chmod +x /tmp/module_agent_review.sh
+          rm -rf /tmp/head-snapshot
+          mkdir -p /tmp/head-snapshot/docs /tmp/head-snapshot/.github
+          [ -f docs/index.html ] && cp docs/index.html /tmp/head-snapshot/docs/index.html || true
+          [ -f AGENTS.md ] && cp AGENTS.md /tmp/head-snapshot/AGENTS.md || true
+          [ -f .golangci.yml ] && cp .golangci.yml /tmp/head-snapshot/.golangci.yml || true
+          [ -d skills ] && cp -R skills /tmp/head-snapshot/skills || true
+          [ -d .github/workflows ] && cp -R .github/workflows /tmp/head-snapshot/.github/workflows || true
+          if curl -fsSL --retry 2 -o /tmp/impeccable "https://github.com/pbakaus/impeccable/releases/download/engine-v0.1.18/impeccable-linux-x64" 2>/dev/null; then
+            if echo "736ed785e74ae2344d3036127f614ddde5ab520a527d8bc82a891612ef71f648  /tmp/impeccable" | sha256sum -c - >/dev/null 2>&1; then
+              chmod +x /tmp/impeccable
+              echo "IMPECCABLE_BIN=/tmp/impeccable" >> "$GITHUB_ENV"
+            else
+              rm -f /tmp/impeccable
+            fi
+          fi
+
+      - name: Run Module Code-Owner Agent Review & Publish PR Verdicts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_PR_NUM: ${{ github.event.pull_request.number }}
+          DISPATCH_PR_NUM: ${{ github.event.inputs.pr_number }}
+        run: |
+          set -euo pipefail
+          ORIG_SHA="$(git rev-parse HEAD)"
+
+          if [ -n "${DISPATCH_PR_NUM:-}" ]; then
+            PR_JSON="$(gh pr view "${DISPATCH_PR_NUM}" --json number,baseRefName,headRefName | jq -c '[.]')"
+          else
+            PR_JSON="$(gh pr list --state open --limit 50 --json number,baseRefName,headRefName | jq -c 'sort_by(.number)')"
+          fi
+
+          echo "Discovered open PRs to evaluate: ${PR_JSON}"
+          TRIGGER_FAILED=0
+          ANY_FAILED=0
+
+          review_single_pr() {
+            local pr_num="$1"
+            local base_branch="$2"
+            local head_branch="$3"
+            local report_file="/tmp/module-agent-report-${pr_num}.md"
+
+            echo "=================================================================="
+            echo "🛡️ Reviewing PR #${pr_num} (origin/${base_branch}...origin/${head_branch})"
+            echo "=================================================================="
+
+            git fetch origin "${base_branch}" "${head_branch}" || true
+            git checkout --force "origin/${head_branch}"
+
+            local pr_passed=1
+            if /tmp/module_agent_review.sh \
+              --base "origin/${base_branch}" \
+              --head "origin/${head_branch}" \
+              --pr-number "${pr_num}" \
+              --config /tmp/module-agents.json \
+              --output "${report_file}"; then
+              pr_passed=0
+            else
+              pr_passed=1
+            fi
+
+            if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -f "${report_file}" ]; then
+              cat "${report_file}" >> "${GITHUB_STEP_SUMMARY}"
+              echo "" >> "${GITHUB_STEP_SUMMARY}"
+            fi
+
+            # 1. Delete any existing <!-- abeta-module-agent-review --> issue comments to prevent duplicates
+            EXISTING_COMMENT_IDS="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr_num}/comments" \
+              --jq '.[] | select(.body | contains("<!-- abeta-module-agent-review -->")) | .id' || true)"
+            if [ -n "${EXISTING_COMMENT_IDS}" ]; then
+              for cid in ${EXISTING_COMMENT_IDS}; do
+                echo "Deleting duplicate issue comment #${cid} on PR #${pr_num}..."
+                gh api --method DELETE "repos/${GITHUB_REPOSITORY}/issues/comments/${cid}" >/dev/null 2>&1 || true
+              done
+            fi
+
+            # 2. Deduplicate PR Reviews (update latest APPROVED review in-place and collapse older ones)
+            if [ "${pr_passed}" -eq 0 ]; then
+              APPROVED_IDS="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_num}/reviews" \
+                --jq '.[] | select(.user.login == "github-actions[bot]" and .state == "APPROVED") | .id' || true)"
+              if [ -n "${APPROVED_IDS}" ]; then
+                LATEST_REV_ID="$(echo "${APPROVED_IDS}" | tail -n1)"
+                echo "Updating existing APPROVED PR review #${LATEST_REV_ID} on PR #${pr_num}..."
+                jq -Rs '{body: .}' "${report_file}" | gh api \
+                  --method PUT \
+                  "repos/${GITHUB_REPOSITORY}/pulls/${pr_num}/reviews/${LATEST_REV_ID}" \
+                  --input - >/dev/null
+                for rid in ${APPROVED_IDS}; do
+                  if [ "${rid}" != "${LATEST_REV_ID}" ]; then
+                    echo "Collapsing superseded APPROVED PR review #${rid} on PR #${pr_num}..."
+                    jq -n '{body: "_Superseded by latest Module Code-Owner Agent review._"}' | gh api \
+                      --method PUT \
+                      "repos/${GITHUB_REPOSITORY}/pulls/${pr_num}/reviews/${rid}" \
+                      --input - >/dev/null 2>&1 || true
+                  fi
+                done
+              else
+                echo "Submitting new APPROVED PR review on PR #${pr_num}..."
+                gh pr review "${pr_num}" --approve --body-file "${report_file}" 2>/dev/null \
+                  || gh pr review "${pr_num}" --comment --body-file "${report_file}" \
+                  || true
+              fi
+            else
+              echo "Submitting CHANGES_REQUESTED PR review on PR #${pr_num}..."
+              gh pr review "${pr_num}" --request-changes --body-file "${report_file}" 2>/dev/null \
+                || gh pr review "${pr_num}" --comment --body-file "${report_file}" \
+                || true
+            fi
+
+            return "${pr_passed}"
+          }
+
+          COUNT="$(echo "${PR_JSON}" | jq 'length')"
+          IDX=0
+          while [ "${IDX}" -lt "${COUNT}" ]; do
+            PR_NUM="$(echo "${PR_JSON}" | jq -r ".[${IDX}].number")"
+            BASE_BRANCH="$(echo "${PR_JSON}" | jq -r ".[${IDX}].baseRefName")"
+            HEAD_BRANCH="$(echo "${PR_JSON}" | jq -r ".[${IDX}].headRefName")"
+
+            if ! review_single_pr "${PR_NUM}" "${BASE_BRANCH}" "${HEAD_BRANCH}"; then
+              ANY_FAILED=1
+              if [ -n "${TRIGGER_PR_NUM:-}" ] && [ "${PR_NUM}" = "${TRIGGER_PR_NUM}" ]; then
+                TRIGGER_FAILED=1
+              fi
+            fi
+            IDX=$((IDX + 1))
+          done
+
+          git checkout --force "${ORIG_SHA}"
+
+          if [ -n "${TRIGGER_PR_NUM:-}" ] && [ "${TRIGGER_FAILED}" -ne 0 ]; then
+            echo "❌ Triggering PR #${TRIGGER_PR_NUM} failed Module Code-Owner Agent review." >&2
+            exit 1
+          fi
+          if [ -z "${TRIGGER_PR_NUM:-}" ] && [ "${ANY_FAILED}" -ne 0 ]; then
+            echo "❌ One or more open PRs failed Module Code-Owner Agent review." >&2
+            exit 1
+          fi
+          echo "✅ All evaluated open PRs passed Module Code-Owner Agent review!"
