@@ -364,8 +364,6 @@ func (c *TypedCache[T]) evictIfNeeded(newKey string) {
 		if _, loaded := c.data.LoadAndDelete(targetKey); loaded {
 			c.size.Add(-1)
 			c.metrics.Evictions.Inc()
-		} else {
-			break
 		}
 	}
 }
