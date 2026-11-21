@@ -36,12 +36,14 @@ npx skills add abeta-dev/go-libs
 
 ## 36-Package Catalog & Primary Exported APIs
 
-### 1. Resilience, Concurrency & Runtime Infrastructure (9 Packages)
+### 1. Resilience, Concurrency & Runtime Infrastructure (10 Packages)
 
 - `github.com/abeta-dev/go-libs/retry` (`@v0.5.0`): Context-aware backoff and retry execution algorithms with non-retryable error classification.
   - Exports: `retry.Do`, `retry.DoWithResult[T]`, `retry.Config`, `retry.Constant`, `retry.Linear`, `retry.Exponential`, `retry.ExponentialJitter`, `retry.MarkPermanent`, `retry.IsPermanent`.
 - `github.com/abeta-dev/go-libs/circuitbreaker` (`@v0.5.0`): Outbound 3-state (`Closed`, `Open`, `HalfOpen`) failure state machine.
   - Exports: `circuitbreaker.ConsecutiveBreaker`, `circuitbreaker.RatioBreaker`, `circuitbreaker.NewConsecutiveBreaker`, `circuitbreaker.NewRatioBreaker`, `Execute`, `State`, `ErrCircuitOpen`.
+- `github.com/abeta-dev/go-libs/ratelimit` (`@v0.5.0`): In-memory and PostgreSQL rate limiters (Token Bucket & Sliding Window) with CIDR trusted-proxy parsing and RFC `RateLimit-*` HTTP headers.
+  - Exports: `ratelimit.New`, `ratelimit.NewTokenBucket`, `ratelimit.NewSlidingWindow`, `ratelimit.NewPGRateLimiter`, `ratelimit.NewGlobal`, `ratelimit.NewAuth`, `TokenBucketLimiter`, `SlidingWindowLimiter`, `WithMetrics`.
 - `github.com/abeta-dev/go-libs/workerpool` (`@v0.5.0`): Bounded panic-safe concurrent worker pool with graceful queue draining and metrics hooks.
   - Exports: `workerpool.Pool`, `workerpool.New`, `Submit`, `SubmitContext`, `Stop`, `WithMetrics`, `WithPanicHandler`.
 - `github.com/abeta-dev/go-libs/cache` (`@v0.5.0`): Generic singleflight stampede-protected multi-policy in-memory cache.
@@ -57,7 +59,7 @@ npx skills add abeta-dev/go-libs
 - `github.com/abeta-dev/go-libs/metrics` (`@v0.5.0`): Framework-agnostic instrumentation interfaces with zero-allocation no-op defaults.
   - Exports: `metrics.Counter`, `metrics.Gauge`, `metrics.Histogram`, `metrics.NoopCounter`, `metrics.NoopGauge`, `metrics.NoopHistogram`.
 
-### 2. HTTP Transport, Edge Middleware & Gin Pipeline (13 Packages)
+### 2. HTTP Transport, Edge Middleware & Gin Pipeline (12 Packages)
 
 - `github.com/abeta-dev/go-libs/ginmw` (`@v0.5.0`): Unified Gin HTTP middleware suite (23 production middleware helpers).
   - Exports: `ginmw.AuthMiddleware`, `ginmw.GenerateToken`, `ginmw.GetClaims`, `ginmw.Compress`, `ginmw.RBAC`, `ginmw.RequirePermission`, `ginmw.RequireAnyPermission`, `ginmw.AdminOnly`, `ginmw.CORS`, `ginmw.GlobalRateLimit`, `ginmw.AuthRateLimit`, `ginmw.LimitBodyDefault`, `ginmw.LimitBodyAuth`, `ginmw.SecurityHeaders`, `ginmw.RequestID`, `ginmw.Logger`, `ginmw.Telemetry`, `ginmw.Idempotency`, `ginmw.RequireTenant`, `ginmw.RespondSuccess`, `ginmw.RespondError`, `ginmw.REDMetrics`, `ginmw.MetricsEndpoint`, `ginmw.ErrorHandler`, `ginmw.Recovery`, `ginmw.RateLimit`.
@@ -65,8 +67,6 @@ npx skills add abeta-dev/go-libs
   - Exports: `compress.Middleware`, `compress.Negotiate`, `compress.Config`, `compress.DefaultConfig`, `compress.EncodingBrotli`, `compress.EncodingGzip`, `compress.EncodingIdentity`.
 - `github.com/abeta-dev/go-libs/httpclient` (`@v0.5.0`): Resilient composed HTTP client chaining RateLimiter -> CircuitBreaker -> Retry -> Per-Attempt Timeout -> Transport.
   - Exports: `httpclient.New`, `httpclient.NewRoundTripper`, `WithRetry`, `WithCircuitBreaker`, `WithRateLimiter`, `WithPerAttemptTimeout`, `WithHeader`.
-- `github.com/abeta-dev/go-libs/ratelimit` (`@v0.5.0`): In-memory and PostgreSQL rate limiters (Token Bucket & Sliding Window) with CIDR trusted-proxy parsing and RFC `RateLimit-*` HTTP headers.
-  - Exports: `ratelimit.New`, `ratelimit.NewTokenBucket`, `ratelimit.NewSlidingWindow`, `ratelimit.NewPGRateLimiter`, `ratelimit.NewGlobal`, `ratelimit.NewAuth`, `TokenBucketLimiter`, `SlidingWindowLimiter`, `WithMetrics`.
 - `github.com/abeta-dev/go-libs/httputil` (`@v0.5.0`): Standardized JSON response writers and domain error status mapping for `net/http`.
   - Exports: `httputil.OK`, `httputil.Created`, `httputil.NoContent`, `httputil.Error`, `httputil.ErrorFromDomain`, `httputil.ValidationError`.
 - `github.com/abeta-dev/go-libs/pagination` (`@v0.5.0`): Clamped offset and cursor pagination query parsers, generic slice pagination, and typed response envelopes.
@@ -127,12 +127,12 @@ npx skills add abeta-dev/go-libs
 1. **`go-libs@v0.5.0`** (`github.com/abeta-dev/go-libs`): 36 zero-business-logic foundational Go packages for HTTP/Gin middleware, resilience, concurrency, PostgreSQL, RBAC, and OpenTelemetry.
    - Docs Portal: https://abeta-dev.github.io/go-libs/
    - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-libs
-2. **`go-fintech-india@v0.3.0`** (`github.com/abeta-dev/go-fintech-india`): Zero-float Indian fintech primitives (`paise`, `gst`, `tds`, `pan`, `gstin`, `aadhaar`, `ifsc`, `upi`, `emvqr`, `fy`, `cin`, `din`, `tan`, `udyam`, `lut`, `hsn`, `inwords`).
+2. **`go-fintech-india@v0.4.0`** (`github.com/abeta-dev/go-fintech-india`): Zero-dependency Indian FinTech & statutory compliance engine (`127` exported symbols across `15` domain files: exact `int64` paise `Money` math, `GSTIN` Mod-36, `PAN`, `Aadhaar` Verhoeff D5, `<100ns` offline `IFSC`/`MICR`, NPCI `UPI` URIs, Razorpay/Cashfree/PhonePe webhooks, Indian `FY`/Advance Tax, MCA Schedule III aging).
    - Docs Portal: https://abeta-dev.github.io/go-fintech-india/
    - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-fintech-india
-3. **`go-app-kit@v0.5.0`** (`github.com/abeta-dev/go-app-kit`): Application-layer accelerators built on `go-libs` and `go-fintech-india` (`audit`, `export`, `notifications`, `outbox`, `pdf` with GST Tax Invoice generation).
+3. **`go-app-kit@v0.6.0`** (`github.com/abeta-dev/go-app-kit`): Enterprise application workflow engines (`outbox`, `pdf`, `notifications`, `audit`, `export` with Brotli/Gzip streaming CSV).
    - Docs Portal: https://abeta-dev.github.io/go-app-kit/
    - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-app-kit
-4. **`cloud-native-observability@v0.3.0`** (`github.com/abeta-dev/cloud-native-observability`): Production LGTM observability platform (Loki, Grafana, Tempo, Prometheus, OpenTelemetry Collector), Terraform IaC, ArgoCD GitOps, and Google SRE multi-window multi-burn-rate SLO alerting.
+4. **`cloud-native-observability@v0.4.0`** (`github.com/abeta-dev/cloud-native-observability`): OpenTelemetry Collector + LGTM stack, Google SRE multi-window burn-rate SLOs, ArgoCD GitOps, and 3-layer Terraform IaC.
    - Docs Portal: https://abeta-dev.github.io/cloud-native-observability/
    - Repository: https://github.com/abeta-dev/cloud-native-observability
