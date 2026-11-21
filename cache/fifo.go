@@ -203,5 +203,3 @@ func (c *fifoBackend[T]) evictOldest() {
 	delete(c.items, oldest.key)
 	c.metrics.Evictions.Inc()
 }
-
-func (c *fifoBackend[T]) Close() {}

@@ -111,6 +111,16 @@ func TestCache_InternalBranches(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	// Deterministic Set post-swap over-capacity eviction branch (c.size.Load() > int64(c.capacity))
+	tcCapSet := NewTypedCache[int](WithCapacity[int](1))
+	tcCapSet.data.Store("existingSet", Item[int]{Value: 1, CreatedAt: now - 200})
+	tcCapSet.data.Store("extraSet", Item[int]{Value: 99, CreatedAt: now - 100})
+	tcCapSet.size.Store(2)
+	tcCapSet.Set("existingSet", 2)
+	if tcCapSet.Len() != 1 {
+		t.Fatalf("expected capacity 1 after Set post-swap eviction, got %d", tcCapSet.Len())
+	}
+
 	// 5. Direct backend constructors with <=0 capacity, nil clock, nil metrics, empty evictions, and GetOrFetch branches
 	bFIFO := newFIFOBackend[int](0, Metrics{}, nil)
 	bFIFO.evictOldest() // tail == nil

@@ -376,20 +376,6 @@ func (c *TypedCache[T]) Close() {
 		if c.stopEvict != nil {
 			close(c.stopEvict)
 		}
-		switch c.policy {
-		case EvictionLRU:
-			if c.lru != nil {
-				c.lru.Close()
-			}
-		case EvictionLFU:
-			if c.lfu != nil {
-				c.lfu.Close()
-			}
-		case EvictionFIFO:
-			if c.fifo != nil {
-				c.fifo.Close()
-			}
-		}
 	})
 }
 

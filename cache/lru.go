@@ -212,5 +212,3 @@ func (c *lruBackend[T]) evictOldest() {
 	delete(c.items, oldest.key)
 	c.metrics.Evictions.Inc()
 }
-
-func (c *lruBackend[T]) Close() {}

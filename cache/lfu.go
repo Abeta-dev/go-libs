@@ -260,5 +260,3 @@ func (c *lfuBackend[T]) evictMinFreq() {
 		c.metrics.Evictions.Inc()
 	}
 }
-
-func (c *lfuBackend[T]) Close() {}
