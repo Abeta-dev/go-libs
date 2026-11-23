@@ -40,12 +40,15 @@ Before committing or opening a PR in this repository, always run:
 ./scripts/check_secrets.sh
 ./scripts/check_version.sh
 ./scripts/check_leaf_imports.sh
+./scripts/check_deprecation.sh
 ./scripts/check_coverage.sh
 go test -race ./...
 ```
 
 - **Secret Scanning Gate**: `scripts/check_secrets.sh` runs TruffleHog secret scanning across both git commit history and the working tree (also enforced in CI via the `secret-scan` job).
 - **Package Count Gate**: `scripts/check_version.sh` enforces `EXPECTED_PKG_COUNT=36`. Adding or removing a top-level package requires updating `EXPECTED_PKG_COUNT` in `scripts/check_version.sh` and documenting the package in `README.md`.
+- **Leaf Import & DAG Isolation Gate**: `scripts/check_leaf_imports.sh` verifies that all **25 Depth-0 pure internal leaf packages** have zero internal `github.com/abeta-dev/go-libs/*` production imports and all **30 minimal-footprint packages** remain free of `gin`, `pgx`, and `otel` dependencies in an isolated `go.mod` sandbox.
+- **Strict `N + 2` Deprecation Window Gate**: `scripts/check_deprecation.sh` enforces `// Deprecated: Since vX.Y.Z (remove in >= vA.B.C). Use <Replacement> instead.` with at least a 2-minor-release (`N + 2`) deprecation window and blocks premature removal against previous release tags.
 - **Coverage Gate**: `scripts/check_coverage.sh` enforces `100.0%` statement coverage across all 36 packages and zero drift against `README.md` and `.github/badges/coverage.json`.
 - **Version Parity Gate**: All `@v` version references in `README.md`, `CONTRIBUTING.md`, and `docs/**/*.md` must match the latest release tag (`@v0.5.0`).
 - **Toolchain Gate**: Requires `Go 1.26.0` (`go.mod` directive `go 1.26.0`).

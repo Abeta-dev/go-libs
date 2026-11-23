@@ -10,9 +10,12 @@ This document outlines the versioning guarantees, breaking change communication 
 
 - **Minor Releases (`v0.X.0`)**: May introduce new packages, enhancements, or breaking API refactorings as APIs are consolidated for long-term maintainability.
 - **Patch Releases (`v0.x.Y`)**: Strictly reserved for backward-compatible bug fixes, performance improvements, and security patches. Zero breaking API changes occur in patch releases.
-- **Breaking Change Communication**:
+- **Breaking Change & Strict `N + 2` Minor-Release Deprecation Window Policy**:
   - Every breaking change is explicitly documented in [CHANGELOG.md](../CHANGELOG.md) under `### Removed (BREAKING)` and `### Changed`.
-  - When feasible, non-urgent symbol changes will include a `// Deprecated: use <NewSymbol> instead` godoc annotation for at least one release before removal.
+  - **Strict `N + 2` Deprecation Window (`./scripts/check_deprecation.sh`)**: Any symbol slated for deprecation must carry a machine-verifiable Godoc annotation matching the exact format:
+    `// Deprecated: Since vX.Y.Z (remove in >= vA.B.C). Use <NewSymbol> instead.`
+    where `(A > X) || (A == X && B >= Y + 2)` (at least **2 minor releases** between initial deprecation and removal). CI (`./scripts/check_deprecation.sh`) rejects malformed deprecation comments, windows shorter than `N + 2` minor releases, and premature symbol removals against the previous release tag.
+  - **Leaf Import & Depth-0 DAG Isolation (`./scripts/check_leaf_imports.sh`)**: CI enforces that all **25 Depth-0 pure internal leaf packages** maintain zero internal `github.com/abeta-dev/go-libs/*` production imports and all **30 minimal-footprint leaf packages** resolve in an isolated `go.mod` sandbox with zero `gin`, `pgx`, or `otel` dependencies.
   - Compile-time breaking changes are never introduced in patch releases.
 
 ---

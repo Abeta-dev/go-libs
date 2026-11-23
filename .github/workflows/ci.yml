@@ -236,6 +236,7 @@ jobs:
           ./scripts/check_secrets.sh
           ./scripts/check_version.sh
           ./scripts/check_leaf_imports.sh
+          ./scripts/check_deprecation.sh
 
       - name: Verify Release Script and Workflow Assertions
         run: |

@@ -5,42 +5,114 @@ set -euo pipefail
 # Leaf Package Import Isolation & Minimal Footprint Gate
 #
 # Guarantees that:
-#   Importing any lightweight "leaf" package in isolation does NOT drag heavy
-#   third-party dependencies (gin, pgx, opentelemetry) into a consumer's
-#   go.sum or compiled binary.
+#   1. Gate 1 (Depth-0 Pure Internal Leaf DAG Isolation): All 25 pure leaf
+#      packages have zero internal github.com/abeta-dev/go-libs/* production
+#      imports, preventing circular or accidental intra-repo coupling.
+#   2. Gate 2 (Minimal-Footprint Isolated go.mod Sandbox Gate): Importing any
+#      of the 30 lightweight minimal-footprint packages in isolation does NOT
+#      drag heavy third-party dependencies (gin, pgx, opentelemetry) into a
+#      consumer's go.sum or compiled binary.
 # ==============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${ROOT_DIR}"
 
-LEAF_PACKAGES=(
-  "shutdown"
-  "retry"
-  "sliceutil"
-  "env"
+PURE_LEAF_PACKAGES=(
   "apperror"
-  "cache"
-  "circuitbreaker"
-  "ratelimit"
-  "workerpool"
-  "cryptoutil"
-  "stringutil"
-  "timeutil"
-  "maputil"
-  "clock"
   "async"
   "bodylimit"
+  "clock"
   "compress"
+  "env"
   "fsm"
+  "health"
+  "httputil"
+  "jwks"
+  "maputil"
   "metrics"
-  "rbaccontext"
+  "pagination"
+  "rbac"
+  "recovery"
+  "requestid"
+  "retry"
   "securityheaders"
+  "shutdown"
+  "sliceutil"
+  "stringutil"
+  "telemetry"
+  "timeutil"
+  "uuidutil"
+  "validation"
+)
+
+LEAF_PACKAGES=(
+  "apperror"
+  "async"
+  "bodylimit"
+  "cache"
+  "circuitbreaker"
+  "clock"
+  "compress"
+  "cryptoutil"
+  "env"
+  "fsm"
+  "health"
+  "httputil"
+  "jwks"
+  "logger"
+  "maputil"
+  "metrics"
+  "pagination"
+  "ratelimit"
+  "rbac"
+  "rbaccontext"
+  "requestid"
+  "retry"
+  "securityheaders"
+  "shutdown"
+  "sliceutil"
+  "stringutil"
+  "timeutil"
+  "uuidutil"
+  "validation"
+  "workerpool"
 )
 
 FORBIDDEN_PATTERN='github.com/gin-gonic/gin|github.com/jackc/pgx|go.opentelemetry.io/otel\b'
 
 echo "========================================================"
-echo "🍃 Verifying Minimal-Footprint Leaf Import Isolation"
+echo "🌿 Gate 1: Verifying Depth-0 Pure Internal Leaf DAG Isolation"
+echo "   Checking ${#PURE_LEAF_PACKAGES[@]} pure leaf packages for 0 internal go-libs imports"
+echo "========================================================"
+
+PURE_FAILED_COUNT=0
+
+for pkg in "${PURE_LEAF_PACKAGES[@]}"; do
+  if ! IMPORTS_OUT=$(go list -f '{{join .Imports "\n"}}' "./${pkg}" 2>&1); then
+    echo "❌ Error: 'go list' failed for '${pkg}': ${IMPORTS_OUT}"
+    PURE_FAILED_COUNT=$((PURE_FAILED_COUNT + 1))
+    continue
+  fi
+
+  INTERNAL_IMPORTS=$(printf '%s\n' "${IMPORTS_OUT}" | grep -E '^github\.com/abeta-dev/go-libs/' | tr '\n' ' ' || true)
+  if [ -n "${INTERNAL_IMPORTS}" ]; then
+    echo "❌ Error: Depth-0 pure leaf '${pkg}' has forbidden internal go-libs imports: ${INTERNAL_IMPORTS}"
+    PURE_FAILED_COUNT=$((PURE_FAILED_COUNT + 1))
+  else
+    echo "   - ${pkg}: pure Depth-0 internal leaf ✅ (0 internal go-libs imports)"
+  fi
+done
+
+if [ "${PURE_FAILED_COUNT}" -ne 0 ]; then
+  echo "========================================================"
+  echo "❌ Error: ${PURE_FAILED_COUNT} pure leaf package(s) violated Depth-0 internal DAG isolation!"
+  exit 1
+fi
+echo "✅ All ${#PURE_LEAF_PACKAGES[@]} Depth-0 pure leaf packages have 0 internal go-libs imports!"
+
+echo "========================================================"
+echo "🍃 Gate 2: Verifying Minimal-Footprint Leaf Import Isolation"
 echo "   Checking ${#LEAF_PACKAGES[@]} leaf packages against heavy dependencies:"
 echo "   - gin (github.com/gin-gonic/gin)"
 echo "   - pgx (github.com/jackc/pgx)"

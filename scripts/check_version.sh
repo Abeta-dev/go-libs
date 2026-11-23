@@ -278,6 +278,10 @@ if [ "${FAILED_SYMBOLS}" -ne 0 ]; then
 fi
 echo "✅ ${SECTION_NAME} CHANGELOG symbols exist in the repository (${CHECKED_PACKAGES} packages checked, ${CHECKED_SYMBOLS} symbols verified)."
 
+if [ -x "$(dirname "${BASH_SOURCE[0]}")/check_deprecation.sh" ]; then
+  "$(dirname "${BASH_SOURCE[0]}")/check_deprecation.sh"
+fi
+
 if [ -x "$(dirname "${BASH_SOURCE[0]}")/check_secrets.sh" ]; then
   "$(dirname "${BASH_SOURCE[0]}")/check_secrets.sh"
 fi
