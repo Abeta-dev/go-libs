@@ -127,10 +127,10 @@ npx skills add abeta-dev/go-libs
 1. **`go-libs@v0.5.0`** (`github.com/abeta-dev/go-libs`): 36 zero-business-logic foundational Go packages for HTTP/Gin middleware, resilience, concurrency, PostgreSQL, RBAC, and OpenTelemetry.
    - Docs Portal: https://abeta-dev.github.io/go-libs/
    - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-libs
-2. **`go-fintech-india@v0.4.0`** (`github.com/abeta-dev/go-fintech-india`): Zero-dependency Indian FinTech & statutory compliance engine (`127` exported symbols across `15` domain files: exact `int64` paise `Money` math, `GSTIN` Mod-36, `PAN`, `Aadhaar` Verhoeff D5, `<100ns` offline `IFSC`/`MICR`, NPCI `UPI` URIs, Razorpay/Cashfree/PhonePe webhooks, Indian `FY`/Advance Tax, MCA Schedule III aging).
+2. **`go-fintech-india@v0.5.0`** (`github.com/abeta-dev/go-fintech-india`): Zero-dependency Indian FinTech & statutory compliance engine (`17` domain files: exact `int64` paise `Money` math, deterministic `CalculateGST` intra/inter-state `CGST+SGST`/`IGST` tax-split, statutory `CalculateTDS` section calculator with Section 206AA enforcement, `GSTIN` Mod-36, `PAN`, `Aadhaar` Verhoeff D5, `<100ns` offline `IFSC`/`MICR`, NPCI `UPI` URIs, Razorpay/Cashfree/PhonePe webhooks, Indian `FY`/Advance Tax, MCA Schedule III aging).
    - Docs Portal: https://abeta-dev.github.io/go-fintech-india/
    - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-fintech-india
-3. **`go-app-kit@v0.6.0`** (`github.com/abeta-dev/go-app-kit`): Enterprise application workflow engines (`outbox`, `pdf`, `notifications`, `audit`, `export` with Brotli/Gzip streaming CSV).
+3. **`go-app-kit@v0.7.0`** (`github.com/abeta-dev/go-app-kit`): **7** enterprise application workflow engines (`outbox`, `pdf`, `notifications`, `audit`, `export` with Brotli/Gzip streaming CSV, zero-leak object `storage` with presigned URLs, and lease-fenced periodic job `scheduler`).
    - Docs Portal: https://abeta-dev.github.io/go-app-kit/
    - GoDoc: https://pkg.go.dev/github.com/abeta-dev/go-app-kit
 4. **`cloud-native-observability@v0.4.0`** (`github.com/abeta-dev/cloud-native-observability`): OpenTelemetry Collector + LGTM stack, Google SRE multi-window burn-rate SLOs, ArgoCD GitOps, and 3-layer Terraform IaC.
