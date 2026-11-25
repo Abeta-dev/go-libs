@@ -330,8 +330,10 @@ func buildPragmas(cfg Config) []string {
 		pragmas = append(pragmas, "PRAGMA temp_store = MEMORY")
 	}
 	if !cfg.ReadOnly {
-		pragmas = append(pragmas, "PRAGMA journal_mode = "+cfg.JournalMode)
-		pragmas = append(pragmas, "PRAGMA synchronous = "+string(cfg.Synchronous))
+		pragmas = append(pragmas,
+			"PRAGMA journal_mode = "+cfg.JournalMode,
+			"PRAGMA synchronous = "+string(cfg.Synchronous),
+		)
 	}
 	if cfg.CacheSizeKB > 0 {
 		pragmas = append(pragmas, fmt.Sprintf("PRAGMA cache_size = -%d", cfg.CacheSizeKB))

@@ -392,7 +392,7 @@ func (cw *compressResponseWriter) start() error {
 		cw.ResponseWriter.WriteHeader(cw.statusCode)
 	}
 	if len(cw.buf) > 0 {
-		_, err := cw.ResponseWriter.Write(cw.buf)
+		_, err := cw.ResponseWriter.Write(cw.buf) //nolint:gosec // G705: transparent HTTP middleware forwarding handler-produced bytes
 		cw.buf = nil
 		return err
 	}

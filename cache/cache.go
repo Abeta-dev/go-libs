@@ -399,6 +399,39 @@ func NewMemoryCache(opts ...Option[any]) *MemoryCache {
 	return NewTypedCache[any](opts...)
 }
 
+func (c *TypedCache[T]) storeSampledItem(key string, newValue T, ttl time.Duration, tags []string) {
+	var exp int64
+	now := c.clock.Now()
+	if ttl > 0 {
+		exp = now.Add(ttl).UnixNano()
+	}
+	item := Item[T]{
+		Value:      newValue,
+		Expiration: exp,
+		CreatedAt:  now.UnixNano(),
+	}
+
+	if c.capacity > 0 {
+		stripe := c.getStripe(key)
+		stripe.Lock()
+		if _, exists := c.data.Load(key); !exists {
+			c.evictIfNeeded(key)
+		}
+		if _, loaded := c.data.Swap(key, item); !loaded {
+			c.size.Add(1)
+		}
+		if c.size.Load() > int64(c.capacity) {
+			c.evictIfNeeded(key)
+		}
+		stripe.Unlock()
+	} else {
+		if _, loaded := c.data.Swap(key, item); !loaded {
+			c.size.Add(1)
+		}
+	}
+	c.replaceKeyTags(key, tags)
+}
+
 func (c *TypedCache[T]) getOrFetchSampledLRU(ctx context.Context, key string, ttl time.Duration, tags []string, fetchFn func(context.Context) (T, error)) (T, FetchStatus, error) {
 	if err := ctx.Err(); err != nil {
 		var zero T
@@ -427,37 +460,7 @@ func (c *TypedCache[T]) getOrFetchSampledLRU(ctx context.Context, key string, tt
 			return zero, fetchErr
 		}
 
-		var exp int64
-		now := c.clock.Now()
-		if ttl > 0 {
-			exp = now.Add(ttl).UnixNano()
-		}
-		item := Item[T]{
-			Value:      newValue,
-			Expiration: exp,
-			CreatedAt:  now.UnixNano(),
-		}
-
-		if c.capacity > 0 {
-			stripe := c.getStripe(key)
-			stripe.Lock()
-			if _, exists := c.data.Load(key); !exists {
-				c.evictIfNeeded(key)
-			}
-			if _, loaded := c.data.Swap(key, item); !loaded {
-				c.size.Add(1)
-			}
-			if c.size.Load() > int64(c.capacity) {
-				c.evictIfNeeded(key)
-			}
-			stripe.Unlock()
-		} else {
-			if _, loaded := c.data.Swap(key, item); !loaded {
-				c.size.Add(1)
-			}
-		}
-		c.replaceKeyTags(key, tags)
-
+		c.storeSampledItem(key, newValue, ttl, tags)
 		return newValue, nil
 	})
 

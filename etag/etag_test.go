@@ -15,12 +15,13 @@ func TestComputeAndMatch(t *testing.T) {
 	body1 := []byte(`{"id":1,"name":"Ada","cached_at_iso":"2026-11-25T00:00:00Z","meta":{"generated_at_iso":"t1","nested":[{"cached_at_iso":"x","v":10}]}}`)
 	body2 := []byte(`{"name":"Ada","id":1,"cached_at_iso":"2026-11-25T01:00:00Z","meta":{"nested":[{"v":10,"cached_at_iso":"y"}],"generated_at_iso":"t2"}}`)
 
-	opts := []etag.Option{
+	opts := make([]etag.Option, 0, 5)
+	opts = append(opts,
 		nil,
 		etag.WithAppVersion("2.1.0"),
 		etag.WithPageVersion("screen-v3"),
 		etag.WithIgnoreJSONKeys("cached_at_iso", "generated_at_iso", " "),
-	}
+	)
 	tag1 := etag.Compute(body1, opts...)
 	tag2 := etag.Compute(body2, opts...)
 	if tag1 != tag2 {

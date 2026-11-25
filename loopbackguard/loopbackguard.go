@@ -262,7 +262,7 @@ func (g *Guard) Token() string {
 // VerifyToken checks candidate against the guard's active CSRF token using
 // constant-time comparison. Empty tokens always return false.
 func (g *Guard) VerifyToken(candidate string) bool {
-	if len(g.token) == 0 || len(candidate) == 0 {
+	if len(g.token) == 0 || candidate == "" {
 		return false
 	}
 	return subtle.ConstantTimeCompare(g.token, []byte(candidate)) == 1
