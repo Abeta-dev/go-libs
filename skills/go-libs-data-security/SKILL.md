@@ -1,12 +1,13 @@
 ---
 name: go-libs-data-security
-description: Database pools, transactional helpers (db.WithTx, db.WithQuerier, db.TxBeginner), RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/abeta-dev/go-libs@v0.5.0 (db, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger — 100.0% statement coverage).
+description: Database pools (PostgreSQL pgxpool + embedded SQLite WAL helper), transactional helpers (db.WithTx, sqlite.WithImmediateTx), RBAC authorization, JWKS public key resolution, bcrypt cryptography, structured logging, and OpenTelemetry tracing using github.com/abeta-dev/go-libs@v0.6.0 (db, sqlite, rbac, rbaccontext, jwks, cryptoutil, telemetry, logger — 100.0% statement coverage).
 ---
 
-# `go-libs-data-security` Subskill (`@v0.5.0` · `100.0%` coverage)
+# `go-libs-data-security` Subskill (`@v0.6.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/db`
+- `github.com/abeta-dev/go-libs/sqlite`
 - `github.com/abeta-dev/go-libs/rbac`
 - `github.com/abeta-dev/go-libs/rbaccontext`
 - `github.com/abeta-dev/go-libs/jwks`
@@ -28,6 +29,10 @@ err = db.WithTx(ctx, pool, func(txCtx context.Context, tx pgx.Tx) error {
 	return err
 })
 ```
+
+## 1b. Embedded SQLite WAL Helper (`sqlite`)
+
+For desktop/edge Go services using any `database/sql` SQLite driver (`modernc.org/sqlite`, `mattn/go-sqlite3`, `ncruces/go-sqlite3`), open with `sqlite.Open(ctx, path, sqlite.WithBusyTimeout(5*time.Second))`, run schema migrations via `db.Migrate(ctx, migrations)` (`PRAGMA user_version`), serialize writes via `db.WithImmediateTx(ctx, fn)` (`BEGIN IMMEDIATE`), and take atomic online backups via `db.Backup(ctx, destPath)` (`VACUUM INTO` + atomic rename).
 
 ## 2. JWKS Verification & Dynamic RBAC (`jwks`, `rbac`, `rbaccontext`)
 

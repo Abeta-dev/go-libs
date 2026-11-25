@@ -293,6 +293,78 @@ func TestMiddleware_BypassAndEdgeCases(t *testing.T) {
 	})
 }
 
+func TestMiddleware_ExcludesSSEEventStream(t *testing.T) {
+	t.Run("small_sse_chunk_not_buffered_and_uncompressed", func(t *testing.T) {
+		var observedWrittenBeforeReturn int
+		rec := httptest.NewRecorder()
+
+		h := compress.Middleware()(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
+			_, _ = w.Write([]byte("data: token-1\n\n"))
+			// Because text/event-stream bypasses threshold buffering immediately,
+			// the underlying ResponseWriter already has the bytes before Flush/return.
+			observedWrittenBeforeReturn = rec.Body.Len()
+			_, _ = w.Write([]byte("data: token-2\n\n"))
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/events", nil)
+		req.Header.Set("Accept-Encoding", "br, gzip")
+		h.ServeHTTP(rec, req)
+
+		if observedWrittenBeforeReturn == 0 {
+			t.Fatalf("expected SSE chunk to bypass 1KB buffer immediately, got 0 bytes before return")
+		}
+		if got := rec.Header().Get("Content-Encoding"); got != "" {
+			t.Fatalf("expected no Content-Encoding for SSE, got %q", got)
+		}
+		if rec.Body.String() != "data: token-1\n\ndata: token-2\n\n" {
+			t.Fatalf("unexpected SSE body: %q", rec.Body.String())
+		}
+	})
+
+	t.Run("large_sse_payload_never_compressed", func(t *testing.T) {
+		largeSSE := strings.Repeat("data: streaming-delta-chunk\n\n", 100)
+		h := compress.Middleware(compress.Config{MinSize: 64})(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Set("Content-Type", "text/event-stream")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(largeSSE))
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/events-large", nil)
+		req.Header.Set("Accept-Encoding", "br, gzip")
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+
+		if got := rec.Header().Get("Content-Encoding"); got != "" {
+			t.Fatalf("expected no Content-Encoding for large SSE stream, got %q", got)
+		}
+		if rec.Body.String() != largeSSE {
+			t.Fatalf("unexpected large SSE payload length=%d want=%d", rec.Body.Len(), len(largeSSE))
+		}
+	})
+
+	t.Run("sse_content_type_set_after_write_header_excluded_in_isCompressible", func(t *testing.T) {
+		largeSSE := strings.Repeat("data: late-header-event\n\n", 100)
+		h := compress.Middleware(compress.Config{MinSize: 64})(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "TEXT/EVENT-STREAM; charset=utf-8")
+			_, _ = w.Write([]byte(largeSSE))
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/events-late", nil)
+		req.Header.Set("Accept-Encoding", "br")
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+
+		if got := rec.Header().Get("Content-Encoding"); got != "" {
+			t.Fatalf("expected no Content-Encoding when Content-Type is SSE, got %q", got)
+		}
+		if rec.Body.String() != largeSSE {
+			t.Fatalf("body mismatch on late-header SSE")
+		}
+	})
+}
+
 func TestMiddleware_DecompressRequest(t *testing.T) {
 	cfg := compress.Config{
 		DecompressRequest:    true,

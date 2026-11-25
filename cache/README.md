@@ -51,6 +51,8 @@ type Cache[T any] interface {
 - **Singleflight Stampede Protection**: On cache misses, concurrent requests collapse into a single database/fetch execution via `singleflight.Group`. All callers receive the resolved value simultaneously, eliminating thundering-herd crashes.
 - **Strictly Zero Allocations**: All eviction data structures (doubly linked list nodes, frequency buckets) achieve zero allocations on steady-state reads and cache hits.
 - **Optional Per-Item TTL on Eviction Caches**: `LRU`, `LFU`, and `FIFO` support per-item expiration in addition to capacity limits.
+- **Prefix & Tag Invalidation (`DeletePrefix`, `SetWithTags`, `InvalidateTag`, `InvalidateTags`)**: Supports BFF write-through mutation invalidation across all 4 eviction policies with automatic tag index cleanup on eviction/expiration.
+- **Fetch Status Reporting (`GetOrFetchWithStatus`, `GetOrFetchWithTags`)**: Returns `FetchStatus` (`FetchStatusHit` / `"HIT"`, `FetchStatusMiss` / `"MISS"`, `FetchStatusCoalesced` / `"COALESCED"`) for `X-BFF-Cache` observability headers.
 - **Thread-Safe**: Fully protected against data races under high-concurrency multi-threaded workloads.
 
 ---

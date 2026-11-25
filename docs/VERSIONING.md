@@ -6,7 +6,7 @@ This document outlines the versioning guarantees, breaking change communication 
 
 ## 1. Pre-1.0 Versioning Contract (`v0.x.y`)
 
-`go-libs` follows [Semantic Versioning 2.0.0](https://semver.org/). Because the library is currently pre-1.0 (`v0.5.x`), consumers should be aware of the following expectations:
+`go-libs` follows [Semantic Versioning 2.0.0](https://semver.org/). Because the library is currently pre-1.0 (`v0.6.x`), consumers should be aware of the following expectations:
 
 - **Minor Releases (`v0.X.0`)**: May introduce new packages, enhancements, or breaking API refactorings as APIs are consolidated for long-term maintainability.
 - **Patch Releases (`v0.x.Y`)**: Strictly reserved for backward-compatible bug fixes, performance improvements, and security patches. Zero breaking API changes occur in patch releases.
@@ -15,7 +15,7 @@ This document outlines the versioning guarantees, breaking change communication 
   - **Strict `N + 2` Deprecation Window (`./scripts/check_deprecation.sh`)**: Any symbol slated for deprecation must carry a machine-verifiable Godoc annotation matching the exact format:
     `// Deprecated: Since vX.Y.Z (remove in >= vA.B.C). Use <NewSymbol> instead.`
     where `(A > X) || (A == X && B >= Y + 2)` (at least **2 minor releases** between initial deprecation and removal). CI (`./scripts/check_deprecation.sh`) rejects malformed deprecation comments, windows shorter than `N + 2` minor releases, and premature symbol removals against the previous release tag.
-  - **Leaf Import & Depth-0 DAG Isolation (`./scripts/check_leaf_imports.sh`)**: CI enforces that all **25 Depth-0 pure internal leaf packages** maintain zero internal `github.com/abeta-dev/go-libs/*` production imports and all **30 minimal-footprint leaf packages** resolve in an isolated `go.mod` sandbox with zero `gin`, `pgx`, or `otel` dependencies.
+  - **Leaf Import & Depth-0 DAG Isolation (`./scripts/check_leaf_imports.sh`)**: CI enforces that all **29 Depth-0 pure internal leaf packages** maintain zero internal `github.com/abeta-dev/go-libs/*` production imports and all **35 minimal-footprint leaf packages** resolve in an isolated `go.mod` sandbox with zero `gin`, `pgx`, or `otel` dependencies.
   - Compile-time breaking changes are never introduced in patch releases.
 
 ---
@@ -28,7 +28,7 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 - **Early**: Production-ready implementation that has undergone recent surface consolidation or is subject to ergonomic refinements based on community feedback.
 - **Experimental / Deprecated**: Transitional APIs that may be superseded by standard CNCF/Go patterns or scheduled for deprecation.
 
-### Complete Inventory (36 Packages: 28 Stable, 8 Early, 0 Deprecated)
+### Complete Inventory (41 Packages: 28 Stable, 13 Early, 0 Deprecated)
 
 | Package | Maturity Tier | Measured Coverage | API Status & Production Risk |
 | :--- | :--- | :--- | :--- |
@@ -68,6 +68,11 @@ Not all packages in `go-libs` have the same degree of API finality. To help engi
 | `logger` | **Early** | 100.0% | Context-aware structured logging with slog, sampling, and sensitive field redaction. |
 | `ratelimit` | **Early** | 100.0% | In-memory rate limiting with Token Bucket and Sliding Window algorithms. |
 | `telemetry` | **Early** | 100.0% | OpenTelemetry distributed tracing wrapper with global and instance-scoped provider support. |
+| `etag` | **Early** | 100.0% | RFC 9110 ETag / If-None-Match (304) and version-gated JSON middleware with client auto-bust. |
+| `httpmw` | **Early** | 100.0% | Zero-Gin, zero-pgx, zero-OTel stdlib `net/http` middleware suite with full `ginmw` parity. |
+| `loopbackguard` | **Early** | 100.0% | Local-first loopback address guard, DNS-rebinding Host allowlist, Same-Origin & CSRF verification. |
+| `sqlite` | **Early** | 100.0% | Driver-agnostic embedded SQLite WAL helper (`busy_timeout`, `BEGIN IMMEDIATE`, `user_version` migrations, `VACUUM INTO` backup). |
+| `sse` | **Early** | 100.0% | First-class Server-Sent Events (`text/event-stream`) streaming helper with heartbeats and `Last-Event-ID`. |
 
 ---
 

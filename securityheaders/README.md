@@ -74,5 +74,5 @@ r.Use(ginmw.SecurityHeaders("api-service"))
 ---
 
 ## 🛡️ Edge Cases Handled
-- **Custom Header Overrides**: Configurable via functional options (`securityheaders.WithCSP`, `securityheaders.WithServerName`, `securityheaders.WithHSTSMaxAge`, `securityheaders.WithPermissionsPolicy`) to allow custom CSP directives if a service serves HTML reports or Swagger UI.
-- **HTTPS Enforcement in Proxied Clouds**: Applies HSTS headers appropriately when operating behind TLS-terminating cloud balancers.
+- **Custom Header Overrides**: Configurable via functional options (`securityheaders.WithCSP`, `securityheaders.WithServerName`, `securityheaders.WithHSTSMaxAge`, `securityheaders.WithPermissionsPolicy`, `securityheaders.WithDisableHSTS`, `securityheaders.WithCacheControl`) for HTML/Swagger UI, local-first loopback BFFs (`http://127.0.0.1`), and ETag-revalidating `private, no-cache` SDUI routes.
+- **HTTPS Enforcement in Proxied Clouds**: Applies HSTS headers appropriately when operating behind TLS-terminating cloud balancers, while `WithDisableHSTS()` cleanly omits HSTS for plain HTTP desktop/loopback listeners.

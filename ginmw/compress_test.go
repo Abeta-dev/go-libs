@@ -8,8 +8,11 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+	"testing/fstest"
 
 	"github.com/abeta-dev/go-libs/compress"
 	"github.com/abeta-dev/go-libs/ginmw"
@@ -112,4 +115,53 @@ func TestCompress_GinMiddleware(t *testing.T) {
 			t.Fatalf("status = %d, want 400", recBad.Code)
 		}
 	})
+
+	// 4. SSE text/event-stream is never buffered or compressed
+	t.Run("sse_uncompressed_and_unbuffered", func(t *testing.T) {
+		r.GET("/sse", func(c *gin.Context) {
+			c.Header("Content-Type", "text/event-stream")
+			c.Status(http.StatusOK)
+			_, _ = c.Writer.WriteString(strings.Repeat("data: chunk\n\n", 20))
+			c.Writer.Flush()
+		})
+		req := httptest.NewRequest(http.MethodGet, "/sse", nil)
+		req.Header.Set("Accept-Encoding", "br, gzip")
+		rec := httptest.NewRecorder()
+		r.ServeHTTP(rec, req)
+
+		if got := rec.Header().Get("Content-Encoding"); got != "" {
+			t.Fatalf("expected no Content-Encoding for SSE, got %q", got)
+		}
+		if !strings.HasPrefix(rec.Body.String(), "data: chunk\n\n") {
+			t.Fatalf("unexpected SSE body: %q", rec.Body.String())
+		}
+	})
+}
+
+func TestPrecompressedFileServerAndFS_GinAdapters(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "index.html"), []byte("<html><head></head><body>ok</body></html>"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	r := gin.New()
+	r.GET("/disk/*filepath", ginmw.PrecompressedFileServer(dir, compress.WithPathPrefix("/disk")))
+	r.GET("/mem/*filepath", ginmw.PrecompressedFS(
+		fstest.MapFS{"app.js": {Data: []byte("alert(1)")}},
+		compress.WithPathPrefix("/mem"),
+	))
+
+	recDisk := httptest.NewRecorder()
+	r.ServeHTTP(recDisk, httptest.NewRequest(http.MethodGet, "/disk/index.html", nil))
+	if recDisk.Code != http.StatusOK || !strings.Contains(recDisk.Body.String(), "ok") {
+		t.Fatalf("disk adapter failed: status=%d body=%q", recDisk.Code, recDisk.Body.String())
+	}
+
+	recMem := httptest.NewRecorder()
+	r.ServeHTTP(recMem, httptest.NewRequest(http.MethodGet, "/mem/app.js", nil))
+	if recMem.Code != http.StatusOK || recMem.Body.String() != "alert(1)" {
+		t.Fatalf("mem adapter failed: status=%d body=%q", recMem.Code, recMem.Body.String())
+	}
 }

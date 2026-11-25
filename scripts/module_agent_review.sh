@@ -429,7 +429,7 @@ for agent in activated_agents:
                 "check_version", ["./scripts/check_version.sh"]
             )
             if rc_ver == 0:
-                domain_checks.append("Version & 36-pkg parity")
+                domain_checks.append("Version & 41-pkg parity")
             else:
                 domain_passed = False
                 overall_passed = False

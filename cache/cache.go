@@ -138,6 +138,10 @@ type TypedCache[T any] struct {
 	lfu      *lfuBackend[T]
 	fifo     *fifoBackend[T]
 	initOnce sync.Once
+
+	tagMu     sync.Mutex
+	tagToKeys map[string]map[string]struct{}
+	keyToTags map[string]map[string]struct{}
 }
 
 func (c *TypedCache[T]) ensureInit() {
@@ -163,14 +167,17 @@ func (c *TypedCache[T]) ensureInit() {
 			if c.lru == nil {
 				c.lru = newLRUBackend[T](capVal, c.metrics, c.clock)
 			}
+			c.lru.onEvict = c.removeKeyTags
 		case EvictionLFU:
 			if c.lfu == nil {
 				c.lfu = newLFUBackend[T](capVal, c.metrics, c.clock)
 			}
+			c.lfu.onEvict = c.removeKeyTags
 		case EvictionFIFO:
 			if c.fifo == nil {
 				c.fifo = newFIFOBackend[T](capVal, c.metrics, c.clock)
 			}
+			c.fifo.onEvict = c.removeKeyTags
 		}
 	})
 }
@@ -216,10 +223,13 @@ func NewTypedCache[T any](opts ...Option[T]) *TypedCache[T] {
 	switch c.policy {
 	case EvictionLRU:
 		c.lru = newLRUBackend[T](capVal, c.metrics, c.clock)
+		c.lru.onEvict = c.removeKeyTags
 	case EvictionLFU:
 		c.lfu = newLFUBackend[T](capVal, c.metrics, c.clock)
+		c.lfu.onEvict = c.removeKeyTags
 	case EvictionFIFO:
 		c.fifo = newFIFOBackend[T](capVal, c.metrics, c.clock)
+		c.fifo.onEvict = c.removeKeyTags
 	}
 
 	if c.evictInterval > 0 {
@@ -250,6 +260,7 @@ func (c *TypedCache[T]) startEviction(interval time.Duration) {
 								if _, loaded := c.data.LoadAndDelete(k); loaded {
 									c.size.Add(-1)
 									c.metrics.Evictions.Inc()
+									c.removeKeyTags(keyStr)
 								}
 							}
 						}
@@ -364,6 +375,9 @@ func (c *TypedCache[T]) evictIfNeeded(newKey string) {
 		if _, loaded := c.data.LoadAndDelete(targetKey); loaded {
 			c.size.Add(-1)
 			c.metrics.Evictions.Inc()
+			if kStr, ok := targetKey.(string); ok {
+				c.removeKeyTags(kStr)
+			}
 		}
 	}
 }
@@ -385,10 +399,43 @@ func NewMemoryCache(opts ...Option[any]) *MemoryCache {
 	return NewTypedCache[any](opts...)
 }
 
-func (c *TypedCache[T]) getOrFetchSampledLRU(ctx context.Context, key string, ttl time.Duration, fetchFn func(context.Context) (T, error)) (T, error) {
+func (c *TypedCache[T]) storeSampledItem(key string, newValue T, ttl time.Duration, tags []string) {
+	var exp int64
+	now := c.clock.Now()
+	if ttl > 0 {
+		exp = now.Add(ttl).UnixNano()
+	}
+	item := Item[T]{
+		Value:      newValue,
+		Expiration: exp,
+		CreatedAt:  now.UnixNano(),
+	}
+
+	if c.capacity > 0 {
+		stripe := c.getStripe(key)
+		stripe.Lock()
+		if _, exists := c.data.Load(key); !exists {
+			c.evictIfNeeded(key)
+		}
+		if _, loaded := c.data.Swap(key, item); !loaded {
+			c.size.Add(1)
+		}
+		if c.size.Load() > int64(c.capacity) {
+			c.evictIfNeeded(key)
+		}
+		stripe.Unlock()
+	} else {
+		if _, loaded := c.data.Swap(key, item); !loaded {
+			c.size.Add(1)
+		}
+	}
+	c.replaceKeyTags(key, tags)
+}
+
+func (c *TypedCache[T]) getOrFetchSampledLRU(ctx context.Context, key string, ttl time.Duration, tags []string, fetchFn func(context.Context) (T, error)) (T, FetchStatus, error) {
 	if err := ctx.Err(); err != nil {
 		var zero T
-		return zero, err
+		return zero, "", err
 	}
 
 	// Fast path: check cache
@@ -396,14 +443,16 @@ func (c *TypedCache[T]) getOrFetchSampledLRU(ctx context.Context, key string, tt
 		item := val.(Item[T])
 		if item.Expiration == 0 || item.Expiration > c.clock.Now().UnixNano() {
 			c.metrics.Hits.Inc()
-			return item.Value, nil
+			return item.Value, FetchStatusHit, nil
 		}
 	}
 
 	c.metrics.Misses.Inc()
 
 	// Cache miss or expired: use singleflight to fetch
+	var executed atomic.Bool
 	ch := c.sf.DoChan(key, func() (any, error) {
+		executed.Store(true)
 		bgCtx := context.WithoutCancel(ctx)
 		newValue, fetchErr := fetchFn(bgCtx)
 		if fetchErr != nil {
@@ -411,66 +460,31 @@ func (c *TypedCache[T]) getOrFetchSampledLRU(ctx context.Context, key string, tt
 			return zero, fetchErr
 		}
 
-		var exp int64
-		now := c.clock.Now()
-		if ttl > 0 {
-			exp = now.Add(ttl).UnixNano()
-		}
-		item := Item[T]{
-			Value:      newValue,
-			Expiration: exp,
-			CreatedAt:  now.UnixNano(),
-		}
-
-		if c.capacity > 0 {
-			stripe := c.getStripe(key)
-			stripe.Lock()
-			if _, exists := c.data.Load(key); !exists {
-				c.evictIfNeeded(key)
-			}
-			if _, loaded := c.data.Swap(key, item); !loaded {
-				c.size.Add(1)
-			}
-			if c.size.Load() > int64(c.capacity) {
-				c.evictIfNeeded(key)
-			}
-			stripe.Unlock()
-		} else {
-			if _, loaded := c.data.Swap(key, item); !loaded {
-				c.size.Add(1)
-			}
-		}
-
+		c.storeSampledItem(key, newValue, ttl, tags)
 		return newValue, nil
 	})
 
 	select {
 	case <-ctx.Done():
 		var zero T
-		return zero, ctx.Err()
+		return zero, "", ctx.Err()
 	case res := <-ch:
 		if res.Err != nil {
 			var zero T
-			return zero, res.Err
+			return zero, "", res.Err
 		}
-		return res.Val.(T), nil
+		if executed.Load() {
+			return res.Val.(T), FetchStatusMiss, nil
+		}
+		return res.Val.(T), FetchStatusCoalesced, nil
 	}
 }
 
 // GetOrFetch attempts to get a value from cache. If it misses or is expired,
 // it uses singleflight to ensure fetchFn is only executed once for concurrent requests.
 func (c *TypedCache[T]) GetOrFetch(ctx context.Context, key string, ttl time.Duration, fetchFn func(context.Context) (T, error)) (T, error) {
-	c.ensureInit()
-	switch c.policy {
-	case EvictionLRU:
-		return c.lru.GetOrFetch(ctx, key, ttl, fetchFn)
-	case EvictionLFU:
-		return c.lfu.GetOrFetch(ctx, key, ttl, fetchFn)
-	case EvictionFIFO:
-		return c.fifo.GetOrFetch(ctx, key, ttl, fetchFn)
-	default:
-		return c.getOrFetchSampledLRU(ctx, key, ttl, fetchFn)
-	}
+	v, _, err := c.GetOrFetchWithStatus(ctx, key, ttl, fetchFn)
+	return v, err
 }
 
 // Get retrieves an item from the cache. Returns false if missing or expired.
@@ -500,6 +514,7 @@ func (c *TypedCache[T]) Get(key string) (T, bool) {
 				if _, loaded := c.data.LoadAndDelete(key); loaded {
 					c.size.Add(-1)
 					c.metrics.Evictions.Inc()
+					c.removeKeyTags(key)
 				}
 			}
 		}
@@ -512,6 +527,11 @@ func (c *TypedCache[T]) Get(key string) (T, bool) {
 
 // Set stores an item in the cache with an optional TTL. If no TTL is passed, it does not expire.
 func (c *TypedCache[T]) Set(key string, value T, ttl ...time.Duration) {
+	c.setValue(key, value, ttl...)
+	c.removeKeyTags(key)
+}
+
+func (c *TypedCache[T]) setValue(key string, value T, ttl ...time.Duration) {
 	c.ensureInit()
 	switch c.policy {
 	case EvictionLRU:
@@ -579,25 +599,33 @@ func (c *TypedCache[T]) Len() int {
 
 // Delete removes an item from the cache.
 func (c *TypedCache[T]) Delete(key string) {
+	_ = c.deleteKey(key)
+}
+
+func (c *TypedCache[T]) deleteKey(key string) bool {
 	c.ensureInit()
+	var deleted bool
 	switch c.policy {
 	case EvictionLRU:
-		c.lru.Delete(key)
-		return
+		deleted = c.lru.Delete(key)
 	case EvictionLFU:
-		c.lfu.Delete(key)
-		return
+		deleted = c.lfu.Delete(key)
 	case EvictionFIFO:
-		c.fifo.Delete(key)
-		return
+		deleted = c.fifo.Delete(key)
+	default:
+		if c.capacity > 0 {
+			stripe := c.getStripe(key)
+			stripe.Lock()
+			if _, loaded := c.data.LoadAndDelete(key); loaded {
+				c.size.Add(-1)
+				deleted = true
+			}
+			stripe.Unlock()
+		} else if _, loaded := c.data.LoadAndDelete(key); loaded {
+			c.size.Add(-1)
+			deleted = true
+		}
 	}
-
-	if c.capacity > 0 {
-		stripe := c.getStripe(key)
-		stripe.Lock()
-		defer stripe.Unlock()
-	}
-	if _, loaded := c.data.LoadAndDelete(key); loaded {
-		c.size.Add(-1)
-	}
+	c.removeKeyTags(key)
+	return deleted
 }

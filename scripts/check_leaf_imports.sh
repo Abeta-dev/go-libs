@@ -5,11 +5,11 @@ set -euo pipefail
 # Leaf Package Import Isolation & Minimal Footprint Gate
 #
 # Guarantees that:
-#   1. Gate 1 (Depth-0 Pure Internal Leaf DAG Isolation): All 25 pure leaf
+#   1. Gate 1 (Depth-0 Pure Internal Leaf DAG Isolation): All 29 pure leaf
 #      packages have zero internal github.com/abeta-dev/go-libs/* production
 #      imports, preventing circular or accidental intra-repo coupling.
 #   2. Gate 2 (Minimal-Footprint Isolated go.mod Sandbox Gate): Importing any
-#      of the 30 lightweight minimal-footprint packages in isolation does NOT
+#      of the 35 lightweight minimal-footprint packages in isolation does NOT
 #      drag heavy third-party dependencies (gin, pgx, opentelemetry) into a
 #      consumer's go.sum or compiled binary.
 # ==============================================================================
@@ -25,10 +25,12 @@ PURE_LEAF_PACKAGES=(
   "clock"
   "compress"
   "env"
+  "etag"
   "fsm"
   "health"
   "httputil"
   "jwks"
+  "loopbackguard"
   "maputil"
   "metrics"
   "pagination"
@@ -39,6 +41,8 @@ PURE_LEAF_PACKAGES=(
   "securityheaders"
   "shutdown"
   "sliceutil"
+  "sqlite"
+  "sse"
   "stringutil"
   "telemetry"
   "timeutil"
@@ -56,11 +60,14 @@ LEAF_PACKAGES=(
   "compress"
   "cryptoutil"
   "env"
+  "etag"
   "fsm"
   "health"
+  "httpmw"
   "httputil"
   "jwks"
   "logger"
+  "loopbackguard"
   "maputil"
   "metrics"
   "pagination"
@@ -72,6 +79,8 @@ LEAF_PACKAGES=(
   "securityheaders"
   "shutdown"
   "sliceutil"
+  "sqlite"
+  "sse"
   "stringutil"
   "timeutil"
   "uuidutil"

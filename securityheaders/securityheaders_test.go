@@ -88,3 +88,39 @@ func TestNew_EmptyOptionsFallbackToDefault(t *testing.T) {
 	assert.Equal(t, securityheaders.DefaultConfig.CSP, hdr.Get("Content-Security-Policy"))
 	assert.Equal(t, securityheaders.DefaultConfig.PermissionsPolicy, hdr.Get("Permissions-Policy"))
 }
+
+func TestNew_DisableHSTSAndCustomCacheControl(t *testing.T) {
+	t.Run("disable_hsts_and_sdui_cache_control", func(t *testing.T) {
+		mw := securityheaders.New(
+			nil,
+			securityheaders.WithDisableHSTS(),
+			securityheaders.WithCacheControl("private, no-cache"),
+		)
+		w := roundTrip(mw)
+		hdr := w.Header()
+		assert.Empty(t, hdr.Get("Strict-Transport-Security"))
+		assert.Equal(t, "private, no-cache", hdr.Get("Cache-Control"))
+		assert.Empty(t, hdr.Get("Pragma"))
+	})
+
+	t.Run("empty_cache_control_omits_headers", func(t *testing.T) {
+		mw := securityheaders.New(
+			securityheaders.WithDisableHSTS(),
+			securityheaders.WithCacheControl(""),
+		)
+		w := roundTrip(mw)
+		hdr := w.Header()
+		assert.Empty(t, hdr.Get("Strict-Transport-Security"))
+		assert.Empty(t, hdr.Get("Cache-Control"))
+		assert.Empty(t, hdr.Get("Pragma"))
+	})
+
+	t.Run("empty_default_cache_control_fallback", func(t *testing.T) {
+		orig := securityheaders.DefaultConfig.CacheControl
+		securityheaders.DefaultConfig.CacheControl = ""
+		defer func() { securityheaders.DefaultConfig.CacheControl = orig }()
+		mw := securityheaders.New()
+		w := roundTrip(mw)
+		assert.Empty(t, w.Header().Get("Cache-Control"))
+	})
+}

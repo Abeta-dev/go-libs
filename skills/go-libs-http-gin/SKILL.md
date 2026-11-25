@@ -1,13 +1,17 @@
 ---
 name: go-libs-http-gin
-description: HTTP server/client and Gin middleware patterns using github.com/abeta-dev/go-libs@v0.5.0 (ginmw, compress, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation — 100.0% statement coverage). Use when building REST APIs, middleware chains, or resilient HTTP clients.
+description: HTTP server/client, stdlib httpmw, SSE, ETag, loopback CSRF guard, and Gin middleware patterns using github.com/abeta-dev/go-libs@v0.6.0 (ginmw, httpmw, compress, etag, loopbackguard, sse, httpclient, httputil, pagination, idempotency, health, requestid, recovery, securityheaders, bodylimit, validation — 100.0% statement coverage). Use when building REST APIs, local-first desktop BFFs, SSE streams, or resilient HTTP clients.
 ---
 
-# `go-libs-http-gin` Subskill (`@v0.5.0` · `100.0%` coverage)
+# `go-libs-http-gin` Subskill (`@v0.6.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/ginmw`
+- `github.com/abeta-dev/go-libs/httpmw`
 - `github.com/abeta-dev/go-libs/compress`
+- `github.com/abeta-dev/go-libs/etag`
+- `github.com/abeta-dev/go-libs/loopbackguard`
+- `github.com/abeta-dev/go-libs/sse`
 - `github.com/abeta-dev/go-libs/httpclient`
 - `github.com/abeta-dev/go-libs/httputil`
 - `github.com/abeta-dev/go-libs/pagination`
@@ -45,12 +49,19 @@ r.Use(
 )
 ```
 
-## 2. Brotli & Gzip HTTP Compression (`compress` + `ginmw.Compress`)
+## 2. SSE-Safe Compression & Precompressed SPA Server (`compress` + `ginmw`)
 
-- Use `compress.Middleware(cfg...)` on standard `net/http` routers or `ginmw.Compress(cfg...)` on Gin routers.
-- Negotiates RFC 9110 `Accept-Encoding` quality weights (`compress.Negotiate`), preferring Brotli (`br`) over Gzip (`gzip`), buffers up to `MinSize` (default `1024` bytes), and bounds request decompression via `MaxDecompressedBytes` (default `10 MiB`).
+- Use `compress.Middleware(cfg...)` on standard `net/http` routers or `ginmw.Compress(cfg...)` on Gin routers. Server-Sent Events (`text/event-stream`) are explicitly excluded from `"text/"` matching and bypass threshold buffering immediately.
+- Serve build-time `<file>.br` / `<file>.gz` sidecar assets (e.g. KMP WasmJS bundles) with SPA fallback and escaped HTML `<meta>` CSRF token injection using `compress.PrecompressedFileServer(dir, compress.WithSPAFallback("index.html"), compress.WithCSRFMetaToken(guard.Token()))` or `compress.PrecompressedFS(embedFS, ...)`.
 
-## 3. Standardized JSON Envelopes & Validation (`httputil` + `validation`)
+## 3. Version-Gated ETag & Local-First Loopback Security (`etag`, `securityheaders`, `loopbackguard`, `sse`, `httpmw`)
+
+- Use `etag.Middleware` / `ginmw.ETag` (or `etag.WriteVersionedJSON`) with `etag.WithAppVersion(v)`, `etag.WithIgnoreJSONKeys("cached_at_iso", "generated_at_iso")`, and `etag.WithCacheControl("private, no-cache")` for `304 Not Modified` caching and `X-Client-App-Version` auto-bust.
+- For local-first desktop BFFs (`http://127.0.0.1`), combine `securityheaders.New(securityheaders.WithDisableHSTS(), securityheaders.WithCacheControl("private, no-cache"))`, `loopbackguard.ValidateLoopbackAddr(addr)`, and `loopbackguard.New()` (DNS-rebinding `Host` allowlist + `Sec-Fetch-Site` / `Origin` + constant-time per-boot CSRF token).
+- Use `sse.Handler` / `ginmw.SSE` with `sse.WithHeartbeat(15*time.Second)` for AI token streaming, sync progress, and SDUI delta streams.
+- Use `httpmw.Chain(...)` for lightweight stdlib `net/http` BFFs needing `RequestID`, `Logger`, `Recovery`, `REDMetrics`, `MetricsEndpoint`, `RequireTenant`, `ETag`, `LoopbackGuard`, and `SSE` with zero Gin/pgx/OTel imports.
+
+## 4. Standardized JSON Envelopes & Validation (`httputil` + `validation`)
 
 - Return consistent JSON envelopes using `httputil.OK(w, data)`, `httputil.Created(w, data)`, `httputil.NoContent(w)`, and `httputil.ErrorFromDomain(w, err)`.
 - Format `validator/v10` errors into clean client field diagnostics using `validation.FormatErrors(err)`.
