@@ -1,9 +1,9 @@
 ---
 name: go-libs-resilience
-description: Resilience, concurrency, caching, and lifecycle patterns using github.com/abeta-dev/go-libs@v0.5.0 (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics — 100.0% statement coverage). Use when hardening external calls, background workers, caches, or state machines.
+description: Resilience, concurrency, caching (prefix/tag invalidation + FetchStatus), and lifecycle patterns using github.com/abeta-dev/go-libs@v0.6.0 (retry, circuitbreaker, ratelimit, workerpool, cache, async, shutdown, fsm, clock, metrics — 100.0% statement coverage). Use when hardening external calls, background workers, caches, or state machines.
 ---
 
-# `go-libs-resilience` Subskill (`@v0.5.0` · `100.0%` coverage)
+# `go-libs-resilience` Subskill (`@v0.6.0` · `100.0%` coverage)
 
 Packages covered:
 - `github.com/abeta-dev/go-libs/retry`
@@ -36,19 +36,26 @@ err := retry.Do(ctx, retry.Config{
 })
 ```
 
-## 2. Stampede-Safe Caching (`cache`)
+## 2. Stampede-Safe Caching with Tag/Prefix Invalidation & `FetchStatus` (`cache`)
 
-Use `cache.NewTypedCache[T]` with `GetOrFetch` to coalesce concurrent cache misses via singleflight across `PolicySampledLRU`, `PolicyLRU`, `PolicyLFU`, `PolicyFIFO`, or `PolicyTTL` eviction policies:
+Use `cache.NewTypedCache[T]` with `GetOrFetchWithStatus` / `GetOrFetchWithTags` to coalesce concurrent cache misses via singleflight, return `FetchStatus` (`HIT` / `MISS` / `COALESCED`) for `X-BFF-Cache` headers, and invalidate on write-through mutations via `DeletePrefix(prefix)`, `SetWithTags(...)`, and `InvalidateTag("screen:people")`:
 
 ```go
 memCache := cache.NewTypedCache[TenantConfig](
-	5000,
-	cache.WithEvictionPolicy(cache.PolicyLRU),
+	cache.WithCapacity[TenantConfig](5000),
+	cache.WithEvictionPolicy[TenantConfig](cache.EvictionLRU),
 )
 
-cfg, err := memCache.GetOrFetch(ctx, tenantID, 5*time.Minute, func(ctx context.Context) (TenantConfig, error) {
-	return repo.FetchTenantConfig(ctx, tenantID)
-})
+cfg, status, err := memCache.GetOrFetchWithTags(
+	ctx, "screen:people:"+tenantID, 5*time.Minute, []string{"screen:people"},
+	func(ctx context.Context) (TenantConfig, error) {
+		return repo.FetchTenantConfig(ctx, tenantID)
+	},
+)
+w.Header().Set("X-BFF-Cache", status.String()) // "HIT", "MISS", or "COALESCED"
+// On write-through mutation:
+memCache.InvalidateTag("screen:people")
+memCache.DeletePrefix("screen:people:")
 ```
 
 ## 3. Bounded Concurrency & State Machines (`workerpool`, `async`, `fsm`)

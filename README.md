@@ -1,6 +1,6 @@
-# go-libs · latest published v0.5.0
+# go-libs · latest published v0.6.0
 
-Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 36 packages and Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
+Production Go microservices frequently reimplement identical operational plumbing—circuit breakers, rate limiters, singleflight caching, worker pools, structured error hierarchies, and graceful shutdown—leading to inconsistent behavior and dependency sprawl across services. `go-libs` provides a unified suite of 41 packages and HTTP/Gin middleware with verified statement coverage under a single module BOM. Each package is independently importable with zero business domain logic, delivering hardened operational primitives without framework lock-in.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/abeta-dev/go-libs.svg)](https://pkg.go.dev/github.com/abeta-dev/go-libs)
 [![Docs Portal](https://img.shields.io/badge/docs-abeta--dev.github.io%2Fgo--libs-00ADD8?logo=read-the-docs&logoColor=white)](https://abeta-dev.github.io/go-libs/)
@@ -16,7 +16,7 @@ Shared, zero-business-logic Go libraries and middleware for cloud-native microse
 > 📖 **Engineering Documentation & Architecture Blueprint**  
 > Complete subsystem guides, module selection flowcharts, architectural rationales, and execution topologies:  
 > - 🏛️ **[System Architecture & Blueprint](docs/ARCHITECTURE.md)** (Topology, Layering Boundaries, Middleware Order)  
-> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.5.0 release ledger, API errata, and evolution)
+> - 📜 **[Changelog & Release Record](CHANGELOG.md)** (latest published v0.6.0 release ledger, API errata, and evolution)
 > - 🏷️ **[Versioning & Stability Matrix](docs/VERSIONING.md)** (Semantic versioning contracts and package tiers)  
 > - ⚡ **[Performance Benchmarks](BENCHMARKS.md)**  
 > - 📝 **[Decisions & Architecture Records](docs/adr/0001-domain-decoupling-and-audit-sink.md)**  
@@ -28,7 +28,7 @@ Each package is independently importable, fully tested with verified statement c
 This repository uses a **Single Module Monorepo** pattern. There is only *one* `go.mod` file at the root of `go-libs`. 
 
 **Why is this the best "BOM" (Bill of Materials) way?**
-By having a single `github.com/abeta-dev/go-libs@v0.5.0` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
+By having a single `github.com/abeta-dev/go-libs@v0.6.0` import, you guarantee that all internal packages (`db`, `recovery`, `ratelimit`, `cache`, `workerpool`, `metrics`, `retry`, `telemetry`) are perfectly synced to the same tested release threshold across all your microservices. It prevents version drifting between interconnected middleware packages natively.
 
 ### Minimal-Footprint Imports
 
@@ -58,21 +58,21 @@ func main() {
 EOF
 
 # 3. Resolve dependencies
-go get github.com/abeta-dev/go-libs@v0.5.0
+go get github.com/abeta-dev/go-libs@v0.6.0
 go mod tidy
 
 # 4. Prove no heavy frameworks exist in go.sum (exits 0 with zero output if clean)
 grep -E 'gin-gonic|jackc/pgx|opentelemetry' go.sum || echo "VERIFIED: Zero heavy dependencies in go.sum"
 ```
 
-> 🛡️ **Continuous CI Regression Guard**: Every pull request runs [`scripts/check_leaf_imports.sh`](scripts/check_leaf_imports.sh) in an isolated sandbox across 13 leaf packages to ensure no heavy framework can ever quietly leak into lightweight primitives.
+> 🛡️ **Continuous CI Regression Guard**: Every pull request runs [`scripts/check_leaf_imports.sh`](scripts/check_leaf_imports.sh) in an isolated sandbox across 35 minimal-footprint leaf packages (and verifies 29 Depth-0 pure internal leaves) to ensure no heavy framework can ever quietly leak into lightweight primitives.
 
 ---
 
 ## Installation
 
 ```bash
-go get github.com/abeta-dev/go-libs@v0.5.0
+go get github.com/abeta-dev/go-libs@v0.6.0
 ```
 
 Requirements:
@@ -257,7 +257,7 @@ helm upgrade --install microservice ./deploy/helm/microservice
 | `circuitbreaker` | `/circuitbreaker` | `NewConsecutiveBreaker(maxFailures, timeout, opts...)`, `NewRatioBreaker(...)` — outbound 3-state machine |
 | `clock` | `/clock` | `Clock`, `RealClock`, `FakeClock` — deterministic mockable time abstraction for sleep-free tests |
 | `workerpool` | `/workerpool` | `New(workers, queueSize, opts...)`, `Submit(task) error`, `SubmitContext(ctx, task) error`, `WithMetrics`, `WithPanicHandler` |
-| `cache` | `/cache` | `NewTypedCache[T](opts...)`, `GetOrFetch`, `WithMetrics`, `WithEvictionInterval` — generic singleflight stampede-protected cache |
+| `cache` | `/cache` | `NewTypedCache[T](opts...)`, `GetOrFetchWithStatus`, `DeletePrefix`, `SetWithTags`, `InvalidateTag`, `FetchStatus` — generic singleflight stampede-protected cache |
 | `shutdown` | `/shutdown` | `New(timeout)`, `.Register(name, fn)`, `.Execute(ctx)`, `.Wait()` — concurrent graceful teardown manager |
 | `async` | `/async` | `Go`, `GoCtx`, `Parallel`, `ParallelLimit` — panic-safe goroutines and bounded concurrency orchestration |
 | `fsm` | `/fsm` | `NewMachine`, `ValidateTransition`, `CanTransition` — declarative in-memory finite state machine with O(1) transitions |
@@ -288,9 +288,13 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 |---|---|---|
 | `httpclient` | `/httpclient` | `New(opts...)`, `NewRoundTripper`, `WithRetry`, `WithCircuitBreaker`, `WithRateLimiter` — resilient composed HTTP transport client |
 | `ratelimit` | `/ratelimit` | `New(cap, window, opts...)`, `NewGlobal()`, `NewAuth()`, RFC `RateLimit-*` headers, `WithMetrics` |
-| `securityheaders` | `/securityheaders` | `New(opts...)` — OWASP defensive security headers (CSP, HSTS, X-Frame) |
+| `securityheaders` | `/securityheaders` | `New(opts...)`, `WithDisableHSTS()`, `WithCacheControl(...)` — OWASP defensive security headers (CSP, HSTS, X-Frame, SDUI cache control) |
 | `bodylimit` | `/bodylimit` | `New(maxBytes)`, `MB(n)`, `KB(n)`, `String(bytes)` — HTTP request body size limiter preventing payload inflation attacks |
-| `compress` | `/compress` | `Middleware(cfg...)`, `Negotiate(acceptEncoding)`, `Config`, `DefaultConfig()` — RFC 9110 Brotli (`br`) & Gzip (`gzip`) response compression with pooled writers and bounded request decompression |
+| `compress` | `/compress` | `Middleware(cfg...)`, `Negotiate(acceptEncoding)`, `PrecompressedFileServer`, `PrecompressedFS` — SSE-safe RFC 9110 Brotli (`br`) & Gzip (`gzip`) compression plus `.br`/`.gz` static/SPA file server with CSRF `<meta>` injection |
+| `etag` | `/etag` | `Middleware(opts...)`, `Compute`, `Match`, `WriteVersionedJSON`, `WithAppVersion`, `WithIgnoreJSONKeys` — RFC 9110 `ETag` / `304 Not Modified` with volatile JSON key stripping and `X-Client-App-Version` auto-bust |
+| `loopbackguard` | `/loopbackguard` | `ValidateLoopbackAddr`, `New(opts...)`, `Guard.Middleware`, `GenerateCSRFToken` — loopback DNS-rebinding `Host` allowlist, `Sec-Fetch-Site` / `Origin` Same-Origin guard, and constant-time per-boot CSRF protection |
+| `sse` | `/sse` | `NewStream`, `Handler`, `Event`, `WithHeartbeat`, `WithRetry` — first-class Server-Sent Events (`text/event-stream`) streaming with keepalives, `Last-Event-ID`, and context cancellation |
+| `httpmw` | `/httpmw` | `Chain`, `Use`, `Logger`, `Recovery`, `REDMetrics`, `MetricsEndpoint`, `RequireTenant`, `ETag`, `LoopbackGuard`, `SSE` — zero-Gin, zero-pgx, zero-OTel stdlib `net/http` middleware suite |
 | `requestid` | `/requestid` | `Middleware`, `FromContext(ctx)`, `Header` constant — W3C correlation ID propagation |
 | `recovery` | `/recovery` | `Middleware(opts...)` — JSON panic recovery with structured `slog` output |
 | `httputil` | `/httputil` | `OK`, `Created`, `NoContent`, `Error`, `ErrorFromDomain`, `ValidationError` — standardized responses |
@@ -306,6 +310,7 @@ Compatible with standard library `http.Handler`, Chi, Echo, or any Go HTTP frame
 | Package | Import suffix | Key exports & Description |
 |---|---|---|
 | `db` | `/db` | `Connect(ctx, url, opts)`, `WithTx(ctx, pool, fn)`, `WithQuerier(ctx, q)`, `GetQuerier(ctx, pool)`, `DBTX` interface — pgx connection pool & transaction wrapper |
+| `sqlite` | `/sqlite` | `Open(ctx, path, opts...)`, `Wrap`, `WithImmediateTx`, `Migrate`, `Backup`, `Checkpoint` — driver-agnostic embedded SQLite WAL helper (`busy_timeout`, `BEGIN IMMEDIATE`, `user_version`, atomic `VACUUM INTO`) |
 | `rbac` | `/rbac` | `NewEngine()`, `Engine.Match(pattern, action)` — role-based access control engine |
 | `rbaccontext` | `/rbaccontext` | `WithPermissions(ctx, perms)`, `Can(ctx, perm)`, `CanAny(ctx, perms...)` — permission helpers |
 | `telemetry` | `/telemetry` | `NewTracerProvider(opts...)`, `InitProvider(tp)`, `StartSpan(ctx, tracer, span)` — OpenTelemetry distributed tracing |
@@ -339,8 +344,12 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 | `ginmw.AuthRateLimit()` | IP token-bucket: 10 req/min (brute-force protection) |
 | `ginmw.LimitBodyDefault()` | 2 MB max body for all API routes |
 | `ginmw.LimitBodyAuth()` | 4 KB max body for auth endpoints |
-| `ginmw.Compress(cfg...)` | RFC 9110 Brotli (`br`) & Gzip (`gzip`) response compression and request decompression |
-| `ginmw.SecurityHeaders(name)` | OWASP defensive headers (CSP, HSTS, X-Frame) |
+| `ginmw.Compress(cfg...)` | SSE-safe RFC 9110 Brotli (`br`) & Gzip (`gzip`) response compression and request decompression |
+| `ginmw.PrecompressedFileServer(dir, opts...)` | Precompressed `.br` / `.gz` static & SPA file server with optional CSRF `<meta>` injection (`PrecompressedFS` for `fs.FS`) |
+| `ginmw.ETag(opts...)` | Version-gated `ETag` / `304 Not Modified` middleware (`WriteVersionedJSON` for direct handlers) |
+| `ginmw.SecurityHeaders(name)` | OWASP defensive headers (`SecurityHeadersWithOptions` supports `WithDisableHSTS` / `WithCacheControl`) |
+| `ginmw.LoopbackGuard(g)` | Local-first DNS-rebinding, Same-Origin, and per-boot CSRF guard (`NewLoopbackGuard`) |
+| `ginmw.SSE(fn, opts...)` | First-class Server-Sent Events (`text/event-stream`) Gin handler adapter |
 | `ginmw.RequestID()` | Injects/propagates `X-Request-ID` |
 | `ginmw.Logger()` | Structured access log (method, path, status, latency) |
 | `ginmw.Telemetry(service)` | OpenTelemetry W3C trace context extraction and span lifecycle |
@@ -355,7 +364,7 @@ All Gin-specific middleware wrappers live in `ginmw` for uniform imports.
 
 ## 📊 Verified Statement Coverage Status
 
-Coverage across all 36 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
+Coverage across all 41 packages in `go-libs` is measured using Go's official statement-level coverage tool (`go test -short -coverprofile=coverage.out ./...`):
 
 > **Overall Repository Statement Coverage: 100.0%** (Zero data races across `-race`)
 > **Core Middleware Gate (`ginmw`): 100.0%**
@@ -365,22 +374,25 @@ Coverage across all 36 packages in `go-libs` is measured using Go's official sta
 |---|---|---|
 | `apperror` | Canonical structured application error codes and helpers | **100.0%** |
 | `async` | Panic-safe goroutines and bounded concurrency orchestration | **100.0%** |
-| `bodylimit` | Gin middleware to cap HTTP request body sizes | **100.0%** |
-| `cache` | Generic singleflight stampede-protected multi-policy cache (SampledLRU, LRU, LFU, FIFO, TTL) | **100.0%** |
+| `bodylimit` | HTTP middleware to cap request body sizes | **100.0%** |
+| `cache` | Generic singleflight stampede-protected multi-policy cache with prefix/tag invalidation and `FetchStatus` | **100.0%** |
 | `circuitbreaker` | Outbound resilience 3-state machine (Consecutive & Failure Ratio algorithms) | **100.0%** |
 | `clock` | Deterministic mockable time abstraction with RealClock and advanceable FakeClock | **100.0%** |
-| `compress` | Brotli (`br`) & Gzip (`gzip`) HTTP compression and bounded request decompression middleware | **100.0%** |
+| `compress` | SSE-safe Brotli (`br`) & Gzip (`gzip`) HTTP compression and precompressed `.br`/`.gz` SPA file server | **100.0%** |
 | `cryptoutil` | Secure password hashing (`golang.org/x/crypto/bcrypt`) and CSPRNG password generation (`crypto/rand`) | **100.0%** |
 | `db` | Database Pool & Querier | **100.0%** |
 | `env` | Zero-dependency typed environment variable parsers | **100.0%** |
+| `etag` | RFC 9110 `ETag` / `304 Not Modified` and version-gated JSON middleware with client auto-bust | **100.0%** |
 | `fsm` | Declarative in-memory finite state machine with O(1) state transitions | **100.0%** |
 | `ginmw` | Unified Gin HTTP middleware chain & helper | **100.0%** |
 | `health` | Parallel dependency health check and Kubernetes probe handler | **100.0%** |
 | `httpclient` | Resilient composed HTTP client (RateLimit -> CircuitBreaker -> Retry -> Timeout -> Transport) | **100.0%** |
+| `httpmw` | Zero-Gin, zero-pgx, zero-OTel stdlib `net/http` middleware suite | **100.0%** |
 | `httputil` | Standardized JSON response and error handlers | **100.0%** |
 | `idempotency` | Two-phase HTTP request deduplication | **100.0%** |
 | `jwks` | Thread-safe cached ECDSA P-256 JWKS public key resolver | **100.0%** |
 | `logger` | Request-context aware structured logging with `slog`, sampling, and sensitive data redaction | **100.0%** |
+| `loopbackguard` | Local-first loopback address, DNS-rebinding `Host`, Same-Origin, and constant-time CSRF guard | **100.0%** |
 | `maputil` | Generic type-safe map operations | **100.0%** |
 | `metrics` | Framework-agnostic Counter, Gauge, Histogram interfaces | *N/A (Pure Interfaces)* |
 | `pagination` | Offset-based request query parser and generic slice pagination | **100.0%** |
@@ -390,9 +402,11 @@ Coverage across all 36 packages in `go-libs` is measured using Go's official sta
 | `recovery` | Panic-to-JSON-500 middleware with structured logging | **100.0%** |
 | `requestid` | Correlation ID generator and context propagator | **100.0%** |
 | `retry` | Context-aware backoff and retry execution algorithms | **100.0%** |
-| `securityheaders` | OWASP secure header injector middleware | **100.0%** |
+| `securityheaders` | OWASP secure header injector middleware (`WithDisableHSTS`, `WithCacheControl`) | **100.0%** |
 | `shutdown` | Graceful concurrent teardown manager | **100.0%** |
 | `sliceutil` | Generic slice algorithms (Reduce, GroupBy, Chunk, Unique, Flatten, First) | **100.0%** |
+| `sqlite` | Driver-agnostic embedded SQLite WAL helper (`BEGIN IMMEDIATE`, `user_version`, `VACUUM INTO`) | **100.0%** |
+| `sse` | First-class Server-Sent Events (`text/event-stream`) streaming helper with heartbeats & `Last-Event-ID` | **100.0%** |
 | `stringutil` | Sensitive info masking and text helpers | **100.0%** |
 | `telemetry` | OpenTelemetry distributed tracing wrapper | **100.0%** |
 | `timeutil` | Parametric time arithmetic, RFC parsing, business days, and timezone utilities | **100.0%** |
@@ -429,10 +443,10 @@ docker compose -f deploy/docker-compose.observability.yml up --build
 
 | Skill | Path | Covered Packages |
 | :--- | :--- | :--- |
-| **`go-libs` (Umbrella)** | [`skills/go-libs/SKILL.md`](skills/go-libs/SKILL.md) | Full 36-package catalog router, architectural invariants, and truth gates |
+| **`go-libs` (Umbrella)** | [`skills/go-libs/SKILL.md`](skills/go-libs/SKILL.md) | Full 41-package catalog router, architectural invariants, and truth gates |
 | **`go-libs-resilience`** | [`skills/go-libs-resilience/SKILL.md`](skills/go-libs-resilience/SKILL.md) | `retry`, `circuitbreaker`, `ratelimit`, `workerpool`, `cache`, `async`, `shutdown`, `fsm`, `clock`, `metrics` |
-| **`go-libs-http-gin`** | [`skills/go-libs-http-gin/SKILL.md`](skills/go-libs-http-gin/SKILL.md) | `ginmw`, `compress`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation` |
-| **`go-libs-data-security`** | [`skills/go-libs-data-security/SKILL.md`](skills/go-libs-data-security/SKILL.md) | `db`, `rbac`, `rbaccontext`, `jwks`, `cryptoutil`, `telemetry`, `logger` |
+| **`go-libs-http-gin`** | [`skills/go-libs-http-gin/SKILL.md`](skills/go-libs-http-gin/SKILL.md) | `ginmw`, `httpmw`, `compress`, `etag`, `loopbackguard`, `sse`, `httpclient`, `httputil`, `pagination`, `idempotency`, `health`, `requestid`, `recovery`, `securityheaders`, `bodylimit`, `validation` |
+| **`go-libs-data-security`** | [`skills/go-libs-data-security/SKILL.md`](skills/go-libs-data-security/SKILL.md) | `db`, `sqlite`, `rbac`, `rbaccontext`, `jwks`, `cryptoutil`, `telemetry`, `logger` |
 | **`go-libs-foundation`** | [`skills/go-libs-foundation/SKILL.md`](skills/go-libs-foundation/SKILL.md) | `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, `uuidutil` |
 
 Machine-readable LLM context is also published at **[`llms.txt`](llms.txt)** (and served live at [`https://abeta-dev.github.io/go-libs/llms.txt`](https://abeta-dev.github.io/go-libs/llms.txt)).
@@ -445,7 +459,7 @@ Machine-readable LLM context is also published at **[`llms.txt`](llms.txt)** (an
 
 | Repository | Architectural Role | Live Documentation Portal | API Reference (`pkg.go.dev`) |
 | :--- | :--- | :--- | :--- |
-| **[`github.com/abeta-dev/go-libs`](https://github.com/abeta-dev/go-libs)** (`v0.5.0`) | Foundational zero-business-logic Go primitives: HTTP/Gin middleware, resilience, concurrency, PostgreSQL, RBAC, and OpenTelemetry | [`abeta-dev.github.io/go-libs`](https://abeta-dev.github.io/go-libs/) | [`pkg.go.dev/github.com/abeta-dev/go-libs`](https://pkg.go.dev/github.com/abeta-dev/go-libs) |
+| **[`github.com/abeta-dev/go-libs`](https://github.com/abeta-dev/go-libs)** (`v0.6.0`) | Foundational zero-business-logic Go primitives: HTTP/Gin & stdlib `httpmw` middleware, SSE, ETag, loopback CSRF guard, resilience, concurrency, PostgreSQL & embedded SQLite WAL, RBAC, and OpenTelemetry | [`abeta-dev.github.io/go-libs`](https://abeta-dev.github.io/go-libs/) | [`pkg.go.dev/github.com/abeta-dev/go-libs`](https://pkg.go.dev/github.com/abeta-dev/go-libs) |
 | **[`github.com/abeta-dev/go-fintech-india`](https://github.com/abeta-dev/go-fintech-india)** (`v0.5.0`) | Zero-dependency Indian FinTech & statutory compliance engine (`17` domain files: exact `int64` paise `Money` math, deterministic `CalculateGST` intra/inter-state `CGST+SGST`/`IGST` tax-split, statutory `CalculateTDS` section calculator with Section 206AA enforcement, `GSTIN` Mod-36, `PAN`, `Aadhaar` Verhoeff D5, `<100ns` offline `IFSC`/`MICR`, NPCI `UPI` URIs, Razorpay/Cashfree/PhonePe webhooks, Indian `FY`/Advance Tax, MCA Schedule III aging) | [`abeta-dev.github.io/go-fintech-india`](https://abeta-dev.github.io/go-fintech-india/) | [`pkg.go.dev/github.com/abeta-dev/go-fintech-india`](https://pkg.go.dev/github.com/abeta-dev/go-fintech-india) |
 | **[`github.com/abeta-dev/go-app-kit`](https://github.com/abeta-dev/go-app-kit)** (`v0.7.0`) | **7** enterprise application workflow engines (`outbox`, `pdf`, `notifications`, `audit`, `export` with Brotli/Gzip streaming CSV, zero-leak object `storage` with presigned URLs, and lease-fenced periodic job `scheduler`) | [`abeta-dev.github.io/go-app-kit`](https://abeta-dev.github.io/go-app-kit/) | [`pkg.go.dev/github.com/abeta-dev/go-app-kit`](https://pkg.go.dev/github.com/abeta-dev/go-app-kit) |
 | **[`github.com/abeta-dev/cloud-native-observability`](https://github.com/abeta-dev/cloud-native-observability)** (`v0.4.0`) | Production LGTM observability stack (Loki, Grafana, Tempo, Prometheus, OTel), Terraform IaC, ArgoCD GitOps, and Google SRE SLO alerting | [`abeta-dev.github.io/cloud-native-observability`](https://abeta-dev.github.io/cloud-native-observability/) | [`github.com/abeta-dev/cloud-native-observability`](https://github.com/abeta-dev/cloud-native-observability) |
@@ -484,7 +498,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, [SECU
 
 ### 📦 Repository Provenance & Release Record
 
-`go-libs` is available from the Go module proxy at the latest verified published version, `v0.5.0`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
+`go-libs` is available from the Go module proxy at the latest verified published version, `v0.6.0`. The current `origin/main` checkout is a separate baseline history; see [Release Baseline](docs/RELEASE_BASELINE.md) before selecting a release or publishing a reconciliation. For the complete version-by-version delivery record and historical commit errata, see **[CHANGELOG.md](CHANGELOG.md)**. Full semantic versioning contracts and package stability tiers are detailed in **[docs/VERSIONING.md](docs/VERSIONING.md)**.
 
 ---
 

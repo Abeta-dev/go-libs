@@ -63,6 +63,8 @@ type Config struct {
 }
 
 // DefaultConfig returns the recommended production compression configuration.
+// Note: Server-Sent Events ("text/event-stream") are always excluded from
+// buffering and compression even though "text/" is listed.
 func DefaultConfig() Config {
 	return Config{
 		MinSize:     defaultMinSize,
@@ -110,11 +112,17 @@ func normalizeConfig(cfg ...Config) Config {
 // acceptable). When both Brotli and Gzip have equal positive quality weights,
 // Brotli ("br") is preferred.
 func Negotiate(acceptEncoding string) string {
+	brQ, gzipQ := negotiateQuality(acceptEncoding)
+	return selectPreferredEncoding(brQ, gzipQ)
+}
+
+func negotiateQuality(acceptEncoding string) (brQ, gzipQ float64) {
 	if strings.TrimSpace(acceptEncoding) == "" {
-		return ""
+		return -1.0, -1.0
 	}
 
-	brQ, gzipQ, starQ := -1.0, -1.0, -1.0
+	brQ, gzipQ = -1.0, -1.0
+	starQ := -1.0
 
 	for _, part := range strings.Split(acceptEncoding, ",") {
 		token, q, ok := parseEncodingDirective(part)
@@ -137,7 +145,7 @@ func Negotiate(acceptEncoding string) string {
 	if gzipQ < 0 && starQ >= 0 {
 		gzipQ = starQ
 	}
-	return selectPreferredEncoding(brQ, gzipQ)
+	return brQ, gzipQ
 }
 
 func parseEncodingDirective(part string) (token string, q float64, ok bool) {
@@ -278,7 +286,15 @@ func hasNoTransform(values []string) bool {
 	return false
 }
 
+func isEventStream(contentType string) bool {
+	mediaType, _, _ := strings.Cut(contentType, ";")
+	return strings.EqualFold(strings.TrimSpace(mediaType), "text/event-stream")
+}
+
 func isCompressible(contentType string, allowed []string) bool {
+	if isEventStream(contentType) {
+		return false
+	}
 	mediaType, _, _ := strings.Cut(contentType, ";")
 	mediaType = strings.ToLower(strings.TrimSpace(mediaType))
 	for _, pattern := range allowed {
@@ -317,6 +333,9 @@ func (cw *compressResponseWriter) WriteHeader(code int) {
 	if !cw.headerWritten {
 		cw.statusCode = code
 		cw.headerWritten = true
+		if !cw.decided && isEventStream(cw.Header().Get("Content-Type")) {
+			_ = cw.start()
+		}
 	}
 }
 

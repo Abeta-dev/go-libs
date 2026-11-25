@@ -3,6 +3,7 @@
 package ginmw
 
 import (
+	"io/fs"
 	"net/http"
 
 	"github.com/abeta-dev/go-libs/compress"
@@ -61,4 +62,16 @@ func Compress(cfg ...compress.Config) gin.HandlerFunc {
 			c.Abort()
 		}
 	}
+}
+
+// PrecompressedFileServer returns a Gin handler serving static files from rootDir
+// using precompressed .br / .gz sidecars with optional SPA fallback and CSRF meta injection.
+func PrecompressedFileServer(rootDir string, opts ...compress.FileServerOption) gin.HandlerFunc {
+	return gin.WrapH(compress.PrecompressedFileServer(rootDir, opts...))
+}
+
+// PrecompressedFS returns a Gin handler serving static files from an fs.FS
+// using precompressed .br / .gz sidecars with optional SPA fallback and CSRF meta injection.
+func PrecompressedFS(fsys fs.FS, opts ...compress.FileServerOption) gin.HandlerFunc {
+	return gin.WrapH(compress.PrecompressedFS(fsys, opts...))
 }

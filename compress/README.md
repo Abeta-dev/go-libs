@@ -8,7 +8,8 @@
 - **Pooled Zero-Leak Writers**: Reuses `*brotli.Writer` and `*gzip.Writer` instances via `sync.Pool` to minimize GC pressure on hot endpoints.
 - **Threshold Buffering (`MinSize`)**: Buffers up to `MinSize` bytes (default `1024`) before committing to compression, avoiding compression overhead on small responses.
 - **Zip-Bomb Safe Request Decompression**: When `DecompressRequest: true`, transparently decompresses incoming `Content-Encoding: br` or `gzip` payloads up to `MaxDecompressedBytes` (default `10 MiB`), returning `413 Request Entity Too Large` when exceeded or `400 Bad Request` on malformed streams.
-- **Streaming & `http.Flusher` Support**: Preserves `http.Flusher` for Server-Sent Events (SSE) and chunked streaming responses.
+- **SSE-Safe Streaming (`text/event-stream`)**: Explicitly excludes `text/event-stream` from `"text/"` matching and bypasses threshold buffering immediately on `WriteHeader` so Server-Sent Events flush straight through uncompressed.
+- **Precompressed Static / SPA File Server (`PrecompressedFileServer` / `PrecompressedFS`)**: Serves build-time `<file>.br` and `<file>.gz` sidecars (such as KMP WasmJS bundles) with RFC 9110 `Accept-Encoding` negotiation, SPA `index.html` fallback, and optional HTML `<meta>` CSRF token injection.
 
 ## Usage
 

@@ -1,15 +1,28 @@
-# IDEs
+# IDEs & editor swap/backup files
 .idea/
 .vscode/
 *.swp
+*.swo
+*~
+*.bak
+*.orig
+*.tmp
 
-# OS
+# OS & cloud-sync conflict artifacts
 .DS_Store
+.DS_Store?
+._*
+Thumbs.db
+* [0-9]
+* [0-9].*
+*_2.*
 
 # Go
 *.test
 *.out
 *.zip
+go.work
+go.work.sum
 bin/
 /microservice
 examples/microservice/microservice

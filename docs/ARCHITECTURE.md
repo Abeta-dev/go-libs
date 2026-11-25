@@ -29,14 +29,16 @@ Circular dependencies between packages are strictly forbidden. Imports must stri
 ```
 Layer 4: Transport Adapters
          ├── ginmw (Gin-specific middleware pipeline & token utilities)
+         ├── httpmw (Zero-Gin, zero-pgx, zero-OTel stdlib net/http middleware suite)
          └── examples/microservice (reference microservice composition)
               │
               ▼
 Layer 3: Cross-Cutting Middleware & HTTP Utilities
          ├── idempotency, pagination, rbac, rbaccontext
          ├── health, recovery, securityheaders, ratelimit, requestid, httputil
+         ├── compress (Brotli/Gzip + PrecompressedFileServer), etag, loopbackguard, sse
          ├── httpclient (resilient client composing rate limit, circuit breaker, retry)
-         └── db, validation, telemetry
+         └── db (PostgreSQL pgxpool), sqlite (embedded WAL helper), validation, telemetry
               │
               ▼
 Layer 2: Core Infrastructure Primitives
@@ -97,28 +99,31 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 
 ---
 
-## 4. Master Module Directory (36 Packages)
+## 4. Master Module Directory (41 Packages)
 
 | Package | Layer | Primary Responsibility | Key Types / Constructors |
 |---|:---:|---|---|
 | `apperror` | 1 | Canonical error codes and structured error wrapping | `Error`, `Code`, `New`, `Wrap` |
 | `async` | 2 | Panic-safe goroutines and bounded concurrency orchestration | `Go`, `GoCtx`, `Parallel`, `ParallelLimit` |
 | `bodylimit` | 3 | HTTP request body size bounding | `New`, `MB`, `KB` |
-| `cache` | 2 | Typed cache with singleflight and eviction policies | `TypedCache`, `NewTypedCache`, `WithEvictionPolicy` |
+| `cache` | 2 | Typed cache with singleflight, prefix/tag invalidation, and `FetchStatus` | `TypedCache`, `NewTypedCache`, `GetOrFetchWithStatus`, `DeletePrefix`, `SetWithTags`, `InvalidateTag` |
 | `circuitbreaker` | 2 | 3-state failure machine for outbound dependencies | `ConsecutiveBreaker`, `RatioBreaker`, `NewConsecutiveBreaker` |
 | `clock` | 1 | Mockable time abstraction with RealClock and advanceable FakeClock | `Clock`, `RealClock`, `FakeClock`, `NewReal`, `NewFake` |
-| `compress` | 3 | RFC 9110 Brotli (`br`) & Gzip (`gzip`) HTTP compression and bounded request decompression | `Middleware`, `Negotiate`, `Config`, `DefaultConfig` |
+| `compress` | 3 | RFC 9110 Brotli (`br`) & Gzip (`gzip`) SSE-safe compression + precompressed static/SPA server | `Middleware`, `Negotiate`, `PrecompressedFileServer`, `PrecompressedFS`, `Config` |
 | `cryptoutil` | 1 | Bcrypt hashing (cost 12) and CSPRNG string generation | `HashPassword`, `GenerateTempPassword` |
 | `db` | 3 | PostgreSQL pgxpool lifecycle, DBTX querier abstraction, and transactional helpers | `Connect`, `DBTX`, `WithTx`, `WithQuerier`, `GetQuerier`, `WithMaxConns` |
 | `env` | 1 | Zero-dependency typed environment variable retrieval | `String`, `Int`, `Bool`, `MustString` |
+| `etag` | 3 | RFC 9110 ETag / `If-None-Match` (`304`) & version-gated JSON middleware | `Middleware`, `Compute`, `Match`, `WriteVersionedJSON`, `WithAppVersion`, `WithIgnoreJSONKeys` |
 | `fsm` | 2 | Declarative in-memory finite state machine with O(1) state transitions | `Machine`, `NewMachine`, `Transition`, `CanTransition`, `ValidateTransition` |
-| `ginmw` | 4 | Complete Gin-native middleware pipeline and token utilities | `RequestID`, `Telemetry`, `AuthMiddleware`, `RBAC`, `REDMetrics` |
+| `ginmw` | 4 | Complete Gin-native middleware pipeline and token utilities | `RequestID`, `Telemetry`, `AuthMiddleware`, `RBAC`, `REDMetrics`, `ETag`, `LoopbackGuard`, `SSE` |
 | `health` | 3 | Kubernetes-compliant liveness and readiness probes | `Handler`, `New`, `WithChecker` |
 | `httpclient` | 3 | Resilient composed HTTP client pipeline with circuit breaker, rate limit, and retry | `New`, `NewRoundTripper`, `WithRetry`, `WithCircuitBreaker` |
+| `httpmw` | 4 | Zero-Gin, zero-pgx, zero-OTel stdlib `net/http` middleware suite | `Chain`, `Use`, `Logger`, `Recovery`, `REDMetrics`, `MetricsEndpoint`, `RequireTenant`, `ETag`, `SSE` |
 | `httputil` | 3 | Standard JSON response envelopes and domain error mapping | `OK`, `Created`, `ErrorFromDomain` |
 | `idempotency` | 3 | Two-phase atomic request locking and response replay | `Store`, `MemoryStore`, `PGStore`, `NewPGStore`, `Middleware` |
 | `jwks` | 3 | Thread-safe cached ECDSA P-256 JWKS public key resolver | `Resolver`, `NewResolver`, `GetECPublicKey` |
 | `logger` | 1 | Context-aware structured JSON logging via `log/slog` | `Default`, `WithContext`, `FromContext` |
+| `loopbackguard` | 3 | Local-first loopback guard, DNS-rebinding Host allowlist, Same-Origin & CSRF verification | `ValidateLoopbackAddr`, `Guard`, `New`, `GenerateCSRFToken` |
 | `maputil` | 1 | Generic type-safe map transformations | `Merge`, `Filter` |
 | `metrics` | 1 | Framework-agnostic instrumentation interfaces | `Counter`, `Gauge`, `Histogram` |
 | `pagination` | 3 | Clamped offset and cursor pagination and SQL calculations | `Parse`, `Offset`, `Response`, `ParseCursor`, `EncodeCursor`, `DecodeCursor` |
@@ -128,9 +133,11 @@ requestid ➔ bodylimit ➔ cors ➔ recovery ➔ logger ➔ telemetry ➔ ratel
 | `recovery` | 3 | Panic recovery middleware with structured logging | `Middleware`, `WithLogger` |
 | `requestid` | 3 | Correlation ID extraction and context propagation | `Middleware`, `FromContext` |
 | `retry` | 2 | Context-aware retry execution with backoff algorithms | `Do`, `DoWithResult`, `Constant`, `ExponentialJitter` |
-| `securityheaders` | 3 | OWASP defensive security headers middleware | `New`, `Default` |
+| `securityheaders` | 3 | OWASP defensive security headers middleware (`WithDisableHSTS`, `WithCacheControl`) | `New`, `Default`, `WithDisableHSTS`, `WithCacheControl` |
 | `shutdown` | 2 | Coordinated graceful OS signal teardown manager | `Manager`, `New`, `Register`, `Wait` |
 | `sliceutil` | 1 | Generic slice algorithms | `Reduce`, `GroupBy`, `Chunk`, `Unique`, `Flatten`, `First` |
+| `sqlite` | 3 | Driver-agnostic embedded SQLite WAL helper (`BEGIN IMMEDIATE`, `user_version`, `VACUUM INTO`) | `Open`, `Wrap`, `DB`, `WithImmediateTx`, `Migrate`, `Backup`, `Checkpoint` |
+| `sse` | 3 | First-class Server-Sent Events (`text/event-stream`) streaming helper | `Stream`, `Event`, `NewStream`, `Handler`, `WithHeartbeat` |
 | `stringutil` | 1 | Sensitive data masking, truncation, and secure random generators | `MaskEmail`, `MaskPhone`, `Truncate`, `RandomAlphanumeric`, `RandomSecureString` |
 | `telemetry` | 3 | OpenTelemetry provider initialization and span helpers | `InitProvider`, `NewTracerProvider`, `StartSpan` |
 | `timeutil` | 1 | UTC normalization and business day calculations | `NowIn`, `FormatIn`, `AddBusinessDays`, `StartOfDay`, `EndOfDay` |
@@ -278,11 +285,11 @@ func main() {
 
 ## 8. AI Agent Skills & Context Routing (`AGENTS.md` + `skills/`)
 
-To prevent LLM context bloat across all 36 packages, `go-libs` ships progressive-disclosure Agent Skills (`SKILL.md`) routed via the root [`AGENTS.md`](../AGENTS.md):
-- [`skills/go-libs/SKILL.md`](../skills/go-libs/SKILL.md) — Umbrella 36-package router and truth-gate guide
-- [`skills/go-libs-resilience/SKILL.md`](../skills/go-libs-resilience/SKILL.md) — Layer 2 resilience, caching, concurrency, and deterministic time
-- [`skills/go-libs-http-gin/SKILL.md`](../skills/go-libs-http-gin/SKILL.md) — Layer 3 & 4 Gin middleware pipeline, HTTP compression (`compress`), HTTP client/utilities, idempotency, and pagination
-- [`skills/go-libs-data-security/SKILL.md`](../skills/go-libs-data-security/SKILL.md) — PostgreSQL `db.DBTX`, JWKS, dynamic RBAC, bcrypt `cryptoutil`, `logger`, and `telemetry`
+To prevent LLM context bloat across all 41 packages, `go-libs` ships progressive-disclosure Agent Skills (`SKILL.md`) routed via the root [`AGENTS.md`](../AGENTS.md):
+- [`skills/go-libs/SKILL.md`](../skills/go-libs/SKILL.md) — Umbrella 41-package router and truth-gate guide
+- [`skills/go-libs-resilience/SKILL.md`](../skills/go-libs-resilience/SKILL.md) — Layer 2 resilience, caching (prefix/tag invalidation + `FetchStatus`), concurrency, and deterministic time
+- [`skills/go-libs-http-gin/SKILL.md`](../skills/go-libs-http-gin/SKILL.md) — Layer 3 & 4 Gin & stdlib `httpmw` pipelines, SSE-safe `compress` + `PrecompressedFileServer`, `etag`, `loopbackguard`, `sse`, HTTP client/utilities, idempotency, and pagination
+- [`skills/go-libs-data-security/SKILL.md`](../skills/go-libs-data-security/SKILL.md) — PostgreSQL `db.DBTX`, embedded `sqlite` WAL helper, JWKS, dynamic RBAC, bcrypt `cryptoutil`, `logger`, and `telemetry`
 - [`skills/go-libs-foundation/SKILL.md`](../skills/go-libs-foundation/SKILL.md) — Layer 1 `apperror`, `env`, `sliceutil`, `maputil`, `stringutil`, `timeutil`, and `uuidutil`
 
 

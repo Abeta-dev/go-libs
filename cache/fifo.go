@@ -4,7 +4,9 @@ package cache
 
 import (
 	"context"
+	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/abeta-dev/go-libs/clock"
@@ -31,6 +33,7 @@ type fifoBackend[T any] struct {
 	metrics  Metrics
 	sf       singleflight.Group
 	clock    clock.Clock
+	onEvict  func(key string)
 }
 
 func newFIFOBackend[T any](capacity int, m Metrics, clk clock.Clock) *fifoBackend[T] {
@@ -75,6 +78,9 @@ func (c *fifoBackend[T]) Get(key string) (T, bool) {
 		delete(c.items, key)
 		c.metrics.Evictions.Inc()
 		c.metrics.Misses.Inc()
+		if c.onEvict != nil {
+			c.onEvict(key)
+		}
 		var zero T
 		return zero, false
 	}
@@ -114,16 +120,25 @@ func (c *fifoBackend[T]) Set(key string, value T, ttl ...time.Duration) {
 
 // GetOrFetch retrieves an item or executes fetchFn under singleflight stampede protection.
 func (c *fifoBackend[T]) GetOrFetch(ctx context.Context, key string, ttl time.Duration, fetchFn func(context.Context) (T, error)) (T, error) {
+	v, _, err := c.GetOrFetchWithStatus(ctx, key, ttl, nil, fetchFn)
+	return v, err
+}
+
+// GetOrFetchWithStatus retrieves an item or executes fetchFn under singleflight stampede protection,
+// reporting whether the result was a HIT, MISS, or COALESCED fetch.
+func (c *fifoBackend[T]) GetOrFetchWithStatus(ctx context.Context, key string, ttl time.Duration, onStore func(), fetchFn func(context.Context) (T, error)) (T, FetchStatus, error) {
 	if err := ctx.Err(); err != nil {
 		var zero T
-		return zero, err
+		return zero, "", err
 	}
 
 	if val, ok := c.Get(key); ok {
-		return val, nil
+		return val, FetchStatusHit, nil
 	}
 
+	var executed atomic.Bool
 	ch := c.sf.DoChan(key, func() (any, error) {
+		executed.Store(true)
 		bgCtx := context.WithoutCancel(ctx)
 		newValue, fetchErr := fetchFn(bgCtx)
 		if fetchErr != nil {
@@ -131,31 +146,55 @@ func (c *fifoBackend[T]) GetOrFetch(ctx context.Context, key string, ttl time.Du
 			return zero, fetchErr
 		}
 		c.Set(key, newValue, ttl)
+		if onStore != nil {
+			onStore()
+		}
 		return newValue, nil
 	})
 
 	select {
 	case <-ctx.Done():
 		var zero T
-		return zero, ctx.Err()
+		return zero, "", ctx.Err()
 	case res := <-ch:
 		if res.Err != nil {
 			var zero T
-			return zero, res.Err
+			return zero, "", res.Err
 		}
-		return res.Val.(T), nil
+		if executed.Load() {
+			return res.Val.(T), FetchStatusMiss, nil
+		}
+		return res.Val.(T), FetchStatusCoalesced, nil
 	}
 }
 
-// Delete removes an item from the cache.
-func (c *fifoBackend[T]) Delete(key string) {
+// Delete removes an item from the cache and reports whether it existed.
+func (c *fifoBackend[T]) Delete(key string) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	if node, exists := c.items[key]; exists {
 		c.removeNode(node)
 		delete(c.items, key)
+		return true
 	}
+	return false
+}
+
+// DeletePrefix removes all items whose keys start with prefix and returns the deleted keys.
+func (c *fifoBackend[T]) DeletePrefix(prefix string) []string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	var deleted []string
+	for k, node := range c.items {
+		if strings.HasPrefix(k, prefix) {
+			c.removeNode(node)
+			delete(c.items, k)
+			deleted = append(deleted, k)
+		}
+	}
+	return deleted
 }
 
 // Len returns the count of items in the cache.
@@ -202,4 +241,7 @@ func (c *fifoBackend[T]) evictOldest() {
 	c.removeNode(oldest)
 	delete(c.items, oldest.key)
 	c.metrics.Evictions.Inc()
+	if c.onEvict != nil {
+		c.onEvict(oldest.key)
+	}
 }

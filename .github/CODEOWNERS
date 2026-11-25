@@ -42,22 +42,27 @@
 # ------------------------------------------------------------------------------
 /ginmw/             @umesh0492
 /compress/          @umesh0492
+/etag/              @umesh0492
+/httpmw/            @umesh0492
 /httpclient/        @umesh0492
 /httputil/          @umesh0492
+/loopbackguard/     @umesh0492
 /pagination/        @umesh0492
 /idempotency/       @umesh0492
 /health/            @umesh0492
 /requestid/         @umesh0492
 /recovery/          @umesh0492
 /securityheaders/   @umesh0492
+/sse/               @umesh0492
 /bodylimit/         @umesh0492
 /validation/        @umesh0492
 
 # ------------------------------------------------------------------------------
 # 4. @go-libs-data-security-agent (skills/go-libs-data-security/SKILL.md)
-#    PostgreSQL transactions, RBAC, JWKS, cryptography, telemetry & logging.
+#    PostgreSQL/SQLite persistence, RBAC, JWKS, cryptography, telemetry & logging.
 # ------------------------------------------------------------------------------
 /db/                @umesh0492
+/sqlite/            @umesh0492
 /rbac/              @umesh0492
 /rbaccontext/       @umesh0492
 /jwks/              @umesh0492

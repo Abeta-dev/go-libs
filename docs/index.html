@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>go-libs · Production-Hardened Go Microservice Foundations</title>
-  <meta name="description" content="36 hardened, framework-agnostic Go microservice packages with verified 100.0% statement coverage, zero heavy dependencies in core leaves, and zero data races under -race.">
+  <meta name="description" content="41 hardened, framework-agnostic Go microservice packages with verified 100.0% statement coverage, zero heavy dependencies in core leaves, and zero data races under -race.">
   <meta name="theme-color" content="#0b0f19">
 
   <!-- Open Graph -->
   <meta property="og:title" content="go-libs · Production-Hardened Go Microservice Foundations">
-  <meta property="og:description" content="36 production-ready Go packages with verified 100.0% statement coverage and zero data races.">
+  <meta property="og:description" content="41 production-ready Go packages with verified 100.0% statement coverage and zero data races.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://abeta-dev.github.io/go-libs/">
 
@@ -1044,11 +1044,11 @@
           <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
         </svg>
         <span>go-libs</span>
-        <span class="brand-badge">v0.5.0</span>
+        <span class="brand-badge">v0.6.0</span>
       </a>
       <ul class="nav-links">
         <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#packages">Packages (36)</a></li>
+        <li><a href="#packages">Packages (41)</a></li>
         <li><a href="#quickstart">Quick Start</a></li>
         <li><a href="#benchmarks">Benchmarks</a></li>
         <li><a href="#branch-protection">Security Gate</a></li>
@@ -1077,16 +1077,16 @@
     <div class="container">
       <h1>Production-Hardened Go Microservice Foundations</h1>
       <p class="hero-sub">
-        Unified, zero-business-logic foundation primitives for high-throughput Go backends. Hardened with verified 100.0% statement coverage across 36 packages, zero heavy dependencies in core leaves, and zero data races under <code>-race</code>.
+        Unified, zero-business-logic foundation primitives for high-throughput Go backends. Hardened with verified 100.0% statement coverage across 41 packages, zero heavy dependencies in core leaves, and zero data races under <code>-race</code>.
       </p>
       <div class="hero-meta">
-        <span>Release v0.5.0 · Go 1.26.0+ · Single-Module BOM</span>
+        <span>Release v0.6.0 · Go 1.26.0+ · Single-Module BOM</span>
       </div>
 
       <div class="install-row">
         <div class="install-box">
           <span class="install-prompt">$</span>
-          <code class="install-code" id="installCmd">go get github.com/abeta-dev/go-libs@v0.5.0</code>
+          <code class="install-code" id="installCmd">go get github.com/abeta-dev/go-libs@v0.6.0</code>
           <button type="button" class="copy-btn" onclick="copyInstall(this)">Copy</button>
         </div>
       </div>
@@ -1115,7 +1115,7 @@
       <!-- Stats Grid -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-val">36</div>
+          <div class="stat-val">41</div>
           <div class="stat-lbl">Hardened Packages</div>
         </div>
         <div class="stat-card">
@@ -1160,6 +1160,7 @@
           <p class="tier-desc">Composes lower-level primitives into framework-native middleware pipelines.</p>
           <div class="tier-pkgs">
             <span class="pkg-chip">ginmw</span>
+            <span class="pkg-chip">httpmw</span>
             <span class="pkg-chip">examples/microservice</span>
           </div>
         </div>
@@ -1173,6 +1174,9 @@
           <p class="tier-desc">Standard library <code>http.Handler</code> compatible middleware, context propagation, and transports.</p>
           <div class="tier-pkgs">
             <span class="pkg-chip">compress</span>
+            <span class="pkg-chip">etag</span>
+            <span class="pkg-chip">loopbackguard</span>
+            <span class="pkg-chip">sse</span>
             <span class="pkg-chip">httpclient</span>
             <span class="pkg-chip">ratelimit</span>
             <span class="pkg-chip">securityheaders</span>
@@ -1184,6 +1188,7 @@
             <span class="pkg-chip">idempotency</span>
             <span class="pkg-chip">validation</span>
             <span class="pkg-chip">db</span>
+            <span class="pkg-chip">sqlite</span>
             <span class="pkg-chip">jwks</span>
             <span class="pkg-chip">rbac</span>
             <span class="pkg-chip">rbaccontext</span>
@@ -1250,10 +1255,10 @@
       </div>
     </section>
 
-    <!-- Interactive Package Directory (36 Packages) -->
+    <!-- Interactive Package Directory (41 Packages) -->
     <section id="packages" class="container page-section">
       <div class="section-head">
-        <h2>Package Directory (36 Packages)</h2>
+        <h2>Package Directory (41 Packages)</h2>
         <p>Explore the complete collection of production-hardened microservice packages with live filtering.</p>
       </div>
 
@@ -1262,14 +1267,14 @@
         <input type="search" id="pkgSearch" class="search-input" placeholder="Search packages by name, exported symbol, or purpose (press / to focus)..." aria-label="Search packages by name, exported symbol, or purpose">
         <div class="filter-meta">
           <div class="category-pills" role="group" aria-label="Filter packages by category">
-            <button type="button" class="pill-btn active" data-cat="all" aria-pressed="true" onclick="filterCategory('all', this)">All (36)</button>
+            <button type="button" class="pill-btn active" data-cat="all" aria-pressed="true" onclick="filterCategory('all', this)">All (41)</button>
             <button type="button" class="pill-btn" data-cat="resilience" aria-pressed="false" onclick="filterCategory('resilience', this)">Core Resilience (9)</button>
             <button type="button" class="pill-btn" data-cat="primitives" aria-pressed="false" onclick="filterCategory('primitives', this)">Generics &amp; Primitives (10)</button>
-            <button type="button" class="pill-btn" data-cat="http" aria-pressed="false" onclick="filterCategory('http', this)">HTTP &amp; Transport (11)</button>
-            <button type="button" class="pill-btn" data-cat="security" aria-pressed="false" onclick="filterCategory('security', this)">Data &amp; Security (5)</button>
-            <button type="button" class="pill-btn" data-cat="framework" aria-pressed="false" onclick="filterCategory('framework', this)">Framework Adapters (1)</button>
+            <button type="button" class="pill-btn" data-cat="http" aria-pressed="false" onclick="filterCategory('http', this)">HTTP &amp; Transport (14)</button>
+            <button type="button" class="pill-btn" data-cat="security" aria-pressed="false" onclick="filterCategory('security', this)">Data &amp; Security (6)</button>
+            <button type="button" class="pill-btn" data-cat="framework" aria-pressed="false" onclick="filterCategory('framework', this)">Framework Adapters (2)</button>
           </div>
-          <div id="pkgCountStatus" class="pkg-count-status" role="status" aria-live="polite">Showing 36 of 36 packages</div>
+          <div id="pkgCountStatus" class="pkg-count-status" role="status" aria-live="polite">Showing 41 of 41 packages</div>
         </div>
       </div>
 
@@ -1655,7 +1660,7 @@ func main() {
         <a href="https://github.com/abeta-dev/go-libs/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a>
       </div>
       <div class="footer-ecosystem" aria-label="Abeta Go Ecosystem">
-        <a href="https://github.com/abeta-dev/go-libs" target="_blank" rel="noopener">go-libs@v0.5.0</a>
+        <a href="https://github.com/abeta-dev/go-libs" target="_blank" rel="noopener">go-libs@v0.6.0</a>
         <a href="https://github.com/abeta-dev/go-fintech-india" target="_blank" rel="noopener">go-fintech-india@v0.5.0</a>
         <a href="https://github.com/abeta-dev/go-app-kit" target="_blank" rel="noopener">go-app-kit@v0.7.0</a>
         <a href="https://github.com/abeta-dev/cloud-native-observability" target="_blank" rel="noopener">cloud-native-observability@v0.4.0</a>
@@ -1739,8 +1744,8 @@ func main() {
         name: "cache",
         category: "resilience",
         coverage: "100.0%",
-        desc: "Generic singleflight stampede-protected in-memory cache with pluggable SampledLRU/LRU/LFU/FIFO eviction.",
-        exports: ["TypedCache", "NewTypedCache", "WithEvictionPolicy", "WithCapacity", "GetOrFetch"]
+        desc: "Generic singleflight stampede-protected cache with SampledLRU/LRU/LFU/FIFO eviction, prefix/tag invalidation, and FetchStatus.",
+        exports: ["TypedCache", "NewTypedCache", "GetOrFetchWithStatus", "DeletePrefix", "SetWithTags", "InvalidateTag", "FetchStatus"]
       },
       {
         name: "circuitbreaker",
@@ -1760,8 +1765,8 @@ func main() {
         name: "compress",
         category: "http",
         coverage: "100.0%",
-        desc: "RFC 9110 Brotli (br) and Gzip (gzip) HTTP response compression with pooled writers and bounded request decompression.",
-        exports: ["Middleware", "Negotiate", "Config", "DefaultConfig", "EncodingBrotli", "EncodingGzip"]
+        desc: "SSE-safe RFC 9110 Brotli (br) & Gzip (gzip) compression, bounded decompression, and precompressed .br/.gz SPA file server with CSRF meta injection.",
+        exports: ["Middleware", "Negotiate", "PrecompressedFileServer", "PrecompressedFS", "WithSPAFallback", "WithCSRFMetaToken"]
       },
       {
         name: "cryptoutil",
@@ -1785,6 +1790,13 @@ func main() {
         exports: ["String", "Int", "Bool", "Duration", "MustString", "MustInt"]
       },
       {
+        name: "etag",
+        category: "http",
+        coverage: "100.0%",
+        desc: "RFC 9110 ETag / If-None-Match (304) and version-gated JSON middleware with volatile JSON key stripping and client version auto-bust.",
+        exports: ["Middleware", "Compute", "Match", "WriteVersionedJSON", "WithAppVersion", "WithIgnoreJSONKeys"]
+      },
+      {
         name: "fsm",
         category: "resilience",
         coverage: "100.0%",
@@ -1795,8 +1807,8 @@ func main() {
         name: "ginmw",
         category: "framework",
         coverage: "100.0%",
-        desc: "Hardened Gin-specific middleware suite with unified imports (CORS, Compress, JWT Auth, RBAC, Recovery, RequestID, REDMetrics).",
-        exports: ["CORS", "Compress", "Logger", "Recovery", "RequestID", "SecurityHeaders", "Telemetry", "Idempotency", "AuthMiddleware", "REDMetrics"]
+        desc: "Hardened Gin-specific middleware suite (CORS, Compress, ETag, LoopbackGuard, SSE, JWT Auth, RBAC, Recovery, RequestID, REDMetrics).",
+        exports: ["CORS", "Compress", "ETag", "LoopbackGuard", "SSE", "Logger", "Recovery", "RequestID", "SecurityHeadersWithOptions", "REDMetrics"]
       },
       {
         name: "health",
@@ -1811,6 +1823,13 @@ func main() {
         coverage: "100.0%",
         desc: "Composed resilient HTTP transport client combining rate limiting, circuit breaker, retry, and telemetry.",
         exports: ["New", "NewRoundTripper", "WithRetry", "WithCircuitBreaker", "WithRateLimiter", "WithTotalTimeout"]
+      },
+      {
+        name: "httpmw",
+        category: "framework",
+        coverage: "100.0%",
+        desc: "Zero-Gin, zero-pgx, zero-OTel stdlib net/http middleware suite with full ginmw parity for lightweight and desktop BFFs.",
+        exports: ["Chain", "Use", "Logger", "Recovery", "REDMetrics", "MetricsEndpoint", "ETag", "LoopbackGuard", "RequireTenant", "SSE"]
       },
       {
         name: "httputil",
@@ -1839,6 +1858,13 @@ func main() {
         coverage: "100.0%",
         desc: "Context-aware structured slog logger with dynamic sampling and PII field redaction.",
         exports: ["Default", "WithContext", "FromContext", "NewSamplingHandler", "NewRedactingHandler"]
+      },
+      {
+        name: "loopbackguard",
+        category: "http",
+        coverage: "100.0%",
+        desc: "Local-first loopback address validator, DNS-rebinding Host allowlist, Same-Origin guard, and constant-time per-boot CSRF protection.",
+        exports: ["ValidateLoopbackAddr", "New", "Guard", "GenerateCSRFToken", "WithAllowedHosts", "WithStrictSecFetchSite"]
       },
       {
         name: "maputil",
@@ -1907,8 +1933,8 @@ func main() {
         name: "securityheaders",
         category: "http",
         coverage: "100.0%",
-        desc: "OWASP defensive HTTP response headers (HSTS, CSP, X-Frame-Options, X-Content-Type-Options).",
-        exports: ["New", "Default", "Config", "DefaultConfig"]
+        desc: "OWASP defensive HTTP response headers with local-first WithDisableHSTS and ETag-compatible WithCacheControl options.",
+        exports: ["New", "Default", "WithDisableHSTS", "WithCacheControl", "WithCSP", "Config"]
       },
       {
         name: "shutdown",
@@ -1923,6 +1949,20 @@ func main() {
         coverage: "100.0%",
         desc: "Generic slice algorithms beyond standard slices with zero reflection overhead.",
         exports: ["Reduce", "GroupBy", "Chunk", "Unique", "Flatten", "First"]
+      },
+      {
+        name: "sqlite",
+        category: "security",
+        coverage: "100.0%",
+        desc: "Driver-agnostic embedded SQLite WAL helper with busy_timeout, BEGIN IMMEDIATE transactions, PRAGMA user_version migrations, and atomic VACUUM INTO backups.",
+        exports: ["Open", "Wrap", "DB", "WithImmediateTx", "Migrate", "Backup", "Checkpoint"]
+      },
+      {
+        name: "sse",
+        category: "http",
+        coverage: "100.0%",
+        desc: "First-class Server-Sent Events (text/event-stream) streaming helper with flushing, heartbeats, Last-Event-ID, and clean context cancellation.",
+        exports: ["NewStream", "Handler", "Stream", "Event", "WithHeartbeat", "WithRetry"]
       },
       {
         name: "stringutil",

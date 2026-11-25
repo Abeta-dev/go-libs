@@ -19,3 +19,10 @@ func SecurityHeaders(serverName ...string) gin.HandlerFunc {
 	h := securityheaders.New(securityheaders.WithServerName(name))(noopHandler)
 	return gin.WrapH(h)
 }
+
+// SecurityHeadersWithOptions sets defensive HTTP headers using full securityheaders.Option
+// configuration (such as WithDisableHSTS and WithCacheControl for local-first or ETag routes).
+func SecurityHeadersWithOptions(opts ...securityheaders.Option) gin.HandlerFunc {
+	h := securityheaders.New(opts...)(noopHandler)
+	return gin.WrapH(h)
+}

@@ -38,11 +38,19 @@ type Config struct {
 	ServerName string
 	// HSTS max-age in seconds. Defaults to 63072000 (2 years).
 	HSTSMaxAge int
+	// DisableHSTS omits the Strict-Transport-Security header (recommended for
+	// local-first http://127.0.0.1 desktop BFFs and non-TLS loopback listeners).
+	DisableHSTS bool
 	// CSP is the Content-Security-Policy header value.
 	// Defaults to a strict deny-all policy appropriate for REST APIs.
 	CSP string
 	// PermissionsPolicy value. Defaults to denying geo/mic/camera.
 	PermissionsPolicy string
+	// CacheControl overrides the default "no-store" Cache-Control header.
+	// Use WithCacheControl("private, no-cache") for ETag-revalidating SDUI routes,
+	// or WithCacheControl("") to omit Cache-Control and Pragma headers.
+	CacheControl    string
+	cacheControlSet bool
 }
 
 // Option configures defensive HTTP security headers.
@@ -62,6 +70,14 @@ func WithHSTSMaxAge(maxAge int) Option {
 	}
 }
 
+// WithDisableHSTS disables emission of the Strict-Transport-Security header,
+// preventing HSTS breakage on plain HTTP loopback listeners (http://127.0.0.1).
+func WithDisableHSTS() Option {
+	return func(c *Config) {
+		c.DisableHSTS = true
+	}
+}
+
 // WithCSP sets the Content-Security-Policy header value.
 func WithCSP(policy string) Option {
 	return func(c *Config) {
@@ -76,12 +92,23 @@ func WithPermissionsPolicy(policy string) Option {
 	}
 }
 
+// WithCacheControl overrides the default Cache-Control ("no-store") header.
+// Pass "private, no-cache" for ETag-revalidating routes, or "" to omit both
+// Cache-Control and Pragma headers.
+func WithCacheControl(value string) Option {
+	return func(c *Config) {
+		c.CacheControl = value
+		c.cacheControlSet = true
+	}
+}
+
 // DefaultConfig is the recommended configuration for REST API services.
 var DefaultConfig = Config{
 	ServerName:        "api",
 	HSTSMaxAge:        63072000, // 2 years
 	CSP:               "default-src 'none'; frame-ancestors 'none';",
 	PermissionsPolicy: "geolocation=(), microphone=(), camera=()",
+	CacheControl:      "no-store",
 }
 
 // Default is a ready-to-use middleware with DefaultConfig.
@@ -93,7 +120,9 @@ var Default = New()
 func New(opts ...Option) func(http.Handler) http.Handler {
 	cfg := DefaultConfig
 	for _, opt := range opts {
-		opt(&cfg)
+		if opt != nil {
+			opt(&cfg)
+		}
 	}
 	if cfg.ServerName == "" {
 		cfg.ServerName = DefaultConfig.ServerName
@@ -107,6 +136,9 @@ func New(opts ...Option) func(http.Handler) http.Handler {
 	if cfg.PermissionsPolicy == "" {
 		cfg.PermissionsPolicy = DefaultConfig.PermissionsPolicy
 	}
+	if !cfg.cacheControlSet && cfg.CacheControl == "" {
+		cfg.CacheControl = DefaultConfig.CacheControl
+	}
 
 	hsts := fmt.Sprintf("max-age=%d; includeSubDomains; preload", cfg.HSTSMaxAge)
 
@@ -117,11 +149,17 @@ func New(opts ...Option) func(http.Handler) http.Handler {
 			h.Set("X-Content-Type-Options", "nosniff")
 			h.Set("X-XSS-Protection", "1; mode=block")
 			h.Set("Referrer-Policy", "strict-origin-when-cross-origin")
-			h.Set("Strict-Transport-Security", hsts)
+			if !cfg.DisableHSTS {
+				h.Set("Strict-Transport-Security", hsts)
+			}
 			h.Set("Permissions-Policy", cfg.PermissionsPolicy)
 			h.Set("Content-Security-Policy", cfg.CSP)
-			h.Set("Cache-Control", "no-store")
-			h.Set("Pragma", "no-cache")
+			if cfg.CacheControl != "" {
+				h.Set("Cache-Control", cfg.CacheControl)
+				if cfg.CacheControl == "no-store" {
+					h.Set("Pragma", "no-cache")
+				}
+			}
 			h.Set("Server", cfg.ServerName)
 			next.ServeHTTP(w, r)
 		})

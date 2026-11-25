@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-11-25
+
+### Fixed
+- `compress`: Excluded Server-Sent Events (`text/event-stream`) from `"text/"` prefix matching in `isCompressible` and bypassed threshold buffering immediately on `WriteHeader` so streaming SSE chunks flush straight through uncompressed.
+
+### Added
+- `compress`: Added `PrecompressedFileServer`, `PrecompressedFS`, `FileServerOption`, `WithSPAFallback`, `WithFallbackExcludePrefixes`, `WithCSRFMetaToken`, `WithCSRFMetaTokenProvider`, `WithCSRFMetaName`, `WithImmutableCacheControl`, `WithHTMLCacheControl`, and `WithPathPrefix` for serving build-time `.br` / `.gz` sidecar assets (such as KMP WasmJS bundles) with SPA fallback and escaped HTML `<meta>` CSRF token injection.
+- `etag`: Added `Middleware`, `Compute`, `Match`, `WriteVersionedJSON`, `WithAppVersion`, `WithPageVersion`, `WithIgnoreJSONKeys`, `WithCacheControl`, `WithWeak`, `WithClientVersionHeader`, `WithMaxBufferBytes`, and `WithMethods` for RFC 9110 `ETag` / `If-None-Match` (`304 Not Modified`) caching with volatile JSON key stripping and `X-Client-App-Version` mismatch auto-bust.
+- `cache`: Added `FetchStatus`, `FetchStatusHit`, `FetchStatusMiss`, `FetchStatusCoalesced`, `InvalidatingCache`, `GetOrFetchWithStatus`, `GetOrFetchWithTags`, `DeletePrefix`, `SetWithTags`, `InvalidateTag`, and `InvalidateTags` across all 4 eviction policies (`EvictionSampledLRU`, `EvictionLRU`, `EvictionLFU`, `EvictionFIFO`) with leak-free tag index cleanup.
+- `securityheaders`: Added `WithDisableHSTS` and `WithCacheControl` so local-first loopback BFFs (`http://127.0.0.1`) can disable HSTS and ETag-revalidating SDUI routes can configure `private, no-cache` or omit `Cache-Control`.
+- `loopbackguard`: Added `ValidateLoopbackAddr`, `GenerateCSRFToken`, `Guard`, `New`, `WithAllowedHosts`, `WithAllowedOrigins`, `WithCSRFToken`, `WithCSRFHeader`, `WithDisableCSRF`, `WithSafeMethods`, `WithExemptPaths`, `WithStrictSecFetchSite`, `WithRequireLoopbackPeer`, and `WithRandReader` for DNS-rebinding `Host` allowlisting, `Sec-Fetch-Site` / `Origin` Same-Origin enforcement, and constant-time per-boot ephemeral CSRF token verification.
+- `sse`: Added `Stream`, `Event`, `NewStream`, `Handler`, `WithHeartbeat`, `WithHeartbeatComment`, `WithRetry`, `WithHeaders`, `ErrStreamingUnsupported`, and `ErrStreamClosed` for thread-safe Server-Sent Events streaming with heartbeat keepalives, `Last-Event-ID`, and context cancellation.
+- `httpmw`: Added `Chain`, `Use`, `RequestID`, `LimitBody`, `LimitBodyDefault`, `LimitBodyAuth`, `Compress`, `PrecompressedFileServer`, `PrecompressedFS`, `ETag`, `SecurityHeaders`, `LoopbackGuard`, `CORS`, `CORSWithConfig`, `Recovery`, `Logger`, `MetricsTracker`, `DefaultMetrics`, `REDMetrics`, `MetricsEndpoint`, `RateLimit`, `GlobalRateLimit`, `AuthRateLimit`, `RequirePermission`, `RequireAnyPermission`, `RequireTenant`, `WithTenantContext`, `TenantIDFromContext`, and `SSE` providing zero-Gin, zero-pgx, zero-OTel stdlib `net/http` middleware parity.
+- `sqlite`: Added `DB`, `Open`, `Wrap`, `Querier`, `WithQuerier`, `GetQuerier`, `Migration`, `MigrationResult`, `CheckpointMode`, `CheckpointStats`, `SynchronousMode`, `WithDriver`, `WithBusyTimeout`, `WithJournalMode`, `WithSynchronous`, `WithForeignKeys`, `WithTempStoreMemory`, `WithCacheSizeKB`, `WithMaxOpenConns`, `WithReadOnly`, `WithEnsureDir`, `ErrNoSQLiteDriver`, and `ErrInvalidConfig` for driver-agnostic embedded SQLite WAL tuning, `BEGIN IMMEDIATE` write-serialized transactions, `PRAGMA user_version` migrations, and atomic `VACUUM INTO` backups.
+- `ginmw`: Added `ETag`, `WriteVersionedJSON`, `PrecompressedFileServer`, `PrecompressedFS`, `SecurityHeadersWithOptions`, `LoopbackGuard`, `NewLoopbackGuard`, and `SSE` Gin adapters.
+
 ## [0.5.0] - 2026-11-21
 
 ### Added
