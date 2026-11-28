@@ -20,9 +20,11 @@ npx skills add abeta-dev/go-libs
 - [LLM Discovery Index (`llms.txt`)](https://abeta-dev.github.io/go-libs/llms.txt): Structured index for AI coding assistants and LLM context ingestion.
 - [pkg.go.dev API Reference](https://pkg.go.dev/github.com/abeta-dev/go-libs): Full GoDoc symbol documentation for all 41 packages.
 - [GitHub Repository](https://github.com/abeta-dev/go-libs): Source repository, CI/CD pipelines, and issue tracker.
-- [AGENTS.md](https://github.com/abeta-dev/go-libs/blob/main/AGENTS.md): Multi-agent skill routing table and mandatory verification gates.
+- [AGENTS.md](https://github.com/abeta-dev/go-libs/blob/main/AGENTS.md): Mandatory 6-step grounding order, multi-agent skill routing table, and verification gates.
 - [Umbrella Skill (`skills/go-libs/SKILL.md`)](https://github.com/abeta-dev/go-libs/blob/main/skills/go-libs/SKILL.md): Complete 41-package router and truth gate instructions.
 - [System Architecture Blueprint (`docs/ARCHITECTURE.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/ARCHITECTURE.md): Layering boundaries, execution topology, and middleware chain order.
+- [End-to-End Execution Flows (`docs/FLOWS.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/FLOWS.md): Inbound middleware pipeline, cache/singleflight invalidation, SSE/precompressed delivery, loopback CSRF, outbound HTTP resilience, DB/SQLite, and graceful shutdown flows.
+- [CodeGraph & Symbol Index (`docs/CODEGRAPH.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/CODEGRAPH.md): Deterministic AST dependency DAG and exported `file:line` symbol coordinates for all 41 packages.
 - [Versioning & Stability Matrix (`docs/VERSIONING.md`)](https://github.com/abeta-dev/go-libs/blob/main/docs/VERSIONING.md): Semantic versioning contracts and package stability tiers.
 - [Performance Benchmarks (`BENCHMARKS.md`)](https://github.com/abeta-dev/go-libs/blob/main/BENCHMARKS.md): Throughput and zero-allocation benchmark baselines.
 
