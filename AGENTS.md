@@ -2,6 +2,17 @@
 
 This repository provides **41 focused, production-hardened Go packages** (`v0.6.0`, `Go 1.26.0`, **100.0% statement coverage**) covering HTTP & Gin middleware, stdlib `net/http` parity, SSE streaming, ETag/version-gated caching, loopback CSRF guards, resilience & concurrency, PostgreSQL & embedded SQLite WAL helpers, observability, security & RBAC, and foundational type-safe utilities.
 
+## Mandatory Grounding Before Generation (Fixed Analysis Order)
+
+Before generating, modifying, or reviewing any code in this repository, **follow this exact 6-step analysis order**:
+
+1. **`AGENTS.md`** *(this file)* — Identify the matching domain subskill, Module Code-Owner Agent, leaf-import boundaries, and verification gates.
+2. **Architecture Docs** — Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/adr/`](docs/adr/) to verify 4-tier layering and DAG rules.
+3. **Flow Docs** — Read [`docs/FLOWS.md`](docs/FLOWS.md) to trace middleware ordering, caching/singleflight, SSE/precompressed delivery, loopback CSRF, HTTP resilience, and DB/SQLite transaction lifecycles.
+4. **Pattern Docs (Domain Subskills)** — Load the narrowest matching `skills/<domain>/SKILL.md` from the Skill Routing Table below (single source of truth for idiomatic patterns and option builders).
+5. **CodeGraph & Symbol Index** — Consult [`docs/CODEGRAPH.md`](docs/CODEGRAPH.md) (AST dependency DAG and exported `file:line` symbol coordinates) and [`llms.txt`](llms.txt) — plus local `graphify-out/GRAPH_REPORT.md` / `graphify-out/graph.json` when available — to pinpoint exact packages and symbols.
+6. **Source Reads Only for Verification** — Open raw `.go` files **only** to verify exact signatures, edge cases, and tests for the specific targets identified in Steps 1–5 before editing.
+
 ## Skill Routing Table
 
 Load the smallest subskill that matches your task:
